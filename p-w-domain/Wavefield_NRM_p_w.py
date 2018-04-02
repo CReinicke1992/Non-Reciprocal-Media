@@ -58,7 +58,7 @@ Created on Wed Mar 28 14:43:03 2018
         
 import sys
 import numpy as np
-import matplotlib.pylab as plt
+#import matplotlib.pylab as plt
 
 class Wavefield_NRM_p_w:
     
@@ -66,7 +66,7 @@ class Wavefield_NRM_p_w:
         """
         initialises a wavefield in a 1D non-reciprocal medium in the ray-parameter frequency domain.
         
-        The class Wavefield_NRM_p_w defines the parameters of a scalar wavefield in a 1.5D non-reciprocal medium. We consider a single ray-parameter p and all frequencies that are captured by the given number of time samples nt and the time sample interval dt.
+        The class Wavefield_NRM_p_w defines the parameters of a scalar wavefield in a 1.5D non-reciprocal medium. We consider a single ray-parameter p and all frequencies that are sampled by the given number of time samples nt and the time sample interval dt.
         
         **Data format**:
          - Wavefields are saved in an array of dimensions (nt,nr).
