@@ -50,7 +50,17 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         :Example:
 
         >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
         >>> F=LM(nt=1024,dt=0.005,avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),p1=2e-4,ReciprocalMedium=False)
+        
+        .. csv-table:: Unified scalar wavefields: Quantities
+        :header: "Wavefield", "P", "`Q_1`", "`Q_3`", "`\\alpha`", "`\\beta`", "`\\gamma_1`", "`\\gamma_3`", "`\\delta_1`", "`\\delta_3`", "B", "`C_1`", "`C_3`" 
+        :widths: 15, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5
+
+       "TE", ,,,,,,,,,,,
+       "TM", ,,,,,,,,,,,
+       "Ac. (fluid)", "`p`", "`v_1`", "`v_3`", "`\\kappa`", "`\\rho`", "`d_1`", "`d_3`", "`e_1`", "`e_3`", "`q`", "`f_1`", "`f_3`"
+       "SH (solid)", ,,,,,,,,,,,
         """
         
         # Inherit __init__ from Wavefield_NRM_p_w
@@ -61,9 +71,9 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             sys.exit('avec, bvec, g1vec and g3vec have to be of the type numpy.ndarray.')
             
         # Set gamma_1 and gamma_3 by default equal to zero
-        if g1vec == np.zeros(1):
+        if g1vec.all() == np.zeros(1):
             g1vec = np.zeros_like(avec)
-        if g3vec == np.zeros(1):
+        if g3vec.all() == np.zeros(1):
             g3vec = np.zeros_like(avec)
             
         # Force the medium parameters to have identical shape
@@ -89,5 +99,150 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         self.g3vec = g3vec
         self.p1 = p1
         self.ReciprocalMedium = ReciprocalMedium
-            
         
+        # Calculate vertical ray-parameter p3 
+        # Note: By default python uses opposite sign convention for evanescent waves as Kees': (-1)**0.5=1j
+        p3 = np.zeros(np.shape(self.avec),dtype=complex)
+        if self.ReciprocalMedium is True:
+            p3[:] = self.avec*self.bvec + self.g1vec**2 + self.g3vec**2 - self.p1**2
+        elif self.ReciprocalMedium is False:
+            p3[:] = self.avec*self.bvec - self.g1vec**2 + 2*self.g1vec*self.p1 - self.p1**2
+        self.p3 = p3**0.5
+        
+    def L_eigenvectors_p_w(self,beta=None,g3=None,p3=None,normalisation='flux'):
+        """
+        computes the eigenvector matrix L and its inverse Linv, either in flux- or in pressure-normalisation.
+        
+        :param beta: Medium parameter`\\beta`  (real-valued), must be a scalar
+        :param g3: Medium parameter`\\gamma_3`  (real-valued?), must be a scalar
+        :param p3: Vertical ray-parameter `p_3`, must be a scalar
+        :type beta: int, float
+        :type g3: int, float
+        :type p3: int, float
+        :type normalisation: str
+        :return: L, numpy.ndarray (2,2)
+        :return: Linv, numpy.ndarray (2,2)
+        :rtype: dict
+        
+        :Example:
+
+        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
+        >>> F=LM(nt=1024,dt=0.005,avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=2e-4,ReciprocalMedium=False)
+        >>> Lvecs=F.L_eigenvectors_p_w(beta=0.1,g3=0.4,p3=2e-4,normalisation='flux')
+        >>> L = Lvecs['L']
+        >>> Linv = Lvecs['Linv']
+        
+        .. note:: The eigenvector matrix L and its inverse Linv are different for reciprocal and non-reciprocal media.
+        """
+        # Check if required input variables are given
+        if (beta is None) or (g3 is None) or (p3 is None):
+            sys.exit('The input variables \'beta\', \'g3\' and  \'p3\' of the function L_eigenvectors_p_w must be set.')
+         
+        # Check if normalisation is set correctly
+        if (normalisation is not 'flux') and (normalisation is not 'pressure'):
+            sys.exit('The input variable \'normalisation\' of the function L_eigenvectors_p_W must be set, either to \'flux\', or to \'pressure\'.')
+            
+        # Initialise L and Linv
+        L = np.zeros((2,2),dtype=complex)
+        Linv = np.zeros((2,2),dtype=complex)
+            
+        if (self.ReciprocalMedium is True) and (normalisation is 'flux'):
+            # L matrix
+            L[0,0] = beta/p3
+            L[0,1] = beta/p3
+            L[1,0] = p3/beta
+            L[1,1] = -p3/beta
+            L = (L/2)**0.5
+            
+            # Inverse L matrix
+            Linv[0,0] = p3/beta
+            Linv[0,1] = beta/p3
+            Linv[1,0] = p3/beta
+            Linv[1,1] = -beta/p3
+            Linv = (Linv/2)**0.5
+            
+        elif (self.ReciprocalMedium is True) and (normalisation is 'pressure'):
+            # L matrix
+            L[0,0] = 1
+            L[0,1] = 1
+            L[1,0] = p3/beta
+            L[1,1] = -p3/beta
+            
+            # Inverse L matrix
+            Linv[0,0] = 1
+            Linv[0,1] = beta/p3
+            Linv[1,0] = 1
+            Linv[1,1] = -beta/p3
+            Linv = 0.5*Linv
+            
+        elif (self.ReciprocalMedium is False) and (normalisation is 'flux'):
+            # L matrix
+            L[0,0] = 1
+            L[0,1] = 1
+            L[1,0] = (p3+g3)/beta
+            L[1,1] = -(p3-g3)/beta
+            
+            # Inverse L matrix
+            Linv[0,0] = (p3-g3)/beta
+            Linv[0,1] = 1
+            Linv[1,0] = (p3+g3)/beta
+            Linv[1,1] = -1
+            
+            fac = (beta/(2*p3))**0.5
+            L = fac*L
+            Linv = fac*Linv
+            
+        elif (self.ReciprocalMedium is False) and (normalisation is 'pressure'):
+            # L matrix
+            L[0,0] = 1
+            L[0,1] = 1
+            L[1,0] = (p3+g3)/beta
+            L[1,1] = -(p3-g3)/beta
+            
+            # Inverse L matrix
+            Linv[0,0] = (p3-g3)/beta
+            Linv[0,1] = 1
+            Linv[1,0] = (p3+g3)/beta
+            Linv[1,1] = -1
+            Linv = beta/(2*p3)*Linv
+         
+        out = {'L':L,'Linv':Linv}
+        return out
+          
+    def RT_p_w(self,beta_u=None,g3_u=None,p3_u=None,beta_l=None,g3_l=None,p3_l=None,normalisation='flux'):
+        
+        # Check if required input variables are given
+        if (beta_u is None) or (g3_u is None) or (p3_u is None) or (beta_l is None) or (g3_l is None) or (p3_l is None):
+            sys.exit('The input variables \'beta_u\', \'g3_u\',  \'p3_u\', \'beta_l\', \'g3_l\',  \'p3_l\' of the function RT_p_w must be set.')
+         
+        # Check if normalisation is set correctly
+        if (normalisation is not 'flux') and (normalisation is not 'pressure'):
+            sys.exit('The input variable \'normalisation\' of the function RT_p_w must be set, either to \'flux\', or to \'pressure\'.')
+            
+        if (self.ReciprocalMedium is True) and (normalisation is 'flux'):
+            rP = (p3_u*beta_l - p3_l*beta_u) / (p3_u*beta_l + p3_l*beta_u)
+            rM = -rP
+            tP = 2*(p3_u*beta_l*p3_l*beta_u)**0.5
+            tM = tP
+        
+        elif (self.ReciprocalMedium is True) and (normalisation is 'pressure'):
+            rP = (p3_u*beta_l - p3_l*beta_u) / (p3_u*beta_l + p3_l*beta_u)
+            rM = -rP
+            tP = 2*p3_u*beta_l/(p3_u*beta_l+p3_l*beta_u)
+            tM = 1 - rP
+            
+        elif (self.ReciprocalMedium is False) and (normalisation is 'flux'):
+            rP = ((p3_u+g3_u)*beta_l-(p3_l+g3_l)*beta_u) / ((p3_u-g3_u)*beta_l+(p3_l+g3_l)*beta_u)
+            rM = -((p3_u-g3_u)*beta_l-(p3_l-g3_l)*beta_u) / ((p3_u-g3_u)*beta_l+(p3_l+g3_l)*beta_u)
+            tP = 2*(p3_u*beta_l*p3_l*beta_u)**0.5
+            tM = tP
+            
+        elif (self.ReciprocalMedium is False) and (normalisation is 'pressure'):
+            rP = ((p3_u+g3_u)*beta_l-(p3_l+g3_l)*beta_u) / ((p3_u-g3_u)*beta_l+(p3_l+g3_l)*beta_u)
+            rM = -((p3_u-g3_u)*beta_l-(p3_l-g3_l)*beta_u) / ((p3_u-g3_u)*beta_l+(p3_l+g3_l)*beta_u)
+            tP = 2*p3_u*beta_l / ((p3_u-g3_u)*beta_l+(p3_l+g3_l)*beta_u)
+            tM = 2*p3_l*beta_u / ((p3_u-g3_u)*beta_l+(p3_l+g3_l)*beta_u)
+            
+        out = {'rP':rP,'tP':tP,'rM':rM,'tM':tM}
+        return out
