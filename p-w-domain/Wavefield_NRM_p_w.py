@@ -61,9 +61,9 @@ class Wavefield_NRM_p_w:
     def __init__(self,nt,dt,nr=1,dx=1,verbose=False):
         
         if type(nr) is not int:
-            sys.exit('nr has to be an integer.')
+            sys.exit('Wavefield_NRM_p_w: nr has to be an integer.')
         if type(nt) is not int:
-            sys.exit('nt has to be an integer.')
+            sys.exit('Wavefield_NRM_p_w: nt has to be an integer.')
         self.nt = nt
         self.dt = dt
         self.nr = nr
