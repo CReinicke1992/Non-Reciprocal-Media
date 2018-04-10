@@ -33,12 +33,15 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
     nr : int, optional
         Number of space samples.
     
-    dx : int, float, optional
+    dx1 : int, float, optional
         Space sample interval.
         
     verbose : bool, optional
         Set 'verbose=True' to receive feedback in the command line.
         
+    x3vec : numpy.ndarray
+        Vertical spatial vector :math:`x_3`, for n layers 'x3vec' must have the shape (n,). We define the :math:`x_3`-axis as downward-pointing. Implicitly, the first value on the :math:`x_3`-axis is zero (not stored in 'x3vec').
+    
     avec : numpy.ndarray
         Medium parameter :math:`\\alpha` (real-valued), for n layers 'avec' must have the shape (n,).
         
@@ -64,7 +67,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
     -------
     
     class
-        A class to model a wavefield in a 1.5D non-reciprocal medium in the ray-parameter frequency domain. The class defines the following self variables when initialised:
+        A class to model a wavefield in a 1.5D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:
+             - **x3vec**: :math:`x_3`.
             - **avec**: :math:`\\alpha`.
             - **bvec**: :math:`\\beta`.
             - **g1vec**: :math:`\gamma_1`.
@@ -77,11 +81,18 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         
     Notes
     -----
-    We format the data as described below.
-        - Wavefields are saved in an array of dimensions (nt,nr).
+    - We format the data as described below.
+        - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
         - Wavefields are in the p- :math:`\omega` domain.
         - The zero frequency component is placed at the first index position.
         - If the wavefield is transformed to the time domain, the zero time component is placed at the center of the time dimension.
+    - For evanescent waves, Kees makes a sign choice for the vertical ray-parameter,
+        - :math:`p_3' = -j \sqrt{p_1^2 - (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.
+      By default, **NumPy** makes the oppostie sign choice, 
+          - :math:`p_3' = +j \sqrt{p_1^2 - (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.
+      We stick to the sign choice by **NumPy**. Thus, we will also change the sign choice for the propagators,
+          - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(-j \omega p_3' \Delta x_3)`.
+          - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(+j \omega p_3' \Delta x_3)`.
         
     References
     ----------
@@ -92,7 +103,9 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
 
     >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
     >>> import numpy as np
-    >>> F=LM(nt=1024,dt=0.005,avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),p1=2e-4,ReciprocalMedium=False)
+    
+    >>> # Initialise wavefield in a layered non-reciprocal medium
+    >>> F=LM(nt=1024,dt=0.005,x3vec=np.array([1.1,2.2,3.7]),avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),p1=2e-4,ReciprocalMedium=False)
         
     .. csv-table:: **Unified scalar wavefields: Quantities**
         "**Wave- field**", "**P**", ":math:`\mathbf{Q}_1`", ":math:`\mathbf{Q}_3`", ":math:`\mathbf{\\alpha}`", ":math:`\mathbf{\\beta}`", ":math:`\mathbf{\gamma}_1`", ":math:`\mathbf{\gamma}_3`", ":math:`\mathbf{\delta}_1`", ":math:`\mathbf{\delta}_3`", ":math:`\mathbf{B}`", ":math:`\mathbf{C}_1`", ":math:`\mathbf{C}_3`"
@@ -103,14 +116,14 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
     
    """    
   
-    def __init__(self,nt,dt,nr=1,dx=1,verbose=False,avec=np.zeros(1),bvec=np.zeros(1),g1vec=np.zeros(1),g3vec=np.zeros(1),p1=None,ReciprocalMedium=False,AdjointMedium=False):
+    def __init__(self,nt,dt,nr=1,dx1=1,verbose=False,x3vec=np.zeros(1),avec=np.zeros(1),bvec=np.zeros(1),g1vec=np.zeros(1),g3vec=np.zeros(1),p1=None,ReciprocalMedium=False,AdjointMedium=False):
         
         # Inherit __init__ from Wavefield_NRM_p_w
-        Wavefield_NRM_p_w.__init__(self,nt,dt,nr,dx,verbose)
+        Wavefield_NRM_p_w.__init__(self,nt,dt,nr,dx1,verbose)
         
         # Check if medium parameters are passed as arrays
-        if not ( isinstance(avec,np.ndarray) and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) and isinstance(g3vec,np.ndarray) ):
-            sys.exit('Layered_NRM_p_w: avec, bvec, g1vec and g3vec have to be of the type numpy.ndarray.')
+        if not ( isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) and isinstance(g3vec,np.ndarray) ):
+            sys.exit('Layered_NRM_p_w: x3vec, avec, bvec, g1vec and g3vec have to be of the type numpy.ndarray.')
             
         # Set gamma_1 and gamma_3 by default equal to zero
         if g1vec.all() == np.zeros(1):
@@ -119,13 +132,25 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             g3vec = np.zeros_like(avec)
             
         # Force the medium parameters to have identical shape
-        if avec.shape!=bvec.shape or avec.shape!=g1vec.shape or avec.shape!=g3vec.shape:
-            sys.exit('Layered_NRM_p_w: avec, bvec, g1vec and g3vec have to be of identical shape.')
+        if x3vec.shape!=avec.shape or x3vec.shape!=bvec.shape or x3vec.shape!=g1vec.shape or x3vec.shape!=g3vec.shape:
+            sys.exit('Layered_NRM_p_w: x3vec, avec, bvec, g1vec and g3vec have to be of identical shape.')
         
         # Force the medium parameters to be 1-dimensional, i.e. e.g. avec.shape=(n,)
-        if avec.ndim!=1:
-            sys.exit('Layered_NRM_p_w: avec.ndim, bvec.ndim, g1vec.ndim and g3vec.ndim must be one.')
-            
+        if x3vec.ndim!=1:
+            sys.exit('Layered_NRM_p_w: x3vec.ndim, avec.ndim, bvec.ndim, g1vec.ndim and g3vec.ndim must be one.')
+        
+        # Check if x3vec is positive and constantly increasing
+        if x3vec[0]<=0 or (x3vec[1:]-x3vec[:-1] <= 0).any():
+            sys.exit('Layered_NRM_p_w: x3vec must only contain positive and constantly increasing values.')
+        
+        # Check if p1 is a scalar
+        if not ( isinstance(p1,int) or isinstance(p1,float) ):
+            sys.exit('Layered_NRM_p_w: p1 must be of tyoe int or float.')
+        
+        # Check if Medium choices are bools
+        if not ( isinstance(ReciprocalMedium,bool) and isinstance(AdjointMedium,bool) ):
+            sys.exit('Layered_NRM_p_w: \'ReciprocalMedium\' and \'AdjointMedium\' must be of the type bool.')
+        
         # Check if medium parameters correspond to a lossless (non-)reciprocal medium
         if ReciprocalMedium == False:
             if avec.imag.any()!=0 or bvec.imag.any()!=0 or g1vec.imag.any()!=0 or g3vec.imag.any()!=0:
@@ -134,7 +159,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             if avec.imag.any()!=0 or bvec.imag.any()!=0 or g1vec.real.any()!=0 or g3vec.real.any()!=0:
                 sys.exit('Layered_NRM_p_w: In lossless reciprocal media the imaginary value of avec and bvec has to be zero, the real value of g1vec and g3vec has to be zero.')
             
-        # Set medium parameters    
+        # Set medium parameters 
+        self.x3vec = x3vec
         self.avec = avec
         self.bvec = bvec
         self.g1vec = g1vec
@@ -157,8 +183,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         self.p3n = p3n**0.5
         
     def L_eigenvectors_p_w(self,beta=None,g3=None,p3=None,p3n=None,normalisation='flux'):
-        """
-        computes the eigenvector matrix 'L' and its inverse 'Linv', either in flux- or in pressure-normalisation for a single vertical ray-parameter 'p3' inside a homogeneous layer. If \'AdjointMedium=True\', **L_eigenvectors_p_w** also computes the eigenvector matrix in the adjoint medium 'La' and its inverse 'Lainv'.
+        """computes the eigenvector matrix 'L' and its inverse 'Linv', either in flux- or in pressure-normalisation for a single vertical ray-parameter 'p3' inside a homogeneous layer. If \'AdjointMedium=True\', **L_eigenvectors_p_w** also computes the eigenvector matrix in the adjoint medium 'La' and its inverse 'Lainv'.
         
         Parameters
         ----------
@@ -204,10 +229,20 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
 
         >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
         >>> import numpy as np
-        >>> F=LM(nt=1024,dt=0.005,avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=2e-4,ReciprocalMedium=False)
+        
+        >>> # Initialise wavefield in a layered non-reciprocal medium
+        >>> F=LM( nt=1024 , dt=0.005 , x3vec=np.array([1.1,2.2,3.7]) , avec=np.array([1,2,3]) , bvec=np.array([0.4,3.14,2]) , g1vec=np.array([0.9,2.1,0.3]) , g3vec=np.array([0.7,1.14,0.2]) , p1=2e-4 , ReciprocalMedium=False )
+        
+        >>> # Compute eigenvectors in flux-normalisation
         >>> Lvecs=F.L_eigenvectors_p_w(beta=0.1,g3=0.4,p3=2e-4,normalisation='flux')
+        
+        >>> # Eigenvector matrix
         >>> L = Lvecs['L']
+        ([[15.8113883 +0.j, 15.8113883 +0.j],[ 0.03162278+0.j, -0.03162278+0.j]])
+        
+        >>> # Inverse eigenvector matrix
         >>> Linv = Lvecs['Linv']
+        ([[  0.03162278+0.j,  15.8113883 +0.j],[  0.03162278+0.j, -15.8113883 -0.j]])
         
         """
         # Check if required input variables are given
@@ -329,8 +364,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         return out
           
     def RT_p_w(self,beta_u=None,g3_u=None,p3_u=None,p3n_u=None,beta_l=None,g3_l=None,p3_l=None,p3n_l=None,normalisation='flux'):
-        """
-        computes the scattering coefficients at an horizontal interface, either in flux- or in pressure-normalisation. The variables with subscript 'u' refer to the medium parameters in the upper half-space, the variables with subscript 'l' refer to the medium parameters in the lower half-space. We consider a single horizontal ray-parameter :math:`p_1`, which is associated with a vertical ray-parameter 'p3_u' in the upper half-space and 'p3_l' in the lower half-space. If one sets \'AdjointMedium=True\', **RT_p_w** also computes the scattering coefficients in the adjoint medium.
+        """computes the scattering coefficients at an horizontal interface, either in flux- or in pressure-normalisation. The variables with subscript 'u' refer to the medium parameters in the upper half-space, the variables with subscript 'l' refer to the medium parameters in the lower half-space. We consider a single horizontal ray-parameter :math:`p_1`, which is associated with a vertical ray-parameter 'p3_u' in the upper half-space and 'p3_l' in the lower half-space. If one sets \'AdjointMedium=True\', **RT_p_w** also computes the scattering coefficients in the adjoint medium.
         
         Parameters
         ----------
@@ -375,6 +409,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 - **tPa**: Transmission coefficient from above (adjoint medium).
                 - **rMa**: Reflection coefficient from below (adjoint medium).
                 - **tMa**: Transmission coefficient from below (adjoint medium).
+            All scattering coefficients are stored as scalars.
         
         Notes
         -----
@@ -391,11 +426,21 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
 
         >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
         >>> import numpy as np
-        >>> F=LM(nt=1024,dt=0.005,avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=2e-4,ReciprocalMedium=False,AdjointMedium=True)
+        
+        >>> # Create wavefield F for positive horizontal ray-parameter p1
+        >>> F=LM(nt=1024,dt=0.005,x3vec=np.array([1.1,2.2,3.7]),avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=2e-4,ReciprocalMedium=False,AdjointMedium=True)
         >>> ScatCoeffs = F.RT_p_w(beta_u=F.bvec[0],g3_u=F.g3vec[0],p3_u=F.p3[0],p3n_u=F.p3n[0],beta_l=F.bvec[1],g3_l=F.g3vec[1],p3_l=F.p3[1],p3n_l=F.p3n[1],normalisation='flux')
         >>> rplus = ScatCoeffs['rP']
-        >>> Fn=LM(nt=1024,dt=0.005,avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=-2e-4,ReciprocalMedium=False,AdjointMedium=True)
+        (0.8620013269525346+0.5069060192304582j)
+        
+        >>> # Create wavefield Fn for negative horizontal ray-parameter p1
+        >>> Fn=LM(nt=1024,dt=0.005,x3vec=np.array([1.1,2.2,3.7]),avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=-2e-4,ReciprocalMedium=False,AdjointMedium=True)
         >>> ScatCoeffsn = Fn.RT_p_w(beta_u=Fn.bvec[0],g3_u=Fn.g3vec[0],p3_u=Fn.p3[0],p3n_u=Fn.p3n[0],beta_l=Fn.bvec[1],g3_l=Fn.g3vec[1],p3_l=Fn.p3[1],p3n_l=Fn.p3n[1],normalisation='flux')
+        
+        >>> # In non-reciprocal media, for flux-normalisation, the reflection coefficients
+        >>> # in true medium for positive horizontal ray-parameter p1
+        >>> # and in adjoint medium for negative horizontal ray-parameter p1
+        >>> # are identical:
         >>> np.abs(ScatCoeffs['rP']-ScatCoeffsn['rPa'])
         0.0
         
@@ -480,3 +525,362 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             
         out = {'rP':rP,'tP':tP,'rM':rM,'tM':tM,'rPa':rPa,'tPa':tPa,'rMa':rMa,'tMa':tMa}
         return out
+    
+    def W_propagators_p_w(self,p3=None,p3n=None,g3=None,dx3=None,w=None):
+        """computes the downgoing propagator 'wP' and the upgoing progagator 'wM' for a single vertical ray-parameter 'p3' and a vertical distance 'dx3' (downward pointing :math:`x_3`-axis).
+        
+        
+        Parameters
+        ----------
+    
+        p3 : int, float
+            Vertical ray-parameter :math:`p_3` for a positive horizontal ray-parameter :math:`p_1`.
+        
+        p3n : int, float, optional (required if 'AdjointMedium=True')
+            Vertical ray-parameter :math:`p_3` for a negative horizontal ray-parameter :math:`p_1`.
+            
+        g3 : int, float
+            Medium parameter :math:`\gamma_3`.
+            
+        dx3 : int, float
+            Vertical propagation distance :math:`\Delta x_3` (downward pointing :math:`x_3`-axis).
+            
+        w : int, float
+            Frequency :math:`\omega` in radians. By default the propagators are computed for all sampled (positive) frequencies.
+        
+            
+        Returns
+        -------
+    
+        dict
+            Dictionary that contains 
+                - **wP**: Downward propagator :math:`\\tilde{w}^+`.
+                - **wM**: Upward propagator :math:`\\tilde{w}^-`.
+                - **wPa**: Downward propagator :math:`\\tilde{w}^{+(a)}` (adjoint medium). 
+                - **wMa**: Upward propagator :math:`\\tilde{w}^{-(a)}` (adjoint medium). 
+            All propagators are stored either in an arrays of shape (nf,1), or as a scalar (if the variable'w' is set). The variables 'wPa' and 'wMa' are computed only if one sets 'AdjointMedium=True'.
+        
+        
+        References
+        ----------
+        Kees document as soon as it is published.
+
+
+        Examples
+        --------
+
+        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
+        
+        >>> F=LM(nt=1024,dt=0.005,x3vec=np.array([1.1,2.2,3.7]),avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),p1=2e-4,ReciprocalMedium=False)
+        >>> W=F.W_propagators_p_w( p3=F.p3[0] , p3n=F.p3n[0] , g3=F.g3vec[0] , dx3=F.x3vec[1]-F.x3vec[0])
+        
+        >>> W['wP']
+        [[ 1.00000000e+00+0.        j],[0.24690276+0.34159244j],...,[1.07001473e-192-1.48037608e-192j]]
+        
+        >>> # The propagator has nf samples because it is computed only for positive frequencies
+        >>> W['wP'].shape
+        (513, 1)
+        
+        >>> # AdjointMedium=False, hence, we expect output 'None'
+        >>> W['wPa']
+       
+       
+        """
+        
+        # Check if required input variables are given
+        if (not np.isscalar(p3)) or (not np.isscalar(g3)) or (not np.isscalar(dx3)):
+            sys.exit('W_propagators_p_w: The input variables \'p3\', \'g3\' and  \'dx3\' must be set as scalars.')
+            
+        # If AdjointMedium=True it is required to set p3n=p3(-p1)
+        if (self.AdjointMedium is True) and (not np.isscalar(p3n)):
+            sys.exit('W_propagators_p_w: If AdjointMedium=True the input variable \'p3n\' must be set as a scalar.')
+        
+        # Make frequency vector
+        if w is None:
+            w = self.Wvec()
+        # If frequency is given check if it is a scalar
+        elif not np.isscalar(w):
+            sys.exit('W_propagators_p_w: If \'w\' is set it must be a scalar.')   
+        elif w.real < 0:
+            sys.exit('W_propagators_p_w: The real-part of \'w\' must not be smaller than 0.') 
+        else:
+            # We define w as an array to be able to use .copy()
+            w = np.array([[w]])
+        
+        
+        if self.ReciprocalMedium is True:
+            
+            wP = np.exp(1j*w*p3*dx3)
+            wM = wP.copy()
+            
+            if self.AdjointMedium is True:
+                wPa = np.exp(1j*w*p3n*dx3)
+                wMa = wPa.copy()
+            else: 
+                wPa = None
+                wMa = None
+        
+        elif self.ReciprocalMedium is False:
+            
+            wP = np.exp(1j*w*(p3+g3)*dx3)
+            wM = np.exp(1j*w*(p3-g3)*dx3)
+        
+            if self.AdjointMedium is True:
+                wPa = np.exp(1j*w*(p3n-g3)*dx3)
+                wMa = np.exp(1j*w*(p3n+g3)*dx3)
+            else: 
+                wPa = None
+                wMa = None
+                
+        out = {'wP':wP,'wM':wM,'wPa':wPa,'wMa':wMa}
+        return out
+    
+    def RT_response_p_w(self,x3vec=None,avec=None,bvec=None,g1vec=None,g3vec=None,normalisation='flux',InternalMultiples=True):
+        """computes the reflection and transmission responses from above and from below. If medium parameters are given the computed responses are associated with the given parameters medium. Otherwise, the medium parameters defined in **Layered_NRM_p_w** are used.
+        
+        The medium responses are associated to measurements at :math:`x_3=0` and at :math:`x_3=` 'x3vec[-2]' :math:`+\epsilon`, where :math:`\epsilon` is an infinitesimally small positive constant. Hence, the propagation from :math:`x_3=0` to the shallowest interface is included. However, the propagation through the deepest layer is excluded.
+        
+        Parameters
+        ----------
+    
+        x3vec : numpy.ndarray, optional
+            Vertical spatial vector :math:`x_3`, for n layers 'x3vec' must have the shape (n,). We define the :math:`x_3`-axis as downward-pointing. Implicitly, the first value on the :math:`x_3`-axis is zero (not stored in 'x3vec').
+    
+        avec : numpy.ndarray, optional
+            Medium parameter :math:`\\alpha` (real-valued), for n layers 'avec' must have the shape (n,).
+            
+        bvec : numpy.ndarray, optional
+            Medium parameter :math:`\\beta` (real-valued), for n layers 'bvec' must have the shape (n,).
+        
+        g1vec : numpy.ndarray, optional
+            Medium parameter :math:`\gamma_1` (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers 'g1vec' must have the shape (n,).
+            
+        g3vec : numpy.ndarray, optional
+            Medium parameter :math:`\gamma_3` (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers 'g3vec' must have the shape (n,).
+            
+        normalisation : str, optional
+            For pressure-normalisation set normalisation='pressure', for flux-normalisation set normalisation='flux'.
+            
+        InternalMultiples : bool, optional
+            To model internal multiples set 'InternalMultiples=True'. To ignore internal multiples set 'InternalMultiples=False'.
+            
+        Returns
+        -------
+    
+        dict
+            Dictionary that contains 
+                - **RP**: Reflection response from above.
+                - **TP**: Transmission response from above.
+                - **RM**: Reflection response from below.
+                - **TM**: Transmission response from below.
+                - **RPa**: Reflection response from above (adjoint medium).
+                - **TPa**: Transmission response from above (adjoint medium).
+                - **RMa**: Reflection response from below (adjoint medium).
+                - **TMa**: Transmission response from below (adjoint medium).
+            All medium responses are stored in arrays of shape (nf,1). The variables 'RPa', 'TPa', 'RMa' and 'TMa' are computed only if one sets 'AdjointMedium=True'.
+        
+        
+        References
+        ----------
+        Kees document as soon as it is published.
+        
+        Examples
+        --------
+
+        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
+        
+        >>> # Initialise a wavefield in a 1D reciprocal medium
+        >>> # Here, the parameters are chosen such that the wavefield is purely propagating (not evanescent)
+        >>> F=LM(nt=1024,dt=0.005,x3vec=np.array([100,500,1000,1010]),avec=np.array([5,2,3,4]),bvec=np.array([0.4,3.14,2,1.5]),g1vec=np.array([0.9,2.1,0.3,0.25]),g3vec=np.array([0.7,1.14,0.2,0.3]),p1=2e-4,ReciprocalMedium=False)
+        
+        >>> # Model the medium responses
+        >>> Responses=F.RT_response_p_w(normalisation='flux',InternalMultiples=True)
+        >>> # Here are your first medium responses:
+        >>> Rplus = Responses['RP']
+        >>> Tplus = Responses['TP']
+        
+        >>> # Verify if conservation of energy is satisfied
+        >>> Rplus.conj()*Rplus+Tplus.conj()*Tplus
+        ([[1.+0.j], [1.+0.j], ..., [1.+0.j]])
+        
+        
+        """
+        
+        # Check if normalisation is set correctly
+        if (normalisation is not 'flux') and (normalisation is not 'pressure'):
+            sys.exit('RT_response_p_w: The input variable \'normalisation\' must be set, either to \'flux\', or to \'pressure\'.')
+        # Medium responses of the adjoint medium can only be computed in flux-normalisation
+        if (self.AdjointMedium is True) and (normalisation is 'pressure'):
+            sys.exit('RT_response_p_w: We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.')
+        
+        # Check if a layer stack is given
+        if isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) \
+        and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) \
+        and isinstance(g3vec,np.ndarray):
+            
+            # Create a wavefield in a sub-medium
+            # I do this because when the sub-wavefield is initialised all parameters 
+            # are automatically tested for correctness
+            self.SubSelf = Layered_NRM_p_w(self.nt,self.dt,self.nr,self.dx1,self.verbose,x3vec=x3vec,avec=avec,bvec=bvec,\
+                                           g1vec=g1vec,g3vec=g3vec,p1=self.p1,ReciprocalMedium=self.ReciprocalMedium,\
+                                           AdjointMedium=self.AdjointMedium)
+            
+            x3vec = self.SubSelf.x3vec
+            bvec = self.SubSelf.bvec
+            g3vec = self.SubSelf.g3vec
+            p3 = self.SubSelf.p3
+            p3n = self.SubSelf.p3n
+        
+            del self.Subself
+                
+        # Else compute response of entire medium
+        else:
+            x3vec = self.x3vec
+            bvec = self.bvec
+            g3vec = self.g3vec
+            p3 = self.p3
+            p3n = self.p3n
+            
+        
+        # Number of layers
+        N = np.size(x3vec)
+        
+        # Vector with layer thicknesses
+        dx3vec = x3vec.copy()
+        dx3vec[1:] = x3vec[1:]-x3vec[:-1]
+        
+        # Reflection responses: Initial value
+        RP = np.zeros((self.nf,1),dtype=complex)
+        RM = np.zeros((self.nf,1),dtype=complex)
+        
+        # Here every frequency component has an amplitude equal to one. Hence,
+        # the total wavefield has a strength of sqrt(nt)
+        # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
+        # Hence in the time domain the wavefield has an amplitude equal to one.
+        TP = np.ones((self.nf,1),dtype=complex)
+        TM = np.ones((self.nf,1),dtype=complex)
+        
+        # Internal multiple operator: Initial value
+        M1 = np.ones((self.nf,1),dtype=complex)
+        M2 = np.ones((self.nf,1),dtype=complex)
+        
+        if self.AdjointMedium is True:
+            RPa = RP.copy()
+            RMa = RP.copy()
+            TPa = TP.copy()
+            TMa = TP.copy()
+        else:
+            RPa = None
+            TPa = None
+            RMa = None
+            TMa = None
+        
+        # Loop over N-1 interfaces
+        for n in range(0,N-1):
+            
+            # Scattering coefficients
+            ScatCoeffs = self.RT_p_w(beta_u=bvec[n]  ,g3_u=g3vec[n]  ,p3_u=p3[n]  ,p3n_u=p3n[n],\
+                                     beta_l=bvec[n+1],g3_l=g3vec[n+1],p3_l=p3[n+1],p3n_l=p3n[n+1],\
+                                     normalisation=normalisation)
+            
+            rP = ScatCoeffs['rP']
+            tP = ScatCoeffs['tP']
+            rM = ScatCoeffs['rM']
+            tM = ScatCoeffs['tM']
+            
+            # Propagators
+            W = self.W_propagators_p_w(p3=p3[n],p3n=p3n[n],g3=g3vec[n],dx3=dx3vec[n])
+            WP = W['wP']
+            WM = W['wM']
+            
+            if InternalMultiples is True:
+                M1 = 1 / (1 - RM*WM*rP*WP)
+                M2 = 1 / (1 - rP*WP*RM*WM)
+            
+            # Update reflection / transmission responses
+            RP = RP + TM*WM*rP*WP*M1*TP
+            RM = rM + tP*WP*RM*WM*M2*tM
+            TP = tP*WP*M1*TP
+            TM = TM*WM*M2*tM  
+            
+            if self.AdjointMedium is True:
+                rP = ScatCoeffs['rPa']
+                tP = ScatCoeffs['tPa']
+                rM = ScatCoeffs['rMa']
+                tM = ScatCoeffs['tMa']
+                WP = W['wPa']
+                WM = W['wMa']
+            
+                if InternalMultiples is True:
+                    M1 = 1 / (1 - RMa*WM*rP*WP)
+                    M2 = 1 / (1 - rP*WP*RMa*WM)
+                
+                # Update reflection / transmission responses
+                RPa = RPa + TMa*WM*rP*WP*M1*TPa
+                RMa = rM + tP*WP*RMa*WM*M2*tM
+                TPa = tP*WP*M1*TPa
+                TMa = TMa*WM*M2*tM  
+                
+        # Verbose: Inform the user if any wavefield contains NaNs of Infs.
+        if self.verbose is True:
+            
+            if (np.isnan(RP).any() or np.isnan(TP).any() or np.isnan(RM).any() or np.isnan(TM).any()\
+                or np.isinf(RP).any() or np.isinf(TP).any() or np.isinf(RM).any() or np.isinf(TM).any()):
+                print('\n')
+                print('Layered_NRM_p_w:')
+                print('\n'+100*'-'+'\n')
+                print('One of the modelled wavefields in the true medium contains a NaN (Not a Number) or an Inf (infinite) element.')
+                print('\n')
+                
+                if np.isnan(RP).any():
+                    print('\t - RP contains '+np.count_nonzero(np.isnan(RP))+' NaN.')
+                if np.isinf(RP).any():
+                    print('\t - RP contains '+np.count_nonzero(np.isinf(RP))+' Inf.')
+                if np.isnan(TP).any():
+                    print('\t - TP contains '+np.count_nonzero(np.isnan(TP))+' NaN.')
+                if np.isinf(TP).any():
+                    print('\t - TP contains '+np.count_nonzero(np.isinf(TP))+' Inf.')
+                if np.isnan(RM).any():
+                    print('\t - RM contains '+np.count_nonzero(np.isnan(RM))+' NaN.')
+                if np.isinf(RM).any():
+                    print('\t - RM contains '+np.count_nonzero(np.isinf(RM))+' Inf.')
+                if np.isnan(TM).any():
+                    print('\t - TM contains '+np.count_nonzero(np.isnan(TM))+' NaN.')
+                if np.isinf(TM).any():
+                    print('\t - TM contains '+np.count_nonzero(np.isinf(TM))+' Inf.')
+            
+            if self.AdjointMedium is True:
+                
+                if (np.isnan(RPa).any() or np.isnan(TPa).any() or np.isnan(RMa).any() or np.isnan(TMa).any()\
+                or np.isinf(RPa).any() or np.isinf(TPa).any() or np.isinf(RMa).any() or np.isinf(TMa).any()):
+                    print('\n')
+                    print('Layered_NRM_p_w:')
+                    print('\n'+100*'-'+'\n')
+                    print('One of the modelled wavefields in the adoint medium contains a NaN (Not a Number) or an Inf (infinite) element.')
+                    print('\n')
+                    
+                    if np.isnan(RPa).any():
+                        print('\t - RPa contains '+np.count_nonzero(np.isnan(RPa))+' NaN.')
+                    if np.isinf(RPa).any():
+                        print('\t - RPa contains '+np.count_nonzero(np.isinf(RPa))+' Inf.')
+                    if np.isnan(TPa).any():
+                        print('\t - TPa contains '+np.count_nonzero(np.isnan(TPa))+' NaN.')
+                    if np.isinf(TPa).any():
+                        print('\t - TPa contains '+np.count_nonzero(np.isinf(TPa))+' Inf.')
+                    if np.isnan(RMa).any():
+                        print('\t - RMa contains '+np.count_nonzero(np.isnan(RMa))+' NaN.')
+                    if np.isinf(RMa).any():
+                        print('\t - RMa contains '+np.count_nonzero(np.isinf(RMa))+' Inf.')
+                    if np.isnan(TMa).any():
+                        print('\t - TMa contains '+np.count_nonzero(np.isnan(TMa))+' NaN.')
+                    if np.isinf(TMa).any():
+                        print('\t - TMa contains '+np.count_nonzero(np.isinf(TMa))+' Inf.')
+                
+                print('\n')
+
+                
+        out={'RP':RP,'TP':TP,'RM':RM,'TM':TM,'RPa':RPa,'TPa':TPa,'RMa':RMa,'TMa':TMa}
+        return out
+            

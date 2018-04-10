@@ -33,7 +33,7 @@ class Wavefield_NRM_p_w:
     nr : int, optional
         Number of space samples.
     
-    dx : int, float, optional
+    dx1 : int, float, optional
         Space sample interval.
         
     verbose : bool, optional
@@ -43,31 +43,47 @@ class Wavefield_NRM_p_w:
     -------
     
     class
-        A class to define a wavefield in a 1.5D non-reciprocal medium in the ray-parameter frequency domain.
+        A class to define a wavefield in a 1.5D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:
+            - **nt**: Number of time samples.
+            - **dt**: Time sample interval in seconds.
+            - **nr**: Number of space samples.
+            - **dx1**: Number of space samples.
+            - **verbose**: If one sets 'verbose=True' feedback will be output in the command line.
+            - **nf**: Number of positive time samples :math:`=0.5 nt + 1`.
+            - **nk**: Number of positive space samples :math:`=0.5 nr + 1`.
+            
     
-    **Data format**:
-     - Wavefields are saved in an array of dimensions (nt,nr).
-     - Wavefields are in the p- :math:`\omega` domain.
-     - The zero frequency component is placed at the first index position.
-     - If the wavefield is transformed to the time domain, the zero time component is placed at the center of the time dimension.
+    Notes
+    -----
+    We format the data as described below.
+        - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
+        - Wavefields are in the p- :math:`\omega` domain.
+        - The zero frequency component is placed at the first index position.
+        - If the wavefield is transformed to the time domain, the zero time component is placed at the center of the time dimension.
      
-    **Example:** Initialise a wavefield class
+    Examples
+    -------- 
     
+    >>> # Initialise a wavefield class
     >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
     >>> F=WF(nt=1024,dt=0.005)
     
     """
     
-    def __init__(self,nt,dt,nr=1,dx=1,verbose=False):
+    def __init__(self,nt,dt,nr=1,dx1=1,verbose=False):
         
         if type(nr) is not int:
             sys.exit('Wavefield_NRM_p_w: nr has to be an integer.')
         if type(nt) is not int:
             sys.exit('Wavefield_NRM_p_w: nt has to be an integer.')
+        # Check if verbose is a bool
+        if not isinstance(verbose,bool):
+            sys.exit('Wavefield_NRM_p_w: \'verbose\' must be of the type bool.')
+            
         self.nt = nt
         self.dt = dt
         self.nr = nr
-        self.dx = dx
+        self.dx1 = dx1
         self.verbose = verbose
         self.nf = int(self.nt/2) + 1 # Index of Nyquist frequency + 1
         self.nk = int(self.nr/2) + 1 # Index of Nyquist space sample + 1
@@ -77,20 +93,18 @@ class Wavefield_NRM_p_w:
     def Dw(self):
         """returns frequency sampling interval :math:`\Delta` :math:`\omega` in radians.
         
-        The frequency sampling interval is defined by the time sampling interval :math:`\Delta t` and the number of time samples nt.
+        The frequency sampling interval is defined by the time sampling interval :math:`\Delta t` and the number of time samples 'nt'. 
         
         Returns
         -------
+        
         float
-            Frequency sample interval in radians :math:`\Delta \omega`
+            Frequency sample interval in radians :math:`\Delta \omega` :math:`= \\frac{2 \pi}{\Delta t \; nt}`
         
         
-        .. math:: 
-            \Delta \omega = \frac{2 \pi}{\Delta t nt}
+        Examples
+        --------
         
-        
-        **Example**
-
         >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
         >>> F=WF(nt=1024,dt=0.005)
         >>> F.Dw()
@@ -105,49 +119,48 @@ class Wavefield_NRM_p_w:
         
         Returns
         -------
-        dict
-            Dictionary that contains the frequency vector with zero frequency placed 
-                - at the center '**wvec**' (nt,1), 
-                - at the first index position '**wvecfft**' (nt,1).
-            
+        numpy.ndarray
+            Frequency vector, zero frequency is placed at the first index position. The vector has the shape (nf,1).
         
-        **Example**
+        Examples
+        --------
 
         >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
         >>> F=WF(nt=1024,dt=0.005)
-        >>> F.Wvec()['wvec']
-        array([[-628.31853072], ..., [ 627.09134609]])
+        >>> F.Wvec()
+        array([[0.], ..., [628.31853072]])
     
         """
         dw = 2*np.pi/(self.dt*self.nt)
-        wvec = np.zeros((self.nt,1))
-        wvec[:,0] = dw*np.arange(-self.nt/2,self.nt/2)
-        wvecfft = np.fft.ifftshift(wvec)
-        
-        out = {'wvec':wvec,'wvecfft':wvecfft}
-        return out
+        wvec = np.zeros((self.nf,1))
+        wvec[:,0] = dw*np.arange(0,self.nf)
+ 
+        return wvec
     
     # Space vector
     def Xvec(self):
-        """returns a vector of all spatial samples x in metres.
+        """returns a vector of all spatial samples :math:`x` in metres.
         
         Returns
         -------
         dict
-            Dictionary that contains the offset vector with zero offset placed 
-                - at the center '**xvec**' (nr,1), 
-                - at the first index position '**xvecfft**' (nr,1).
+            Dictionary that contains the offset vector,
+                - **xvec**: zero offset placed at the center.
+                - **xvecfft**: zero offset placed at the first index position.
+            Both vectors have the shape (nt,1).
                 
-        
-        **Example**
+
+        Examples
+        --------
 
         >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
-        >>> F=WF(nt=1024,dt=0.005,nr=512,dx=10)
+        >>> F=WF(nt=1024,dt=0.005,nr=512,dx1=10)
         >>> F.Xvec()['xvec']
         array([[-2560.], ...,[ 2550.]])
+        
         """
         xvec = np.zeros((self.nr,1))
-        xvec[:,0] = self.dx*np.arange(-self.nr/2,self.nr/2)
+        xvec[:,0] = self.dx1*np.arange(-self.nr/2,self.nr/2)
         xvecfft = np.fft.ifftshift(xvec)
         
         out = {'xvec':xvec,'xvecfft':xvecfft}
@@ -155,22 +168,25 @@ class Wavefield_NRM_p_w:
     
     # Time vector
     def Tvec(self):
-        """returns a vector of all time samples t in seconds.
+        """returns a vector of all time samples :math:`t` in seconds.
         
         Returns
         -------
         dict
-            Dictionary that contains the time vector with zero time placed 
-                - at the center '**tvec**' (nt,1), 
-                - at the first index position '**tvecfft**' (nt,1).
+            Dictionary that contains the time vector, 
+                - **tvec**: zero time placed at the center. 
+                - **tvecfft**: zero time placed at the first index position.
+            Both vectors have the shape (nt,1).
                 
         
-        **Example**
+        Examples
+        --------
 
         >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
-        >>> F=WF(nt=1024,dt=0.005,nr=512,dx=10)
+        >>> F=WF(nt=1024,dt=0.005,nr=512,dx1=10)
         >>> F.Tvec()['tvec']
         array([[-2.56 ], ..., [ 2.555]])
+        
         """
         tvec = np.zeros((self.nt,1))
         tvec[:,0] = self.dt*np.arange(-self.nt/2,self.nt/2)
@@ -183,22 +199,25 @@ class Wavefield_NRM_p_w:
     def T_X_grid(self):
         """returns two time-space meshgrids. 
         
-         Returns
+        Returns
         -------
         dict
             Dictionary that contains a meshgrid
-                - with the time vector tvec (the zero time sample is placed in the center) along the 1st dimension, and nr copies of it along the 2nd dimension '**Tgrid**' (nt,nr),
-                - with the offset vector xvec (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension '**Xgrid**' (nt,nr),
-                - with the time vector tvecfft (the zero time sample is placed at the first index position) along the 1st dimension, and nr copies of it along the 2nd dimension '**Tgridfft**' (nt,nr),
-                - with the offset vector xvecfft (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension '**Xgridfft**' (nt,nr).
+                - **Tgrid**: with the time vector *tvec* (the zero time sample is placed in the center) along the 1st dimension, and nr copies of it along the 2nd dimension.
+                - **Xgrid**: with the offset vector *xvec* (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension.
+                - **Tgridfft**: with the time vector *tvecfft* (the zero time sample is placed at the first index position) along the 1st dimension, and nr copies of it along the 2nd dimension.
+                - **Xgridfft**: with the offset vector *xvecfft* (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension.
+            All output arrays have the shape (nt,nr).
     
         
-        **Example**
+        Examples
+        --------
 
         >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
-        >>> F=WF(nt=1024,dt=0.005,nr=512,dx=10)
+        >>> F=WF(nt=1024,dt=0.005,nr=512,dx1=10)
         >>> F.T_X_grid()['Tgridfft'][:,0]
         array([ 0.   ,  0.005,  0.01 , ..., -0.015, -0.01 , -0.005])
+        
         """
         tvec = self.Tvec()['tvec']
         tvecfft = self.Tvec()['tvecfft']
@@ -218,25 +237,26 @@ class Wavefield_NRM_p_w:
         -------
         dict
             Dictionary that contains a meshgrid
-                - with the frequency vector wvec (the zero frequency sample is placed in the center) along the 1st dimension, and nr copies of it along the 2nd dimension '**Wgrid**' (nt,nr),
-                - with the offset vector xvec (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension '**Xgrid**' (nt,nr),
-                - with the frequency vector wvecfft (the zero frequency sample is placed at the first index position) along the 1st dimension, and nr copies of it along the 2nd dimension '**Wgridfft**' (nt,nr),
-                - with the offset vector xvecfft (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension '**Xgridfft**' (nt,nr).
+                - **Wgrid**: with the frequency vector *wvec* (the zero frequency sample is placed in the center) along the 1st dimension, and nr copies of it along the 2nd dimension.
+                - **Xgrid**: with the offset vector *xvec* (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension.
+                - **Xgridfft**: with the offset vector *xvecfft* (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension.
+            All output arrays have the shape (nf,nr).
                 
         
-        :Example:
+        Examples
+        --------
 
         >>> from Wavefield_NRM_p_w import Wavefield_NRM_p_w as WF
-        >>> F=WF(nt=1024,dt=0.005,nr=512,dx=10)
-        >>> F.W_X_grid()['Wgridfft'][:,0]
-        array([ 0.        ,  1.22718463,  2.45436926, ..., -3.68155389, -2.45436926, -1.22718463])
+        >>> F=WF(nt=1024,dt=0.005,nr=512,dx1=10)
+        >>> F.W_X_grid()['Wgrid'][:,0]
+        array([ 0.        ,  1.22718463,  2.45436926, ..., 628.3185307179587])
+        
         """
-        wvec = self.Wvec()['wvec']
-        wvecfft = self.Wvec()['wvecfft']
+        wvec = self.Wvec()
         xvec = self.Xvec()['xvec']
         xvecfft = self.Xvec()['xvecfft']
         Xgrid,Wgrid = np.meshgrid(xvec,wvec)
-        Xgridfft,Wgridfft = np.meshgrid(xvecfft,wvecfft)
+        Xgridfft,_ = np.meshgrid(xvecfft,wvec)
         
-        out = {'Wgrid':Wgrid,'Xgrid':Xgrid,'Wgridfft':Wgridfft,'Xgridfft':Xgridfft}
+        out = {'Wgrid':Wgrid,'Xgrid':Xgrid,'Xgridfft':Xgridfft}
         return out
