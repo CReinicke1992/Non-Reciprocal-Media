@@ -59,7 +59,7 @@ class Wavefield_NRM_p_w:
         - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
         - Wavefields are in the p- :math:`\omega` domain.
         - The zero frequency component is placed at the first index position.
-        - If the wavefield is transformed to the time domain, the zero time component is placed at the center of the time dimension.
+        - If the wavefield is transformed to the time domain, the zero time component is placed at the first index position, followed by nt/2-1 positive time samples and nt/2 negative time samples.
      
     Examples
     -------- 
@@ -260,3 +260,91 @@ class Wavefield_NRM_p_w:
         
         out = {'Wgrid':Wgrid,'Xgrid':Xgrid,'Xgridfft':Xgridfft}
         return out
+    
+    # Transform wavefield from w-p-domain to t-p-domain
+    def PW2PT(self,array_pw,NumPy_fft_Sign_Convention=False):
+        """applies an inverse Fourier transform from the :math:`p_1`-:math:`\omega` domain to  the :math:`p_1`-:math:`t` domain. 
+        
+        We assume that the time domain signal is real-valued (:math:`p_1`-:math:`t` domain). Therefore, we use the NumPy function :py:class:`numpy.fft.irfft`.
+        
+        Parameters
+        ----------
+    
+        array_pw : numpy.ndarray
+            Array in the :math:`p_1`-:math:`\omega` domain, shape (nf,nr).
+        
+        NumPy_fft_Sign_Convention : bool, optional
+            Set 'NumPy_fft_Sign_Convention=True' if Numpy's sign convention is used for the inverse Fourier transform (positive sign in the exponential of the inverse Fourier transform). 
+            
+        Returns
+        -------
+        
+        numpy.ndarray
+            Real-valued array in the :math:`p_1`-:math:`t` domain, shape (nt,nr).
+            
+        Notes
+        -----
+        
+        In the sub-class **Layered_NRM_p_w** we define the wavefield propagators with a positive sign, :math:`\\tilde{w}^{\pm} = \mathrm{exp}(+j \omega p_3' \Delta x_3)`. Thus, we implicitly assume that the inverse Fourier transfrom is defined with a negative sign in the exponential function, which is why we set by default 'NumPy_fft_Sign_Convention=False'.
+    
+        """
+        
+        if not isinstance(array_pw,np.ndarray):
+            sys.exit('PW2PT: The input variable \'array_pw\' must be of the type numpy.ndarray.')
+            
+        if array_pw.shape != (self.nf,self.nr):
+            sys.exit('PW2PT: The input variable \'array_pw\' must have the shape (nf,nr).')
+        
+        # If ifft sign convention is opposite to NumPy's convention
+        # We apply a complex conjugation first, such that NumPy's ifft can
+        # be applied as inverse Fourier transform
+        if NumPy_fft_Sign_Convention is False:
+            array_pw = array_pw.conj()
+            
+        array_pt = np.fft.irfft(array_pw,n=None,axis=0,norm=None)
+        
+        return array_pt
+    
+    # Transform wavefield from p-t-domain to p-w-domain
+    def PT2PW(self,array_pt,NumPy_fft_Sign_Convention=False):
+        """applies an inverse Fourier transform from the :math:`p_1`-:math:`t` domain to the :math:`p_1`-:math:`\omega` domain. 
+        
+        We assume that the time domain signal is real-valued (:math:`p_1`-:math:`t` domain). Therefore, we use the NumPy function :py:class:`numpy.fft.rfft`.
+        
+        Parameters
+        ----------
+    
+        array_pt : numpy.ndarray
+            Real-valued array in the :math:`p_1`-:math:`t` domain, shape (nt,nr).
+        
+        NumPy_fft_Sign_Convention : bool, optional
+            Set 'NumPy_fft_Sign_Convention=True' if Numpy's sign convention is used for the Fourier transform (negative sign in the exponential of the forward Fourier transform). 
+            
+        Returns
+        -------
+        
+        numpy.ndarray
+            Array in the :math:`p_1`-:math:`\omega` domain, shape (nf,nr).
+            
+        Notes
+        -----
+        
+        In the sub-class **Layered_NRM_p_w** we define the wavefield propagators with a positive sign, :math:`\\tilde{w}^{\pm} = \mathrm{exp}(+j \omega p_3' \Delta x_3)`. Thus, we implicitly assume that the forward Fourier transfrom is defined with a positive sign in the exponential function, which is why we set by default 'NumPy_fft_Sign_Convention=False'.
+    
+        """
+        
+        if not isinstance(array_pt,np.ndarray):
+            sys.exit('PT2PW: The input variable \'array_pt\' must be of the type numpy.ndarray.')
+            
+        if array_pt.shape != (self.nt,self.nr):
+            sys.exit('PT2PW: The input variable \'array_pt\' must have the shape (nt,nr).')
+            
+        array_pw = np.fft.rfft(array_pt,n=None,axis=0,norm=None)
+        
+        # If fft sign convention is opposite to NumPy's convention
+        # We apply a complex conjugation, such that NumPy's fft can
+        # be applied as forward Fourier transform
+        if NumPy_fft_Sign_Convention is False:
+            array_pw = array_pw.conj()
+        
+        return array_pt

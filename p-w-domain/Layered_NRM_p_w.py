@@ -85,7 +85,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
         - Wavefields are in the p- :math:`\omega` domain.
         - The zero frequency component is placed at the first index position.
-        - If the wavefield is transformed to the time domain, the zero time component is placed at the center of the time dimension.
+        - If the wavefield is transformed to the time domain, the zero time component is placed at the first index position, followed by nt/2-1 positive time samples and nt/2 negative time samples.
     - For evanescent waves, Kees makes a sign choice for the vertical ray-parameter,
         - :math:`p_3' = -j \sqrt{p_1^2 - (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.
       By default, **NumPy** makes the oppostie sign choice, 
