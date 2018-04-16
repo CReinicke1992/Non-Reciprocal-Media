@@ -140,8 +140,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             sys.exit('Layered_NRM_p_w: x3vec.ndim, avec.ndim, bvec.ndim, g1vec.ndim and g3vec.ndim must be one.')
         
         # Check if x3vec is positive and constantly increasing
-        if x3vec[0]<=0 or (x3vec[1:]-x3vec[:-1] <= 0).any():
-            sys.exit('Layered_NRM_p_w: x3vec must only contain positive and constantly increasing values.')
+        if x3vec[0]<0 or (x3vec[1:]-x3vec[:-1] <= 0).any():
+            sys.exit('Layered_NRM_p_w: x3vec must only contain constantly increasing values greater than, or equal to zero.')
         
         # Check if p1 is a scalar
         if not ( isinstance(p1,int) or isinstance(p1,float) ):
@@ -733,7 +733,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             p3 = self.SubSelf.p3
             p3n = self.SubSelf.p3n
         
-            del self.Subself
+#            del self.Subself
                 
         # Else compute response of entire medium
         else:
@@ -884,3 +884,591 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         out={'RP':RP,'TP':TP,'RM':RM,'TM':TM,'RPa':RPa,'TPa':TPa,'RMa':RMa,'TMa':TMa}
         return out
             
+    # Insert a layer in the model    
+    def Insert_layer(self,x3,UpdateSelf=False):
+        """inserts a transparent interface at the depth level 'x3'. If 'x3' coincides with an interface of the model the model's interface is left unchanged. If 'x3' is a vector it is interpreted as multiple depth levels at which transparent interfaces will be inserted.
+        
+        Parameters
+        ----------
+    
+        x3 : int, float, numpy.ndarray
+            A depth level, or a vector of depth levels, at which a transparent interface will be inserted. The variable 'x3' either must be a scalar, or have the shape (n,). Each element of 'x3' must be real-valued and greater than, or equal to zero.
+    
+        UpdateSelf : bool, optional
+            Set 'UpdateSelf=True' to not only output an updated model but also update the 'self' parameters.
+            
+        Returns
+        -------
+    
+        dict
+            Dictionary that contains 
+                - **x3vec**: Updated depth vector.
+                - **avec**: Updated :math:`\\alpha` vector.
+                - **bvec**: Updated :math:`\\beta` vector.
+                - **g1vec**: Updated :math:`\gamma_1` vector.
+                - **g3vec**: Updated :math:`\gamma_3` vector.
+            All medium parameter vectors are stored in arrays of shape (n,).
+        
+        Examples
+        --------
+
+        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
+        
+        >>> # Initialise a wavefield in a 1D reciprocal medium
+        >>> F=LM(nt=1024,dt=0.005,x3vec=np.array([10,150,200]),avec=np.array([1,2,3]),
+        >>>      bvec=np.array([0.4,3.14,2]),g1vec=np.array([0.9,2.1,0.3]),
+        >>>      g3vec=np.array([0.7,1.14,0.2]),p1=2e-4)
+        
+        >>> # Insert a transparent layer at x3=1
+        >>> out=F.Insert_layer(x3=1,UpdateSelf=False)
+        
+        >>> # Updated depth vector
+        >>> out['x3vec']
+        array([  1,  10, 150, 200])
+        
+        >>> # Updated alpha vector
+        >>> out['avec']
+        array([1, 1, 2, 3])
+        
+        """
+        
+        # Check if x3 is a scalar or an array of the shape (n,).
+        if not ( np.isscalar(x3) 
+                or ( isinstance(x3,np.ndarray) and x3.ndim == 1) ):
+            sys.exit('Insert_layer: The input variable \'x3\' must be either a scalar, or an array of shape (n,).')
+        
+        if np.isscalar(x3):
+            x3 = np.array([x3])
+        
+        # Check if x3 is real-valued.
+        if not np.isreal(x3).all():
+            sys.exit('Insert_layer: The input variable \'x3\' must be real-valued.')
+        
+        # Check if all elements of x3 are greater than, or equal to zero.
+        if x3[x3<0].size > 0:
+            sys.exit('Insert_layer: Each element of the input variable \'x3\' must be  greater than, or equal to zero.')
+        
+        X3vec = self.x3vec
+        Avec  = self.avec
+        Bvec  = self.bvec
+        G1vec = self.g1vec
+        G3vec = self.g3vec
+        
+        if np.isscalar(x3):
+            x3 = np.array([x3])
+        
+        for i in range(np.size(x3)):
+        
+            # Vector of depths smaller than or equal to x3[i]
+            L = X3vec[X3vec<=x3[i]] 
+            
+            # Case1: x3[i] smaller than X3vec[0]
+            if L.size == 0:
+                X3vec = np.hstack([x3[i]   ,X3vec])
+                Avec  = np.hstack([Avec[0] ,Avec])
+                Bvec  = np.hstack([Bvec[0] ,Bvec])
+                G1vec = np.hstack([G1vec[0],G1vec])
+                G3vec = np.hstack([G3vec[0],G3vec])
+            
+            # Case2: x3[i] coincides with an element of X3vec
+            elif L[-1] == x3[i]:
+                X3vec = X3vec
+                Avec  = Avec
+                Bvec  = Bvec
+                G1vec = G1vec
+                G3vec = G3vec
+            
+            # Case 3: x3[i] is larger than X3vec[-1]
+            elif L.size == X3vec.size:
+                X3vec = np.hstack([X3vec,x3[i]])
+                Avec  = np.hstack([Avec ,Avec[-1]])
+                Bvec  = np.hstack([Bvec ,Bvec[-1]])
+                G1vec = np.hstack([G1vec,G1vec[-1]])
+                G3vec = np.hstack([G3vec,G3vec[-1]])
+                
+            # Case 4: x3[i] is between X3vec[0] and X3vec[-1] AND does not coincide with any element of X3vec
+            else:
+                
+                b = L[-1] 
+                ind = X3vec.tolist().index(b)
+                
+                X3vec = np.hstack([X3vec[:ind+1],x3[i]       ,X3vec[ind+1:]])
+                Avec  = np.hstack([Avec[:ind+1] ,Avec[ind+1] ,Avec[ind+1:]])
+                Bvec  = np.hstack([Bvec[:ind+1] ,Bvec[ind+1] ,Bvec[ind+1:]])
+                G1vec = np.hstack([G1vec[:ind+1],G1vec[ind+1],G1vec[ind+1:]])
+                G3vec = np.hstack([G3vec[:ind+1],G3vec[ind+1],G3vec[ind+1:]])
+            
+        # Update self: Apply layer insertion to the self-parameters    
+        if UpdateSelf is True:
+            self.x3vec = X3vec
+            self.avec  = Avec
+            self.bvec  = Bvec
+            self.g1vec = G1vec
+            self.g3vec = G3vec
+            
+        out = {'x3vec':X3vec,'avec':Avec,'bvec':Bvec,'g1vec':G1vec,'g3vec':G3vec}
+        return out
+    
+    def GreensFunction_p_w(self,x3R,x3S,normalisation='flux',InternalMultiples=True):
+        """computes the one-way Green\'s functions between for a receiver- and source-depth defined by the input variables \'x3R\' and \'x3S\'. The one-way wavefields are decomposed at the receiver- and at the source-side.
+        
+        Parameters
+        ----------
+    
+        x3R : int,float
+            Receiver depth.
+    
+        x3S : int, float
+            Source depth.
+            
+        normalisation : str, optional
+            For pressure-normalisation set normalisation='pressure', for flux-normalisation set normalisation='flux'.
+            
+        InternalMultiples : bool, optional
+            To model internal multiples set 'InternalMultiples=True'. To ignore internal multiples set 'InternalMultiples=False'.
+            
+        Returns
+        -------
+    
+        dict
+            Dictionary that contains 
+                - **GPP**: Green\'s function :math:`G^{+,+}` (true medium).
+                - **GPM**: Green\'s function :math:`G^{+,-}` (true medium).
+                - **GMP**: Green\'s function :math:`G^{-,+}` (true medium).
+                - **GMM**: Green\'s function :math:`G^{-,-}` (true medium).
+                - **GPPa**: Green\'s function :math:`G^{+,+}` (adjoint medium).
+                - **GPMa**: Green\'s function :math:`G^{+,-}` (adjoint medium).
+                - **GMPa**: Green\'s function :math:`G^{-,+}` (adjoint medium).
+                - **GMMa**: Green\'s function :math:`G^{-,-}` (adjoint medium).
+            All medium responses are stored in arrays of shape (nf,1). The variables 'GPPa', 'GPMa', 'GMPa' and 'GMMa' are computed only if one sets 'AdjointMedium=True'.
+        
+        Notes
+        -----
+        
+        - The superscript \'+\' and \'-\' refer to downgoing and upgoing waves, respectively.
+        - The first superscript refers to the wavefield at the receiver-side.
+        - The second superscript refers to the wavefield at the source-side.
+        
+        References
+        ----------
+        Kees document as soon as it is published.
+        
+        Examples
+        --------
+
+        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
+
+        >>> F=LM( nt=1024,dt=0.005,x3vec=np.array([10,150,200]),
+        >>>       avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),
+        >>>       g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),
+        >>>       p1=2e-4,ReciprocalMedium=False,AdjointMedium=True )
+        
+        >>> G = F.GreensFunction_p_w(x3R=0,x3S=0,normalisation=normalisation,
+        >>>                          InternalMultiples=InternalMultiples)
+        >>> RT=F.RT_response_p_w(normalisation=normalisation,
+        >>>                      InternalMultiples=InternalMultiples)
+        >>> np.linalg.norm(RT['RP']-G['GMP']
+        0.0
+        
+        """
+        
+        # Insert transparent interfaces at source and receiver depth levels
+        # The insertion implicitly checks that x3R and x3S are non-negative 
+        # real-valued scalars
+        Tmp_medium = self.Insert_layer(x3=np.array([x3R,x3S]),UpdateSelf=False)
+        X3vec = Tmp_medium['x3vec']
+        Avec  = Tmp_medium['avec']
+        Bvec  = Tmp_medium['bvec']
+        G1vec = Tmp_medium['g1vec']
+        G3vec = Tmp_medium['g3vec']
+        
+        # Get indices of the receiver and source interfaces
+        r = X3vec.tolist().index(x3R)
+        s = X3vec.tolist().index(x3S)
+        
+        if x3R > x3S:
+            
+            # Overburden
+            x3vec = X3vec[:s+1]
+            avec  = Avec[:s+1]
+            bvec  = Bvec[:s+1]
+            g1vec = G1vec[:s+1]
+            g3vec = G3vec[:s+1]
+            
+            L1 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+            
+            # Sandwiched layer stack
+            x3vec = X3vec[s+1:r+1] - X3vec[s]
+            avec  = Avec[s+1:r+1]
+            bvec  = Bvec[s+1:r+1]
+            g1vec = G1vec[s+1:r+1]
+            g3vec = G3vec[s+1:r+1]
+            
+            L2 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+            
+            # Underburden
+            x3vec = X3vec[r+1:] - X3vec[r]
+            avec  = Avec[r+1:]
+            bvec  = Bvec[r+1:]
+            g1vec = G1vec[r+1:]
+            g3vec = G3vec[r+1:]
+            
+            # Exception if underburden is homogeneous
+            if x3vec.size == 0:
+                x3vec = np.array([0])
+                avec  = Avec[r:]
+                bvec  = Bvec[r:]
+                g1vec = G1vec[r:]
+                g3vec = G3vec[r:]
+            
+            L3 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+
+            # Get variables that are used multiple times to avoid multiple 
+            # reading from dictionary
+            RM1 = L1['RM']
+            TP2 = L2['TP']
+            
+            if InternalMultiples is True:
+                M1 = 1 / (1 - RM1*L2['RP'])
+            else:
+                M1 = 1
+            GPP12 =  TP2*M1
+            GPM12 = -TP2*M1*RM1 # Multiply by -1 because upgoing
+                                # sources are defined with 
+                                # negative amplitude
+                                            
+            # Compute reflection from below of parts 1+2 
+            RM12 = L2['RM'] + TP2*M1*RM1*L2['TM']
+            
+            # Compute the Green's functions G13 for the complete medium
+            if InternalMultiples is True:
+                M2 = 1 / ( 1 - RM12*L3['RP'] )
+            else:
+                M2 = 1
+            GPP13 = M2*GPP12
+            GPM13 = M2*GPM12
+            GMP13 = L3['RP']*M2*GPP12
+            GMM13 = L3['RP']*M2*GPM12
+            
+            # Green;s functions in adjoint medium
+            if self.AdjointMedium is True:
+                # Get variables that are used multiple times to avoid multiple 
+                # reading from dictionary
+                RM1 = L1['RMa']
+                TP2 = L2['TPa']
+                
+                if InternalMultiples is True:
+                    M1 = 1 / (1 - RM1*L2['RPa'])
+                else:
+                    M1 = 1
+                GPP12 =  TP2*M1
+                GPM12 = -TP2*M1*RM1 # Multiply by -1 because upgoing
+                                    # sources are defined with 
+                                    # negative amplitude
+                                                
+                # Compute reflection from below of parts 1+2 
+                RM12 = L2['RMa'] + TP2*M1*RM1*L2['TMa']
+                
+                # Compute the Green's functions G13 for the complete medium
+                if InternalMultiples is True:
+                    M2 = 1 / ( 1 - RM12*L3['RPa'] )
+                else:
+                    M2 = 1
+                GPP13a = M2*GPP12
+                GPM13a = M2*GPM12
+                GMP13a = L3['RPa']*M2*GPP12
+                GMM13a = L3['RPa']*M2*GPM12
+                
+            
+            
+        elif x3R == x3S:
+            
+            # Overburden
+            x3vec = X3vec[:s+1]
+            avec  = Avec[:s+1]
+            bvec  = Bvec[:s+1]
+            g1vec = G1vec[:s+1]
+            g3vec = G3vec[:s+1]
+            
+            L1 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+            
+            # Underburden
+            x3vec = X3vec[r+1:] - X3vec[r]
+            avec  = Avec[r+1:]
+            bvec  = Bvec[r+1:]
+            g1vec = G1vec[r+1:]
+            g3vec = G3vec[r+1:]
+            
+            # Exception if underburden is homogeneous
+            if x3vec.size == 0:
+                x3vec = np.array([0])
+                avec  = Avec[r:]
+                bvec  = Bvec[r:]
+                g1vec = G1vec[r:]
+                g3vec = G3vec[r:]
+            
+            L3 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+          
+            # Get variables that are used multiple times to avoid multiple 
+            # reading from dictionary
+            RM1 = L1['RM']
+            RP3 = L3['RP']
+            
+            if InternalMultiples is True:
+                M1 = 1 / (1 - RM1*RP3 )
+                M2 = 1 / (1 - RP3*RM1 )
+            else:
+                M1 = np.ones((self.nf,self.nr),dtype=complex)
+                M2 = M1.copy()
+                
+            GPP13 =  M1.copy() 
+            GPM13 = -M1*RM1     # Multiply by -1 because upgoing
+                                # sources are defined with 
+                                # negative amplitude
+            GMP13 =  RP3*M1
+            GMM13 = -M2     # Multiply by -1 because upgoing
+                            # sources are defined with 
+                            # negative amplitude
+                            
+            # Green;s functions in adjoint medium
+            if self.AdjointMedium is True:
+                # Get variables that are used multiple times to avoid multiple 
+                # reading from dictionary
+                RM1 = L1['RMa']
+                RP3 = L3['RPa']
+                
+                if InternalMultiples is True:
+                    M1 = 1 / (1 - RM1*RP3 )
+                    M2 = 1 / (1 - RP3*RM1 )
+                else:
+                    M1 = np.ones((self.nf,self.nr),dtype=complex)
+                    M2 = M1.copy()
+                    
+                GPP13a =  M1.copy() 
+                GPM13a = -M1*RM1     # Multiply by -1 because upgoing
+                                     # sources are defined with 
+                                     # negative amplitude
+                GMP13a =  RP3*M1
+                GMM13a = -M2     # Multiply by -1 because upgoing
+                                 # sources are defined with 
+                                 # negative amplitude
+            
+        elif x3R < x3S:
+            
+            # Overburden
+            x3vec = X3vec[:r+1]
+            avec  = Avec[:r+1]
+            bvec  = Bvec[:r+1]
+            g1vec = G1vec[:r+1]
+            g3vec = G3vec[:r+1]
+            
+            L1 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+            
+            # Sandwiched layer stack
+            x3vec = X3vec[r+1:s+1] - X3vec[r]
+            avec  = Avec[r+1:s+1]
+            bvec  = Bvec[r+1:s+1]
+            g1vec = G1vec[r+1:s+1]
+            g3vec = G3vec[r+1:s+1]
+            
+            L2 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+            
+            # Underburden
+            x3vec = X3vec[s+1:] - X3vec[s]
+            avec  = Avec[s+1:]
+            bvec  = Bvec[s+1:]
+            g1vec = G1vec[s+1:]
+            g3vec = G3vec[s+1:]
+            
+            # Exception if underburden is homogeneous
+            if x3vec.size == 0:
+                x3vec = np.array([0])
+                avec  = Avec[s:]
+                bvec  = Bvec[s:]
+                g1vec = G1vec[s:]
+                g3vec = G3vec[s:]
+            
+            L3 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
+                                      g1vec=g1vec,g3vec=g3vec,
+                                      normalisation=normalisation,
+                                      InternalMultiples=InternalMultiples)
+            
+            # Get variables that are used multiple times to avoid multiple 
+            # reading from dictionary
+            RM1 = L1['RM']
+            TM2 = L2['TM']
+            RP3 = L3['RP']
+            
+            # Compute reflection from above of part 2+3 
+            if InternalMultiples is True:
+                M1 = 1 / (1 - RP3*L2['RM'])
+            else:
+                M1 = 1
+            RP23 = L2['RP'] + TM2*M1*RP3*L2['TP']
+            
+            # Compute the Green's functions G23 that exclude the medium above 
+            # the receiver: GMP23,GMM23
+            GMP23 =  TM2*M1*RP3                   
+            GMM23 = -TM2*M1         # Multiply by -1 because upgoing
+                                    # sources are defined with 
+                                    # negative amplitude
+                
+            
+            
+            # Compute the Green's functions G13 for the complete medium
+            if InternalMultiples is True:
+                M2 = 1 / (1 - RP23*RM1)
+            else:
+                M2 = 1
+            GPP13 = RM1*M2*GMP23
+            GPM13 = RM1*M2*GMM23
+            GMP13 = M2*GMP23
+            GMM13 = M2*GMM23
+            
+            # Green;s functions in adjoint medium
+            if self.AdjointMedium is True:
+                # Get variables that are used multiple times to avoid multiple 
+                # reading from dictionary
+                RM1 = L1['RMa']
+                TM2 = L2['TMa']
+                RP3 = L3['RPa']
+                
+                # Compute reflection from above of part 2+3 
+                if InternalMultiples is True:
+                    M1 = 1 / (1 - RP3*L2['RMa'])
+                else:
+                    M1 = 1
+                RP23 = L2['RPa'] + TM2*M1*RP3*L2['TPa']
+                
+                # Compute the Green's functions G23 that exclude the medium above 
+                # the receiver: GMP23,GMM23
+                GMP23 =  TM2*M1*RP3                   
+                GMM23 = -TM2*M1         # Multiply by -1 because upgoing
+                                        # sources are defined with 
+                                        # negative amplitude
+                    
+                
+                
+                # Compute the Green's functions G13 for the complete medium
+                if InternalMultiples is True:
+                    M2 = 1 / (1 - RP23*RM1)
+                else:
+                    M2 = 1
+                GPP13a = RM1*M2*GMP23
+                GPM13a = RM1*M2*GMM23
+                GMP13a = M2*GMP23
+                GMM13a = M2*GMM23
+                
+        if self.AdjointMedium is False:
+            GPP13a = None
+            GPM13a = None
+            GMP13a = None
+            GMM13a = None
+            
+        # Verbose: Inform the user if any wavefield contains NaNs of Infs.
+        if self.verbose is True:
+            
+            if ( np.isnan(GPP13).any() or np.isnan(GPM13).any() 
+              or np.isnan(GMP13).any() or np.isnan(GMM13).any()
+              or np.isinf(GPP13).any() or np.isinf(GPM13).any() 
+              or np.isinf(GMP13).any() or np.isinf(GMM13).any()):
+                
+                print('\n')
+                print('Layered_NRM_p_w:')
+                print('\n'+100*'-'+'\n')
+                print('One of the modelled wavefields in the true medium '
+                +'contains a NaN (Not a Number) or an Inf (infinite) element.')
+                print('\n')
+                
+                if np.isnan(GPP13).any():
+                    print('\t - GPP13 contains '
+                          +np.count_nonzero(np.isnan(GPP13))+' NaN.')
+                if np.isinf(GPP13).any():
+                    print('\t - GPP13 contains '
+                          +np.count_nonzero(np.isinf(GPP13))+' Inf.')
+                if np.isnan(GPM13).any():
+                    print('\t - GPM13 contains '
+                          +np.count_nonzero(np.isnan(GPM13))+' NaN.')
+                if np.isinf(GPM13).any():
+                    print('\t - GPM13 contains '
+                          +np.count_nonzero(np.isinf(GPM13))+' Inf.')
+                if np.isnan(GMP13).any():
+                    print('\t - GMP13 contains '
+                          +np.count_nonzero(np.isnan(GMP13))+' NaN.')
+                if np.isinf(GMP13).any():
+                    print('\t - GMP13 contains '
+                          +np.count_nonzero(np.isinf(GMP13))+' Inf.')
+                if np.isnan(GMM13).any():
+                    print('\t - GMM13 contains '
+                          +np.count_nonzero(np.isnan(GMM13))+' NaN.')
+                if np.isinf(GMM13).any():
+                    print('\t - GMM13 contains '
+                          +np.count_nonzero(np.isinf(GMM13))+' Inf.')
+            
+            if self.AdjointMedium is True:
+                
+                if ( np.isnan(GPP13a).any() or np.isnan(GPM13a).any() 
+                  or np.isnan(GMP13a).any() or np.isnan(GMM13a).any()
+                  or np.isinf(GPP13a).any() or np.isinf(GPM13a).any() 
+                  or np.isinf(GMP13a).any() or np.isinf(GMM13a).any()):
+                
+                    print('\n')
+                    print('Layered_NRM_p_w:')
+                    print('\n'+100*'-'+'\n')
+                    print('One of the modelled wavefields in the adjoint medium '
+                    +'contains a NaN (Not a Number) or an Inf (infinite) element.')
+                    print('\n')
+                    
+                    if np.isnan(GPP13a).any():
+                        print('\t - GPP13a contains '
+                              +np.count_nonzero(np.isnan(GPP13a))+' NaN.')
+                    if np.isinf(GPP13a).any():
+                        print('\t - GPP13a contains '
+                              +np.count_nonzero(np.isinf(GPP13a))+' Inf.')
+                    if np.isnan(GPM13a).any():
+                        print('\t - GPM13a contains '
+                              +np.count_nonzero(np.isnan(GPM13a))+' NaN.')
+                    if np.isinf(GPM13a).any():
+                        print('\t - GPM13a contains '
+                              +np.count_nonzero(np.isinf(GPM13a))+' Inf.')
+                    if np.isnan(GMP13a).any():
+                        print('\t - GMP13a contains '
+                              +np.count_nonzero(np.isnan(GMP13a))+' NaN.')
+                    if np.isinf(GMP13a).any():
+                        print('\t - GMP13a contains '
+                              +np.count_nonzero(np.isinf(GMP13a))+' Inf.')
+                    if np.isnan(GMM13a).any():
+                        print('\t - GMM13a contains '
+                              +np.count_nonzero(np.isnan(GMM13a))+' NaN.')
+                    if np.isinf(GMM13a).any():
+                        print('\t - GMM13a contains '
+                              +np.count_nonzero(np.isinf(GMM13a))+' Inf.')
+                
+        out = {'GPP':GPP13,'GPM':GPM13,'GMP':GMP13,'GMM':GMM13,
+               'GPPa':GPP13a,'GPMa':GPM13a,'GMPa':GMP13a,'GMMa':GMM13a}
+        return out
+    
+    
