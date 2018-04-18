@@ -680,7 +680,6 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 - **TMa**: Transmission response from below (adjoint medium).
             All medium responses are stored in arrays of shape (nf,1). The variables 'RPa', 'TPa', 'RMa' and 'TMa' are computed only if one sets 'AdjointMedium=True'.
         
-        
         References
         ----------
         Kees document as soon as it is published.
@@ -716,32 +715,32 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             sys.exit('RT_response_p_w: We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.')
         
         # Check if a layer stack is given
-        if isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) \
-        and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) \
-        and isinstance(g3vec,np.ndarray):
+        if (isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) 
+        and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) 
+        and isinstance(g3vec,np.ndarray)):
             
             # Create a wavefield in a sub-medium
             # I do this because when the sub-wavefield is initialised all parameters 
             # are automatically tested for correctness
-            self.SubSelf = Layered_NRM_p_w(self.nt,self.dt,self.nr,self.dx1,self.verbose,x3vec=x3vec,avec=avec,bvec=bvec,\
-                                           g1vec=g1vec,g3vec=g3vec,p1=self.p1,ReciprocalMedium=self.ReciprocalMedium,\
+            self.SubSelf = Layered_NRM_p_w(self.nt,self.dt,self.nr,self.dx1,self.verbose,x3vec=x3vec,avec=avec,bvec=bvec,
+                                           g1vec=g1vec,g3vec=g3vec,p1=self.p1,ReciprocalMedium=self.ReciprocalMedium,
                                            AdjointMedium=self.AdjointMedium)
             
             x3vec = self.SubSelf.x3vec
-            bvec = self.SubSelf.bvec
+            bvec  = self.SubSelf.bvec
             g3vec = self.SubSelf.g3vec
-            p3 = self.SubSelf.p3
-            p3n = self.SubSelf.p3n
+            p3    = self.SubSelf.p3
+            p3n   = self.SubSelf.p3n
         
 #            del self.Subself
                 
         # Else compute response of entire medium
         else:
             x3vec = self.x3vec
-            bvec = self.bvec
+            bvec  = self.bvec
             g3vec = self.g3vec
-            p3 = self.p3
-            p3n = self.p3n
+            p3    = self.p3
+            p3n   = self.p3n
             
         
         # Number of layers
@@ -768,9 +767,9 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         
         if self.AdjointMedium is True:
             RPa = RP.copy()
-            RMa = RP.copy()
+            RMa = RM.copy()
             TPa = TP.copy()
-            TMa = TP.copy()
+            TMa = TM.copy()
         else:
             RPa = None
             TPa = None
@@ -781,8 +780,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         for n in range(0,N-1):
             
             # Scattering coefficients
-            ScatCoeffs = self.RT_p_w(beta_u=bvec[n]  ,g3_u=g3vec[n]  ,p3_u=p3[n]  ,p3n_u=p3n[n],\
-                                     beta_l=bvec[n+1],g3_l=g3vec[n+1],p3_l=p3[n+1],p3n_l=p3n[n+1],\
+            ScatCoeffs = self.RT_p_w(beta_u=bvec[n]  ,g3_u=g3vec[n]  ,p3_u=p3[n]  ,p3n_u=p3n[n],
+                                     beta_l=bvec[n+1],g3_l=g3vec[n+1],p3_l=p3[n+1],p3n_l=p3n[n+1],
                                      normalisation=normalisation)
             
             rP = ScatCoeffs['rP']
@@ -829,7 +828,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             if (np.isnan(RP).any() or np.isnan(TP).any() or np.isnan(RM).any() or np.isnan(TM).any()\
                 or np.isinf(RP).any() or np.isinf(TP).any() or np.isinf(RM).any() or np.isinf(TM).any()):
                 print('\n')
-                print('Layered_NRM_p_w:')
+                print('RT_response_p_w:')
                 print('\n'+100*'-'+'\n')
                 print('One of the modelled wavefields in the true medium contains a NaN (Not a Number) or an Inf (infinite) element.')
                 print('\n')
@@ -856,7 +855,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 if (np.isnan(RPa).any() or np.isnan(TPa).any() or np.isnan(RMa).any() or np.isnan(TMa).any()\
                 or np.isinf(RPa).any() or np.isinf(TPa).any() or np.isinf(RMa).any() or np.isinf(TMa).any()):
                     print('\n')
-                    print('Layered_NRM_p_w:')
+                    print('RT_response_p_w:')
                     print('\n'+100*'-'+'\n')
                     print('One of the modelled wavefields in the adoint medium contains a NaN (Not a Number) or an Inf (infinite) element.')
                     print('\n')
@@ -907,6 +906,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 - **bvec**: Updated :math:`\\beta` vector.
                 - **g1vec**: Updated :math:`\gamma_1` vector.
                 - **g3vec**: Updated :math:`\gamma_3` vector.
+                - **p3**: Updated :math:`p_3(p_1)` vector.
+                - **p3n**: Updated :math:`p_3(-p_1)` vector.
             All medium parameter vectors are stored in arrays of shape (n,).
         
         Examples
@@ -954,6 +955,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         Bvec  = self.bvec
         G1vec = self.g1vec
         G3vec = self.g3vec
+        P3    = self.p3
+        P3n   = self.p3n
         
         if np.isscalar(x3):
             x3 = np.array([x3])
@@ -970,6 +973,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 Bvec  = np.hstack([Bvec[0] ,Bvec])
                 G1vec = np.hstack([G1vec[0],G1vec])
                 G3vec = np.hstack([G3vec[0],G3vec])
+                P3    = np.hstack([P3[0]   ,P3])
+                P3n   = np.hstack([P3n[0]  ,P3n])
             
             # Case2: x3[i] coincides with an element of X3vec
             elif L[-1] == x3[i]:
@@ -978,6 +983,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 Bvec  = Bvec
                 G1vec = G1vec
                 G3vec = G3vec
+                P3    = P3
+                P3n   = P3n
             
             # Case 3: x3[i] is larger than X3vec[-1]
             elif L.size == X3vec.size:
@@ -986,6 +993,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 Bvec  = np.hstack([Bvec ,Bvec[-1]])
                 G1vec = np.hstack([G1vec,G1vec[-1]])
                 G3vec = np.hstack([G3vec,G3vec[-1]])
+                P3    = np.hstack([P3   ,P3[-1]])
+                P3n   = np.hstack([P3n  ,P3n[-1]])
                 
             # Case 4: x3[i] is between X3vec[0] and X3vec[-1] AND does not coincide with any element of X3vec
             else:
@@ -998,6 +1007,8 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                 Bvec  = np.hstack([Bvec[:ind+1] ,Bvec[ind+1] ,Bvec[ind+1:]])
                 G1vec = np.hstack([G1vec[:ind+1],G1vec[ind+1],G1vec[ind+1:]])
                 G3vec = np.hstack([G3vec[:ind+1],G3vec[ind+1],G3vec[ind+1:]])
+                P3    = np.hstack([P3[:ind+1]   ,P3[ind+1]   ,P3[ind+1:]])
+                P3n   = np.hstack([P3n[:ind+1]  ,P3n[ind+1]  ,P3n[ind+1:]])
             
         # Update self: Apply layer insertion to the self-parameters    
         if UpdateSelf is True:
@@ -1006,12 +1017,14 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
             self.bvec  = Bvec
             self.g1vec = G1vec
             self.g3vec = G3vec
+            self.p3    = P3
+            self.p3n   = P3n
             
-        out = {'x3vec':X3vec,'avec':Avec,'bvec':Bvec,'g1vec':G1vec,'g3vec':G3vec}
+        out = {'x3vec':X3vec,'avec':Avec,'bvec':Bvec,'g1vec':G1vec,'g3vec':G3vec,'p3':P3,'p3n':P3n}
         return out
     
     def GreensFunction_p_w(self,x3R,x3S,normalisation='flux',InternalMultiples=True):
-        """computes the one-way Green\'s functions between for a receiver- and source-depth defined by the input variables \'x3R\' and \'x3S\'. The one-way wavefields are decomposed at the receiver- and at the source-side.
+        """computes the one-way Green\'s functions for a receiver and source depth defined by the input variables \'x3R\' and \'x3S\'. The one-way wavefields are decomposed at the receiver- and at the source-side. We define the receiver and source depths just below \'x3R\' and \'x3S\', respectively (this is important if the receiver or source depth coincides with an interface).
         
         Parameters
         ----------
@@ -1077,7 +1090,18 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         # Insert transparent interfaces at source and receiver depth levels
         # The insertion implicitly checks that x3R and x3S are non-negative 
         # real-valued scalars
-        Tmp_medium = self.Insert_layer(x3=np.array([x3R,x3S]),UpdateSelf=False)
+        # If the receiver or source depth is greater than, or equal to the 
+        # deepest interface, we insert another transparent layer below the  
+        # 'new' deepest interface. This is necessary because the function 
+        # RT_response_p_w does not compute the propagation through the deepest
+        # layer. By adding a transparent interface below the source/receiver we
+        # ensure that the propagation is computed correctly.
+        if (x3R >= self.x3vec[-1]) or (x3S >= self.x3vec[-1]):
+            xb = np.max([x3R,x3S])+1
+            Tmp_medium = self.Insert_layer(x3=np.array([x3R,x3S,xb]),
+                                           UpdateSelf=False)
+        else:
+            Tmp_medium = self.Insert_layer(x3=np.array([x3R,x3S]),UpdateSelf=False)
         X3vec = Tmp_medium['x3vec']
         Avec  = Tmp_medium['avec']
         Bvec  = Tmp_medium['bvec']
@@ -1091,23 +1115,23 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         if x3R > x3S:
             
             # Overburden
-            x3vec = X3vec[:s+1]
-            avec  = Avec[:s+1]
-            bvec  = Bvec[:s+1]
-            g1vec = G1vec[:s+1]
-            g3vec = G3vec[:s+1]
+            x3vec = X3vec[:s+2]
+            avec  = Avec[:s+2]
+            bvec  = Bvec[:s+2]
+            g1vec = G1vec[:s+2]
+            g3vec = G3vec[:s+2]
             
             L1 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
                                       g1vec=g1vec,g3vec=g3vec,
                                       normalisation=normalisation,
                                       InternalMultiples=InternalMultiples)
-            
+
             # Sandwiched layer stack
-            x3vec = X3vec[s+1:r+1] - X3vec[s]
-            avec  = Avec[s+1:r+1]
-            bvec  = Bvec[s+1:r+1]
-            g1vec = G1vec[s+1:r+1]
-            g3vec = G3vec[s+1:r+1]
+            x3vec = X3vec[s+1:r+2] - X3vec[s]
+            avec  = Avec[s+1:r+2]
+            bvec  = Bvec[s+1:r+2]
+            g1vec = G1vec[s+1:r+2]
+            g3vec = G3vec[s+1:r+2]
             
             L2 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
                                       g1vec=g1vec,g3vec=g3vec,
@@ -1195,11 +1219,11 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         elif x3R == x3S:
             
             # Overburden
-            x3vec = X3vec[:s+1]
-            avec  = Avec[:s+1]
-            bvec  = Bvec[:s+1]
-            g1vec = G1vec[:s+1]
-            g3vec = G3vec[:s+1]
+            x3vec = X3vec[:s+2]
+            avec  = Avec[:s+2]
+            bvec  = Bvec[:s+2]
+            g1vec = G1vec[:s+2]
+            g3vec = G3vec[:s+2]
             
             L1 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
                                       g1vec=g1vec,g3vec=g3vec,
@@ -1273,11 +1297,11 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         elif x3R < x3S:
             
             # Overburden
-            x3vec = X3vec[:r+1]
-            avec  = Avec[:r+1]
-            bvec  = Bvec[:r+1]
-            g1vec = G1vec[:r+1]
-            g3vec = G3vec[:r+1]
+            x3vec = X3vec[:r+2]
+            avec  = Avec[:r+2]
+            bvec  = Bvec[:r+2]
+            g1vec = G1vec[:r+2]
+            g3vec = G3vec[:r+2]
             
             L1 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
                                       g1vec=g1vec,g3vec=g3vec,
@@ -1285,11 +1309,11 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                                       InternalMultiples=InternalMultiples)
             
             # Sandwiched layer stack
-            x3vec = X3vec[r+1:s+1] - X3vec[r]
-            avec  = Avec[r+1:s+1]
-            bvec  = Bvec[r+1:s+1]
-            g1vec = G1vec[r+1:s+1]
-            g3vec = G3vec[r+1:s+1]
+            x3vec = X3vec[r+1:s+2] - X3vec[r]
+            avec  = Avec[r+1:s+2]
+            bvec  = Bvec[r+1:s+2]
+            g1vec = G1vec[r+1:s+2]
+            g3vec = G3vec[r+1:s+2]
             
             L2 = self.RT_response_p_w(x3vec=x3vec,avec=avec,bvec=bvec,
                                       g1vec=g1vec,g3vec=g3vec,
@@ -1397,7 +1421,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
               or np.isinf(GMP13).any() or np.isinf(GMM13).any()):
                 
                 print('\n')
-                print('Layered_NRM_p_w:')
+                print('GreensFunction_p_w:')
                 print('\n'+100*'-'+'\n')
                 print('One of the modelled wavefields in the true medium '
                 +'contains a NaN (Not a Number) or an Inf (infinite) element.')
@@ -1436,7 +1460,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                   or np.isinf(GMP13a).any() or np.isinf(GMM13a).any()):
                 
                     print('\n')
-                    print('Layered_NRM_p_w:')
+                    print('GreensFunction_p_w:')
                     print('\n'+100*'-'+'\n')
                     print('One of the modelled wavefields in the adjoint medium '
                     +'contains a NaN (Not a Number) or an Inf (infinite) element.')
@@ -1471,4 +1495,272 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
                'GPPa':GPP13a,'GPMa':GPM13a,'GMPa':GMP13a,'GMMa':GMM13a}
         return out
     
+    def FocusingFunction_p_w(self,x3F,normalisation='flux',InternalMultiples=True):
+        """computes the focusing functions between the top surface (:math:`x_3=0`) and the focusing depth defined by the input variable \'x3F\'. We define the focusing depth just below \'x3F\'. Hence, if the focusing depth coincides with an interface the focusing function focuses below that interface.
+        
+        Parameters
+        ----------
     
+        x3F : int,float
+            Focusing depth.
+            
+        normalisation : str, optional
+            For pressure-normalisation set normalisation='pressure', for flux-normalisation set normalisation='flux'. Until now, this function only models the focusing function for flux-normalisation.
+            
+        InternalMultiples : bool, optional
+            To model internal multiples set 'InternalMultiples=True'. To ignore internal multiples set 'InternalMultiples=False'.
+            
+        Returns
+        -------
+    
+        dict
+            Dictionary that contains 
+                - **FP**: Downgoing focusing function.
+                - **RP**: Reflection response from above.
+                - **TP**: Transmission response from above.
+                - **FM**: Upgoing focusing function.
+                - **RM**: Reflection response from below.
+                - **TM**: Transmission response from below.
+                - **FPa**: Downgoing focusing function (adjoint medium).
+                - **RPa**: Reflection response from above (adjoint medium).
+                - **TPa**: Transmission response from above (adjoint medium).
+                - **FMa**: Upgoing focusing function (adjoint medium).
+                - **RMa**: Reflection response from below (adjoint medium).
+                - **TMa**: Transmission response from below (adjoint medium).
+            All medium responses are stored in arrays of shape (nf,1). The variables 'FPa', 'RPa', 'TPa', 'FMa', 'RMa' and 'TMa' are computed only if one sets 'AdjointMedium=True'.
+        
+        Notes
+        -----
+        
+        - The downgoing focusing funtion :math:`\\tilde{F}_1^+` is computed by inverting the expressions for the transmission from above :math:`\\tilde{T}^+`:
+            :math:`\\tilde{F}_{1,n}^+ = \\tilde{F}_{1,n-1}^+ (\\tilde{w}_n^+)^{-1} (1 - \\tilde{w}_n^+ \\tilde{R}_{n-1}^{\cap} \\tilde{w}_n^- \\tilde{r}_n^{\cup} )^{-1} (\\tilde{t}_n^+)^{-1}`
+        - The upgoing focusing function is computed by applying the reflection response :math:`R^{\cup}` on the downgoing focusing funtion :math:`\\tilde{F}_1^+`:
+            :math:`\\tilde{F}_{1,n}^- = \\tilde{R}^{\cup} \\tilde{F}_{1,n}^+`.
+        
+        References
+        ----------
+        Kees document as soon as it is published.
+        
+        Examples
+        --------
+
+        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> import numpy as np
+
+        >>> F=LM( nt=1024,dt=0.005,x3vec=np.array([10,150,200]),
+        >>>       avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),
+        >>>       g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),
+        >>>       p1=2e-4,ReciprocalMedium=False,AdjointMedium=True )
+        
+        """
+        
+        # Check if normalisation is set correctly
+        if normalisation is not 'flux':
+            sys.exit('FocusingFunction_p_w: This function only models the focusing function for flux-normalisation. (For pressure-normalistiont the required equations have to be derived.)')
+        
+        # Insert transparent interfaces at the focusing depth level.
+        # The insertion implicitly checks that x3F is non-negative 
+        # and real-valued.
+        # If the focusing depth is greater than, or equal to the deepest 
+        # interface, we insert another transparent layer below the focusing 
+        # depth to be able to compute scattering coefficients at the focusing 
+        # depth without getting an index error.
+        if x3F >= self.x3vec[-1]:
+            Tmp_medium = self.Insert_layer(x3=np.array([x3F,x3F+1]),
+                                           UpdateSelf=False)
+        else:
+            Tmp_medium = self.Insert_layer(x3=x3F,UpdateSelf=False)
+        
+        X3vec = Tmp_medium['x3vec']
+        Bvec = Tmp_medium['bvec']
+        G3vec = Tmp_medium['g3vec']
+        P3    = Tmp_medium['p3']
+        P3n   = Tmp_medium['p3n']
+        
+        # Index of the focusing depth
+        f = X3vec.tolist().index(x3F)
+        
+        # Only allow propagating waves to model the focusing function
+        if np.iscomplex(P3[:f+1]).any() or np.iscomplex(P3n[:f+1]).any():
+            sys.exit('FocusingFunction_p_w: (Here,) We only define the focusing function for propagating waves, i.e. not evanescent waves.')
+        
+        # Vector with layer thicknesses
+        dx3vec = X3vec.copy()
+        dx3vec[1:] = X3vec[1:]-X3vec[:-1]
+        
+        # Down- and upgoing focusing functions: Initial value
+        # Here every frequency component has an amplitude equal to one. Hence,
+        # the total wavefield has a strength of sqrt(nt)
+        # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
+        # Hence in the time domain the wavefield has an amplitude equal to one.
+        FP = np.ones((self.nf,1),dtype=complex)
+        FM = np.zeros((self.nf,1),dtype=complex)
+        
+        # Reflection responses: Initial value
+        RP = np.zeros((self.nf,1),dtype=complex)
+        RM = np.zeros((self.nf,1),dtype=complex)
+        
+        # Here every frequency component has an amplitude equal to one. Hence,
+        # the total wavefield has a strength of sqrt(nt)
+        # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
+        # Hence in the time domain the wavefield has an amplitude equal to one.
+        TP = np.ones((self.nf,1),dtype=complex)
+        TM = np.ones((self.nf,1),dtype=complex)
+        
+        # Internal multiple operator: Initial value
+        M1 = np.ones((self.nf,1),dtype=complex)
+        M2 = np.ones((self.nf,1),dtype=complex)
+        
+        if self.AdjointMedium is True:
+            FPa = FP.copy()
+            FMa = FM.copy()
+            RPa = RP.copy()
+            RMa = RP.copy()
+            TPa = TP.copy()
+            TMa = TP.copy()
+        else:
+            FPa = None
+            FMa = None
+            RPa = None
+            TPa = None
+            RMa = None
+            TMa = None
+    
+        # Loop over f+1 interfaces
+        # Thus, the wavefield propagates to the focusing depth, and scatters
+        # at the focusing depth.
+        for n in range(0,f+1):
+            
+            # Scattering coefficients
+            ScatCoeffs = self.RT_p_w(beta_u=Bvec[n]  ,g3_u=G3vec[n]  ,p3_u=P3[n]  ,p3n_u=P3n[n],
+                                     beta_l=Bvec[n+1],g3_l=G3vec[n+1],p3_l=P3[n+1],p3n_l=P3n[n+1],
+                                     normalisation=normalisation)
+            
+            rP = ScatCoeffs['rP']
+            tP = ScatCoeffs['tP']
+            rM = ScatCoeffs['rM']
+            tM = ScatCoeffs['tM']
+            
+            # Propagators
+            W = self.W_propagators_p_w(p3=P3[n],p3n=P3n[n],g3=G3vec[n],dx3=dx3vec[n])
+            WP = W['wP']
+            WM = W['wM']
+        
+            if InternalMultiples is True:
+                M1 = 1 / (1 - RM*WM*rP*WP)
+                M2 = 1 / (1 - rP*WP*RM*WM)
+            
+            # Update focusing functions and reflection / transmission responses
+            FP = FP/WP*(1-WP*RM*WM*rP)/tP
+            RP = RP + TM*WM*rP*WP*M1*TP
+            RM = rM + tP*WP*RM*WM*M2*tM
+            TP = tP*WP*M1*TP
+            TM = TM*WM*M2*tM  
+            FM = RP*FP
+            
+            # Model focusing functions in the adjoint medium
+            if self.AdjointMedium is True:
+                rP = ScatCoeffs['rPa']
+                tP = ScatCoeffs['tPa']
+                rM = ScatCoeffs['rMa']
+                tM = ScatCoeffs['tMa']
+                WP = W['wPa']
+                WM = W['wMa']
+            
+                if InternalMultiples is True:
+                    M1 = 1 / (1 - RMa*WM*rP*WP)
+                    M2 = 1 / (1 - rP*WP*RMa*WM)
+                
+                # Update focusing functions and reflection / transmission responses
+                FPa = FPa/WP*(1-WP*RMa*WM*rP)/tP
+                RPa = RPa + TMa*WM*rP*WP*M1*TPa
+                RMa = rM + tP*WP*RMa*WM*M2*tM
+                TPa = tP*WP*M1*TPa
+                TMa = TMa*WM*M2*tM  
+                FMa = RPa*FPa
+                
+        # Verbose: Inform the user if any wavefield contains NaNs of Infs.
+        if self.verbose is True:
+            
+            if (   np.isnan(FP).any() or np.isnan(FM).any() 
+                or np.isnan(RP).any() or np.isnan(RM).any() 
+                or np.isnan(TP).any() or np.isnan(TM).any()
+                or np.isinf(FP).any() or np.isinf(FM).any()
+                or np.isinf(RP).any() or np.isinf(TP).any() 
+                or np.isinf(RM).any() or np.isinf(TM).any()):
+                print('\n')
+                print('FocusingFunction_p_w:')
+                print('\n'+100*'-'+'\n')
+                print('One of the modelled wavefields in the true medium contains a NaN (Not a Number) or an Inf (infinite) element.')
+                print('\n')
+                
+                if np.isnan(FP).any():
+                    print('\t - FP contains '+np.count_nonzero(np.isnan(FP))+' NaN.')
+                if np.isinf(FP).any():
+                    print('\t - FP contains '+np.count_nonzero(np.isinf(FP))+' Inf.')
+                if np.isnan(RP).any():
+                    print('\t - RP contains '+np.count_nonzero(np.isnan(RP))+' NaN.')
+                if np.isinf(RP).any():
+                    print('\t - RP contains '+np.count_nonzero(np.isinf(RP))+' Inf.')
+                if np.isnan(TP).any():
+                    print('\t - TP contains '+np.count_nonzero(np.isnan(TP))+' NaN.')
+                if np.isinf(TP).any():
+                    print('\t - TP contains '+np.count_nonzero(np.isinf(TP))+' Inf.')
+                if np.isnan(FM).any():
+                    print('\t - FM contains '+np.count_nonzero(np.isnan(FM))+' NaN.')
+                if np.isinf(FM).any():
+                    print('\t - FM contains '+np.count_nonzero(np.isinf(FM))+' Inf.')
+                if np.isnan(RM).any():
+                    print('\t - RM contains '+np.count_nonzero(np.isnan(RM))+' NaN.')
+                if np.isinf(RM).any():
+                    print('\t - RM contains '+np.count_nonzero(np.isinf(RM))+' Inf.')
+                if np.isnan(TM).any():
+                    print('\t - TM contains '+np.count_nonzero(np.isnan(TM))+' NaN.')
+                if np.isinf(TM).any():
+                    print('\t - TM contains '+np.count_nonzero(np.isinf(TM))+' Inf.')
+            
+            if self.AdjointMedium is True:
+                
+                if (   np.isnan(FPa).any() or np.isnan(FMa).any() 
+                    or np.isnan(RPa).any() or np.isnan(RMa).any() 
+                    or np.isnan(TPa).any() or np.isnan(TMa).any()
+                    or np.isinf(FPa).any() or np.isinf(FMa).any()
+                    or np.isinf(RPa).any() or np.isinf(TPa).any() 
+                    or np.isinf(RMa).any() or np.isinf(TMa).any()):
+                    print('\n')
+                    print('FocusingFunction_p_w:')
+                    print('\n'+100*'-'+'\n')
+                    print('One of the modelled wavefields in the adoint medium contains a NaN (Not a Number) or an Inf (infinite) element.')
+                    print('\n')
+                    
+                    if np.isnan(FPa).any():
+                        print('\t - FPa contains '+np.count_nonzero(np.isnan(FPa))+' NaN.')
+                    if np.isinf(FPa).any():
+                        print('\t - FPa contains '+np.count_nonzero(np.isinf(FPa))+' Inf.')
+                    if np.isnan(RPa).any():
+                        print('\t - RPa contains '+np.count_nonzero(np.isnan(RPa))+' NaN.')
+                    if np.isinf(RPa).any():
+                        print('\t - RPa contains '+np.count_nonzero(np.isinf(RPa))+' Inf.')
+                    if np.isnan(TPa).any():
+                        print('\t - TPa contains '+np.count_nonzero(np.isnan(TPa))+' NaN.')
+                    if np.isinf(TPa).any():
+                        print('\t - TPa contains '+np.count_nonzero(np.isinf(TPa))+' Inf.')
+                    if np.isnan(FMa).any():
+                        print('\t - FMa contains '+np.count_nonzero(np.isnan(FMa))+' NaN.')
+                    if np.isinf(FMa).any():
+                        print('\t - FMa contains '+np.count_nonzero(np.isinf(FMa))+' Inf.')
+                    if np.isnan(RMa).any():
+                        print('\t - RMa contains '+np.count_nonzero(np.isnan(RMa))+' NaN.')
+                    if np.isinf(RMa).any():
+                        print('\t - RMa contains '+np.count_nonzero(np.isinf(RMa))+' Inf.')
+                    if np.isnan(TMa).any():
+                        print('\t - TMa contains '+np.count_nonzero(np.isnan(TMa))+' NaN.')
+                    if np.isinf(TMa).any():
+                        print('\t - TMa contains '+np.count_nonzero(np.isinf(TMa))+' Inf.')
+                
+                print('\n')
+
+                
+        out={'FP':FP  ,'RP':RP  ,'TP':TP  ,'FM':FM  ,'RM':RM  ,'TM':TM,
+             'FPa':FPa,'RPa':RPa,'TPa':TPa,'FMa':FMa,'RMa':RMa,'TMa':TMa}
+        return out
