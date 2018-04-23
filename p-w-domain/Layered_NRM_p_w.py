@@ -17,9 +17,9 @@ import numpy as np
 import sys
 
 class Layered_NRM_p_w(Wavefield_NRM_p_w):
-    """is a class to model wavefields in 1.5D (non-)reciprocal media in the ray-parameter frequency domain.
+    """is a class to model wavefields in 1D (non-)reciprocal media in the ray-parameter frequency domain.
         
-    The class Layered_NRM_p_w defines a 1.5D (non-)reciprocal medium and a scalar wavefield. We consider a single horizontal ray-parameter 'p1' and all frequencies that are sampled by the given number of time samples 'nt' and the time sample interval 'dt'.
+    The class Layered_NRM_p_w defines a 1D (non-)reciprocal medium and a scalar wavefield. We consider a single horizontal ray-parameter 'p1' and all frequencies that are sampled by the given number of time samples 'nt' and the time sample interval 'dt'.
 
     Parameters
     ----------
@@ -67,7 +67,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
     -------
     
     class
-        A class to model a wavefield in a 1.5D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:
+        A class to model a wavefield in a 1D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:
              - **x3vec**: :math:`x_3`.
             - **avec**: :math:`\\alpha`.
             - **bvec**: :math:`\\beta`.

@@ -19,7 +19,7 @@ import numpy as np
 class Wavefield_NRM_p_w:
     """is a class to define a scalar wavefield in the ray-parameter frequency domain.
         
-    The class Wavefield_NRM_p_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider a single ray-parameter 'p1' and all frequencies that are sampled by the given number of time samples 'nt' and the time sample interval 'dt'.
+    The class Wavefield_NRM_p_w defines the parameters of a scalar wavefield in a 1D (non-)reciprocal medium. We consider a single ray-parameter 'p1' and all frequencies that are sampled by the given number of time samples 'nt' and the time sample interval 'dt'.
         
     Parameters
     ----------
@@ -43,7 +43,7 @@ class Wavefield_NRM_p_w:
     -------
     
     class
-        A class to define a wavefield in a 1.5D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:
+        A class to define a wavefield in a 1D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:
             - **nt**: Number of time samples.
             - **dt**: Time sample interval in seconds.
             - **nr**: Number of space samples.
@@ -76,6 +76,12 @@ class Wavefield_NRM_p_w:
             sys.exit('Wavefield_NRM_p_w: nr has to be an integer.')
         if type(nt) is not int:
             sys.exit('Wavefield_NRM_p_w: nt has to be an integer.')
+        if (type(dt) is not int) and (type(dt) is not float):
+            sys.exit('Wavefield_NRM_p_w: dt has to be an integer or a float.')
+        if (type(dx1) is not int) and (type(dx1) is not float):
+            sys.exit('Wavefield_NRM_p_w: dx1 has to be an integer or a float.')
+        if nt<=0 or nr<=0 or dt<=0 or dx1<=0:
+            sys.exit('Wavefield_NRM_p_w: nt, nr, dt and dx1 must be greater than zero.')
         # Check if verbose is a bool
         if not isinstance(verbose,bool):
             sys.exit('Wavefield_NRM_p_w: \'verbose\' must be of the type bool.')
@@ -147,7 +153,7 @@ class Wavefield_NRM_p_w:
             Dictionary that contains the offset vector,
                 - **xvec**: zero offset placed at the center.
                 - **xvecfft**: zero offset placed at the first index position.
-            Both vectors have the shape (nt,1).
+            Both vectors have the shape (nr,1).
                 
 
         Examples
@@ -307,7 +313,7 @@ class Wavefield_NRM_p_w:
     
     # Transform wavefield from p-t-domain to p-w-domain
     def PT2PW(self,array_pt,NumPy_fft_Sign_Convention=False):
-        """applies an inverse Fourier transform from the :math:`p_1`-:math:`t` domain to the :math:`p_1`-:math:`\omega` domain. 
+        """applies a forward Fourier transform from the :math:`p_1`-:math:`t` domain to the :math:`p_1`-:math:`\omega` domain. 
         
         We assume that the time domain signal is real-valued (:math:`p_1`-:math:`t` domain). Therefore, we use the NumPy function :py:class:`numpy.fft.rfft`.
         
