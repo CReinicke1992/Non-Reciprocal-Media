@@ -19,7 +19,7 @@ import numpy as np
 class Wavefield_NRM_k1_w:
     """is a class to define a scalar wavefield in the horizontal-wavenumber frequency domain (:math:`k_1-\omega`).
         
-    The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number samples and by the given sample intervals, in space ('nr', 'dx1') as well as in time ('nt', 'dt').
+    The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space ('nr', 'dx1') as well as in time ('nt', 'dt').
         
     Parameters
     ----------
@@ -56,7 +56,7 @@ class Wavefield_NRM_k1_w:
     -----
     We format the data as described below.
         - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
-        - Wavefields are in the :math:`k_1-\omega` domain.
+        - Wavefields are in the :math:`k_1`-:math:`\omega` domain.
         - The zero frequency component is placed at the first index position of the first dimension.
         - The zero horizontal-wavenumber component is placed at the first index position of the second dimension.
         - If the wavefield is transformed to the space-time domain: 
