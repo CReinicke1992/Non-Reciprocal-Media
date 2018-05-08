@@ -39,6 +39,14 @@ class Wavefield_NRM_k1_w:
     verbose : bool, optional
         Set 'verbose=True' to receive feedback in the command line.
         
+    eps : int, float, optional
+        A real-valued scalar can be assigned to 'eps' to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,
+            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega`,
+        which is ensured if the function **K1W2X1T** is used, 'eps'(:math:`=\epsilon`) should be positive to the suppress wrap-around effect from positive to negative time,
+            :math:`f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega`.
+        Recommended value eps = :math:`\\frac{3 nf}{dt}`.
+            
+        
     Returns
     -------
     
@@ -49,6 +57,7 @@ class Wavefield_NRM_k1_w:
             - **nr**: Number of space samples.
             - **dx1**: Number of space samples.
             - **verbose**: If one sets 'verbose=True' feedback will be output in the command line.
+            - **eps**: Scalar constant to reduce temporal wrap-around effect.
             - **nf**: Number of positive time samples :math:`=0.5 nt + 1`.
             - **nk**: Number of positive space samples :math:`=0.5 nr + 1`.
             
@@ -62,6 +71,7 @@ class Wavefield_NRM_k1_w:
         - If the wavefield is transformed to the space-time domain: 
             - The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples. 
             - The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.
+            
      
     Examples
     -------- 
@@ -72,7 +82,7 @@ class Wavefield_NRM_k1_w:
     
     """
     
-    def __init__(self,nt,dt,nr,dx1,verbose=False):
+    def __init__(self,nt,dt,nr,dx1,verbose=False,eps=None):
         
         if (type(nr) is not int):
             sys.exit('Wavefield_NRM_k1_w: nr has to be an integer.')
@@ -87,12 +97,16 @@ class Wavefield_NRM_k1_w:
         # Check if verbose is a bool
         if not isinstance(verbose,bool):
             sys.exit('Wavefield_NRM_k1_w: \'verbose\' must be of the type bool.')
+        if eps is not None: 
+            if (type(eps) is not int) and (type(eps) is not float):
+                sys.exit('Wavefield_NRM_k1_w: \'eps\' must be of the type int or float.')
             
         self.nt = nt
         self.dt = dt
         self.nr = nr
         self.dx1 = dx1
         self.verbose = verbose
+        self.eps = eps
         self.nf = int(self.nt/2) + 1 # Index of Nyquist frequency + 1
         self.nk = int(self.nr/2) + 1 # Index of Nyquist space sample + 1
         self.author = "Christian Reinicke"
@@ -181,7 +195,7 @@ class Wavefield_NRM_k1_w:
         Returns
         -------
         numpy.ndarray
-            Frequency vector, zero frequency is placed at the first index position. The vector has the shape (nf,1).
+            Frequency vector, zero frequency is placed at the first index position. The vector has the shape (nf,1). If 'self.eps' is defined, an imaginary constant :math:`\epsilon` is added to the frequency vector. 
         
         Examples
         --------
@@ -195,6 +209,10 @@ class Wavefield_NRM_k1_w:
         dw = 2*np.pi/(self.dt*self.nt)
         wvec = np.zeros((self.nf,1))
         wvec[:,0] = dw*np.arange(0,self.nf)
+        
+        # Add imaginary constant to the frequency
+        if self.eps is not None:
+            wvec = wvec + 1j*self.eps
  
         return wvec
     

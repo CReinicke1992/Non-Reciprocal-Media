@@ -570,7 +570,7 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         dx3 : int, float
             Vertical propagation distance :math:`\Delta x_3` (downward pointing :math:`x_3`-axis).
             
-        w : int, float
+        w : int, float, optional
             Frequency :math:`\omega` in radians. By default the propagators are computed for all sampled (positive) frequencies.
         
             
