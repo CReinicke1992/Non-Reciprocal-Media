@@ -491,3 +491,128 @@ class Wavefield_NRM_k1_w:
             array_k1w[:,1:] = array_k1w[:,-1:0:-1]
         
         return array_k1w
+    
+    def RickerWavelet_w(self,f0=None,w0=None,NormalisationToOne=True):
+        """computes a Ricker wavelet in the frequency domain. 
+        
+        Parameters
+        ----------
+        
+        f0 : int, float, optional
+            Value of the most energetic frequency :math:`f_0` in Hz.
+            
+        w0 : int, float, optional
+            Value of the most energetic frequency :math:`\omega_0` in radians.
+            
+        NormalisationToOne : bool, optional
+            Set 'NormalisationToOne=False' to keep the analytic scaling of the 
+            Ricker wavelet.  For 'NormalisationToOne=True' the Ricker wavelet 
+            is scaled by the inverse of the amplitude of the peak frequency 
+            :math:`\\frac{2}{\mathrm{e}\sqrt{\pi}\omega_0}`.
+            
+        Returns
+        -------
+        
+        numpy.ndarray
+            Array of the shape (nf,nr). The Ricker wavelet (in the frequency 
+            domain) is saved along the first dimension and copied nr times 
+            along the second dimension.
+            
+            :math:`R(\omega) = \\frac{2\omega^2}{\sqrt{\pi}\omega_0^3}
+            \mathrm{e}^{-\\frac{\omega^2}{\omega_0^2}}`
+            
+        References
+        ----------
+        
+        .. [1] Y. Wang, "Frequencies of the Ricker wavelet," Geophysics 80.2 
+        (2015): A31-A37.
+ 
+        """
+        if type(NormalisationToOne) is not bool:
+            sys.exit('RickerWavelet_w: The input variables \'NormalisationToOne\' must be of the type bool.')
+            
+        if f0 is None and w0 is None:
+            sys.exit('RickerWavelet_w: One the input variables, \'f0\' or  \'w0\', must be given. \'f0\' or  \'w0\' are the most energetic frequency either in hertz or in radians.')
+            
+        if f0 is None:
+            if (type(w0) is not int) and (type(w0) is not float):
+                sys.exit('RickerWavelet_w: The input variables \'w0\' must be of the type int or float.')
+                
+            if w0 <= 0:
+                sys.exit('RickerWavelet_w: The input variables \'w0\' must be greater than zero.')
+        else:
+            if (type(f0) is not int) and (type(f0) is not float):
+                sys.exit('RickerWavelet_w: The input variables \'f0\' must be of the type int or float.')
+                
+            if f0 <= 0:
+                sys.exit('RickerWavelet_w: The input variables \'f0\' must be greater than zero.')
+ 
+            # Transform to circular frequency               
+            w0 = 2*np.pi*f0
+                
+        wvec  = self.Wvec()           
+        
+        # Compute wavelet according to Wang 2015
+        Wav = 2*wvec**2/(np.sqrt(np.pi)*w0**3)*np.exp(-(wvec/w0)**2)
+        
+        # Optionally scale the wavelet
+        if NormalisationToOne is True:
+            peak = 2 / (np.e*np.sqrt(np.pi)*w0)
+            Wav  = Wav/peak
+            
+        # Copy the wavelet along the spatial dimension
+        Wav = np.tile(Wav,self.nr)
+        
+        return Wav
+    
+    def Gain_t(self,RelativeTaperLength=2**(-5)):
+        """computes a gain function in the time domain to compensate for the 
+        imaginary constant :math:`\epsilon` added to the frequencies
+        :math:`\omega' = \omega + \mathrm{j}\epsilon`.
+        
+        Parameters
+        ----------
+        
+        RelativeTaperLength : int, float, optional
+            The product of \'RelativeTaperLength\' and the number of temporal 
+            samples \'nt\' determines the taper length. The default value is 
+            \'RelativeTaperLength\':math:`=2^{-5}.`
+            
+        Returns
+        -------
+        
+        numpy.ndarray
+            Array of the shape (nt,nr). The exponential gain function 
+            :math:`\mathrm{e}^{\epsilon t}` is sorted along the first dimension 
+            (time zero element followed by positive time samples, then negative 
+            time samples).
+            
+        
+        
+        
+        """
+        
+        if not ( isinstance(RelativeTaperLength,int) 
+              or isinstance(RelativeTaperLength,float) ):
+            sys.exit('Gain_t \'RelativeTaperLength\' must be of the type int or float.')
+            
+        # Check that RelativeTaperLength is not smaller than zero
+        if RelativeTaperLength < 0:
+            sys.exit('Gain_t: \'RelativeTaperLength\' must be greater than, or equal to zero.')
+        
+        # Compute gain
+        gain = np.exp( self.eps*self.Tvec()['tvecfft'] )
+        
+        # Apply taper
+        taperlen = int(RelativeTaperLength*self.nt)
+        if taperlen != 0:
+            tap = np.cos(np.linspace(0,np.pi/2,taperlen))**2
+            
+            gain_max = gain[self.nf-1-taperlen,0]
+            gain_min = gain[self.nf-1,0]
+            gain[self.nf-1-taperlen:self.nf-1,0] = ( (gain_max - gain_min)*tap 
+                                                    + gain_min                )
+            
+        gain = np.tile(gain,self.nr)
+        
+        return gain
