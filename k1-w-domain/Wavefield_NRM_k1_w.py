@@ -3,7 +3,7 @@
 """
 Routines for modelling wavefields in 1.5D non-reciprocal media.
 
-.. module:: Wavefield_NRM_k1_w
+.. module:: Wavefield_NRM_k1_w-v2.0
 
 :Authors:
     Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()
@@ -17,9 +17,14 @@ import numpy as np
 #import matplotlib.pylab as plt
 
 class Wavefield_NRM_k1_w:
-    """is a class to define a scalar wavefield in the horizontal-wavenumber frequency domain (:math:`k_1-\omega`).
+    """is a class to define a scalar wavefield in the horizontal-wavenumber 
+    frequency domain (:math:`k_1-\omega`).
         
-    The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space ('nr', 'dx1') as well as in time ('nt', 'dt').
+    The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield 
+    in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers 
+    and all frequencies, that are sampled by the given number of samples and by 
+    the given sample intervals, in space ('nr', 'dx1') as well as in time 
+    ('nt', 'dt').
         
     Parameters
     ----------
@@ -40,10 +45,18 @@ class Wavefield_NRM_k1_w:
         Set 'verbose=True' to receive feedback in the command line.
         
     eps : int, float, optional
-        A real-valued scalar can be assigned to 'eps' to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,
-            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega`,
-        which is ensured if the function **K1W2X1T** is used, 'eps'(:math:`=\epsilon`) should be positive to the suppress wrap-around effect from positive to negative time,
-            :math:`f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega`.
+        A real-valued scalar can be assigned to 'eps' to reduce the wrap-around 
+        effect of wavefields in the time domain. If the inverse Fourier 
+        transform is defined as,
+            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} 
+            \mathrm{d}\omega`,
+        which is ensured if the function **K1W2X1T** is used, 'eps' 
+        (:math:`=\epsilon`) should be positive to the suppress wrap-around 
+        effect from positive to negative time,
+            :math:`f(t) \mathrm{e}^{- \epsilon t} = 
+            \int F(\omega + \mathrm{j} \epsilon) \; 
+            \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} 
+            \mathrm{d}\omega`.
         Recommended value eps = :math:`\\frac{3 nf}{dt}`.
             
         
@@ -51,12 +64,15 @@ class Wavefield_NRM_k1_w:
     -------
     
     class
-        A class to define a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:
+        A class to define a wavefield in a 1.5D non-reciprocal medium in the 
+        horizontal-wavenumber frequency domain. The following instances are 
+        defined:
             - **nt**: Number of time samples.
             - **dt**: Time sample interval in seconds.
             - **nr**: Number of space samples.
             - **dx1**: Number of space samples.
-            - **verbose**: If one sets 'verbose=True' feedback will be output in the command line.
+            - **verbose**: If one sets 'verbose=True' feedback will be output 
+            in the command line.
             - **eps**: Scalar constant to reduce temporal wrap-around effect.
             - **nf**: Number of positive time samples :math:`=0.5 nt + 1`.
             - **nk**: Number of positive space samples :math:`=0.5 nr + 1`.
@@ -64,13 +80,20 @@ class Wavefield_NRM_k1_w:
     Notes
     -----
     We format the data as described below.
-        - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
+        - Wavefields are saved in an array of dimensions (nf,nr) in the 
+        frequency domain and (nt,nr) in the time domain.
         - Wavefields are in the :math:`k_1`-:math:`\omega` domain.
-        - The zero frequency component is placed at the first index position of the first dimension.
-        - The zero horizontal-wavenumber component is placed at the first index position of the second dimension.
+        - The zero frequency component is placed at the first index position of 
+        the first dimension.
+        - The zero horizontal-wavenumber component is placed at the first index 
+        position of the second dimension.
         - If the wavefield is transformed to the space-time domain: 
-            - The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples. 
-            - The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.
+            - The zero time component is placed at the first index position of 
+            the first dimension, followed by nt/2-1 positive time samples and 
+            nt/2 negative time samples. 
+            - The zero offset component is placed at the first index position 
+            of the second dimension, followed by nr/2-1 positive offset samples 
+            and nr/2 negative offset samples.
             
      
     Examples

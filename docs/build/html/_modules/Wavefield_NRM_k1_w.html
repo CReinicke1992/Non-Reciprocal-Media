@@ -58,7 +58,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Routines for modelling wavefields in 1.5D non-reciprocal media.</span>
 
-<span class="sd">.. module:: Wavefield_NRM_k1_w</span>
+<span class="sd">.. module:: Wavefield_NRM_k1_w-v2.0</span>
 
 <span class="sd">:Authors:</span>
 <span class="sd">    Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()</span>
@@ -72,9 +72,14 @@
 <span class="c1">#import matplotlib.pylab as plt</span>
 
 <div class="viewcode-block" id="Wavefield_NRM_k1_w"><a class="viewcode-back" href="../Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w">[docs]</a><span class="k">class</span> <span class="nc">Wavefield_NRM_k1_w</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;is a class to define a scalar wavefield in the horizontal-wavenumber frequency domain (:math:`k_1-\omega`).</span>
+    <span class="sd">&quot;&quot;&quot;is a class to define a scalar wavefield in the horizontal-wavenumber </span>
+<span class="sd">    frequency domain (:math:`k_1-\omega`).</span>
 <span class="sd">        </span>
-<span class="sd">    The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space (&#39;nr&#39;, &#39;dx1&#39;) as well as in time (&#39;nt&#39;, &#39;dt&#39;).</span>
+<span class="sd">    The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield </span>
+<span class="sd">    in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers </span>
+<span class="sd">    and all frequencies, that are sampled by the given number of samples and by </span>
+<span class="sd">    the given sample intervals, in space (&#39;nr&#39;, &#39;dx1&#39;) as well as in time </span>
+<span class="sd">    (&#39;nt&#39;, &#39;dt&#39;).</span>
 <span class="sd">        </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -95,10 +100,18 @@
 <span class="sd">        Set &#39;verbose=True&#39; to receive feedback in the command line.</span>
 <span class="sd">        </span>
 <span class="sd">    eps : int, float, optional</span>
-<span class="sd">        A real-valued scalar can be assigned to &#39;eps&#39; to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,</span>
-<span class="sd">            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega`,</span>
-<span class="sd">        which is ensured if the function **K1W2X1T** is used, &#39;eps&#39;(:math:`=\epsilon`) should be positive to the suppress wrap-around effect from positive to negative time,</span>
-<span class="sd">            :math:`f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega`.</span>
+<span class="sd">        A real-valued scalar can be assigned to &#39;eps&#39; to reduce the wrap-around </span>
+<span class="sd">        effect of wavefields in the time domain. If the inverse Fourier </span>
+<span class="sd">        transform is defined as,</span>
+<span class="sd">            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} </span>
+<span class="sd">            \mathrm{d}\omega`,</span>
+<span class="sd">        which is ensured if the function **K1W2X1T** is used, &#39;eps&#39; </span>
+<span class="sd">        (:math:`=\epsilon`) should be positive to the suppress wrap-around </span>
+<span class="sd">        effect from positive to negative time,</span>
+<span class="sd">            :math:`f(t) \mathrm{e}^{- \epsilon t} = </span>
+<span class="sd">            \int F(\omega + \mathrm{j} \epsilon) \; </span>
+<span class="sd">            \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} </span>
+<span class="sd">            \mathrm{d}\omega`.</span>
 <span class="sd">        Recommended value eps = :math:`\\frac{3 nf}{dt}`.</span>
 <span class="sd">            </span>
 <span class="sd">        </span>
@@ -106,12 +119,15 @@
 <span class="sd">    -------</span>
 <span class="sd">    </span>
 <span class="sd">    class</span>
-<span class="sd">        A class to define a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:</span>
+<span class="sd">        A class to define a wavefield in a 1.5D non-reciprocal medium in the </span>
+<span class="sd">        horizontal-wavenumber frequency domain. The following instances are </span>
+<span class="sd">        defined:</span>
 <span class="sd">            - **nt**: Number of time samples.</span>
 <span class="sd">            - **dt**: Time sample interval in seconds.</span>
 <span class="sd">            - **nr**: Number of space samples.</span>
 <span class="sd">            - **dx1**: Number of space samples.</span>
-<span class="sd">            - **verbose**: If one sets &#39;verbose=True&#39; feedback will be output in the command line.</span>
+<span class="sd">            - **verbose**: If one sets &#39;verbose=True&#39; feedback will be output </span>
+<span class="sd">            in the command line.</span>
 <span class="sd">            - **eps**: Scalar constant to reduce temporal wrap-around effect.</span>
 <span class="sd">            - **nf**: Number of positive time samples :math:`=0.5 nt + 1`.</span>
 <span class="sd">            - **nk**: Number of positive space samples :math:`=0.5 nr + 1`.</span>
@@ -119,13 +135,20 @@
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    We format the data as described below.</span>
-<span class="sd">        - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.</span>
+<span class="sd">        - Wavefields are saved in an array of dimensions (nf,nr) in the </span>
+<span class="sd">        frequency domain and (nt,nr) in the time domain.</span>
 <span class="sd">        - Wavefields are in the :math:`k_1`-:math:`\omega` domain.</span>
-<span class="sd">        - The zero frequency component is placed at the first index position of the first dimension.</span>
-<span class="sd">        - The zero horizontal-wavenumber component is placed at the first index position of the second dimension.</span>
+<span class="sd">        - The zero frequency component is placed at the first index position of </span>
+<span class="sd">        the first dimension.</span>
+<span class="sd">        - The zero horizontal-wavenumber component is placed at the first index </span>
+<span class="sd">        position of the second dimension.</span>
 <span class="sd">        - If the wavefield is transformed to the space-time domain: </span>
-<span class="sd">            - The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples. </span>
-<span class="sd">            - The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.</span>
+<span class="sd">            - The zero time component is placed at the first index position of </span>
+<span class="sd">            the first dimension, followed by nt/2-1 positive time samples and </span>
+<span class="sd">            nt/2 negative time samples. </span>
+<span class="sd">            - The zero offset component is placed at the first index position </span>
+<span class="sd">            of the second dimension, followed by nr/2-1 positive offset samples </span>
+<span class="sd">            and nr/2 negative offset samples.</span>
 <span class="sd">            </span>
 <span class="sd">     </span>
 <span class="sd">    Examples</span>

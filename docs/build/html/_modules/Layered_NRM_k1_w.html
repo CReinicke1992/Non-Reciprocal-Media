@@ -58,7 +58,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Routines for modelling wavefields in 1.5D non-reciprocal media.</span>
 
-<span class="sd">.. module:: Wavefield_NRM_k1_w</span>
+<span class="sd">.. module:: Wavefield_NRM_k1_w-v2.0</span>
 
 <span class="sd">:Authors:</span>
 <span class="sd">    Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()</span>
@@ -72,9 +72,14 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <div class="viewcode-block" id="Layered_NRM_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w">[docs]</a><span class="k">class</span> <span class="nc">Layered_NRM_k1_w</span><span class="p">(</span><span class="n">Wavefield_NRM_k1_w</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;is a class to model wavefields in 1.5D (non-)reciprocal media in the horizontal-wavenumber frequency domain.</span>
+    <span class="sd">&quot;&quot;&quot;is a class to model wavefields in 1.5D (non-)reciprocal media in the </span>
+<span class="sd">    horizontal-wavenumber frequency domain.</span>
 <span class="sd">        </span>
-<span class="sd">    The class Layered_NRM_k1_w defines a 1.5D (non-)reciprocal medium and a scalar wavefield. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space (&#39;nr&#39;, &#39;dx1&#39;) as well as in time (&#39;nt&#39;, &#39;dt&#39;).</span>
+<span class="sd">    The class Layered_NRM_k1_w defines a 1.5D (non-)reciprocal medium and a </span>
+<span class="sd">    scalar wavefield. We consider all horizontal-wavenumbers and all </span>
+<span class="sd">    frequencies, that are sampled by the given number of samples and by the </span>
+<span class="sd">    given sample intervals, in space (&#39;nr&#39;, &#39;dx1&#39;) as well as in time </span>
+<span class="sd">    (&#39;nt&#39;, &#39;dt&#39;).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -95,45 +100,76 @@
 <span class="sd">        Set &#39;verbose=True&#39; to receive feedback in the command line.</span>
 <span class="sd">        </span>
 <span class="sd">    eps : int, float, optional</span>
-<span class="sd">        A real-valued scalar can be assigned to &#39;eps&#39; to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,</span>
-<span class="sd">            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega`,</span>
-<span class="sd">        which is ensured if the function **K1W2X1T** is used, &#39;eps&#39;(:math:`=\epsilon`) should be positive to the suppress wrap-around effect from positive to negative time,</span>
-<span class="sd">            :math:`f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega`.</span>
+<span class="sd">        A real-valued scalar can be assigned to &#39;eps&#39; to reduce the wrap-around </span>
+<span class="sd">        effect of wavefields in the time domain. If the inverse Fourier </span>
+<span class="sd">        transform is defined as,</span>
+<span class="sd">            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} </span>
+<span class="sd">            \mathrm{d}\omega`,</span>
+<span class="sd">        which is ensured if the function **K1W2X1T** is used, &#39;eps&#39; </span>
+<span class="sd">        (:math:`=\epsilon`) should be positive to the suppress wrap-around </span>
+<span class="sd">        effect from positive to negative time,</span>
+<span class="sd">            :math:`f(t) \mathrm{e}^{- \epsilon t} = </span>
+<span class="sd">            \int F(\omega + \mathrm{j} \epsilon) \; </span>
+<span class="sd">            \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} </span>
+<span class="sd">            \mathrm{d}\omega`.</span>
 <span class="sd">        Recommended value eps = :math:`\\frac{3 nf}{dt}`.</span>
 <span class="sd">        </span>
 <span class="sd">    x3vec : numpy.ndarray</span>
-<span class="sd">        Vertical spatial vector :math:`x_3`, for n layers &#39;x3vec&#39; must have the shape (n,). We define the :math:`x_3`-axis as downward-pointing. Implicitly, the first value on the :math:`x_3`-axis is zero (not stored in &#39;x3vec&#39;).</span>
+<span class="sd">        Vertical spatial vector :math:`x_3`, for n layers &#39;x3vec&#39; must have the </span>
+<span class="sd">        shape (n,). We define the :math:`x_3`-axis as downward-pointing. </span>
+<span class="sd">        Implicitly, the first value on the :math:`x_3`-axis is zero (not stored </span>
+<span class="sd">        in &#39;x3vec&#39;).</span>
 <span class="sd">    </span>
 <span class="sd">    avec : numpy.ndarray</span>
-<span class="sd">        Medium parameter :math:`\\alpha` (real-valued), for n layers &#39;avec&#39; must have the shape (n,).</span>
+<span class="sd">        Medium parameter :math:`\\alpha` (real-valued), for n layers &#39;avec&#39; </span>
+<span class="sd">        must have the shape (n,).</span>
 <span class="sd">        </span>
-<span class="sd">    bvec : numpy.ndarray</span>
-<span class="sd">        Medium parameter :math:`\\beta` (real-valued), for n layers &#39;bvec&#39; must have the shape (n,).</span>
+<span class="sd">    b11vec : numpy.ndarray</span>
+<span class="sd">        Medium parameter :math:`\\beta_{11}` (real-valued), for n layers </span>
+<span class="sd">        &#39;b11vec&#39; must have the shape (n,).</span>
+<span class="sd">        </span>
+<span class="sd">    b13vec : numpy.ndarray, optional</span>
+<span class="sd">        Medium parameter :math:`\\beta_{13}` (real-valued), for n layers </span>
+<span class="sd">        &#39;b13vec&#39; must have the shape (n,).</span>
+<span class="sd">        </span>
+<span class="sd">    b33vec : numpy.ndarray</span>
+<span class="sd">        Medium parameter :math:`\\beta_{33}` (real-valued), for n layers </span>
+<span class="sd">        &#39;b33vec&#39; must have the shape (n,).</span>
 <span class="sd">    </span>
 <span class="sd">    g1vec : numpy.ndarray, optional</span>
-<span class="sd">        Medium parameter :math:`\gamma_1` (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers &#39;g1vec&#39; must have the shape (n,).</span>
+<span class="sd">        Medium parameter :math:`\gamma_1` (real-valued for non-reciprocal </span>
+<span class="sd">        media), for n layers &#39;g1vec&#39; must have the shape (n,).</span>
 <span class="sd">        </span>
 <span class="sd">    g3vec : numpy.ndarray, optional</span>
-<span class="sd">        Medium parameter :math:`\gamma_3` (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers &#39;g3vec&#39; must have the shape (n,).</span>
+<span class="sd">        Medium parameter :math:`\gamma_3` (real-valued for non-reciprocal </span>
+<span class="sd">        media), for n layers &#39;g3vec&#39; must have the shape (n,).</span>
 <span class="sd">        </span>
 <span class="sd">    ReciprocalMedium : bool, optional</span>
-<span class="sd">        For non-reciprocal media set &#39;ReciprocalMedium=False&#39;, for reciprocal media set &#39;ReciprocalMedium=True&#39;.</span>
+<span class="sd">        For non-reciprocal media set &#39;ReciprocalMedium=False&#39;, for reciprocal </span>
+<span class="sd">        media set &#39;ReciprocalMedium=True&#39;.</span>
 <span class="sd">        </span>
 <span class="sd">    AdjointMedium : bool, optional</span>
-<span class="sd">        Set &#39;AdjointMedium=True&#39; to compute scattering coefficients and propagators in an adjoint medium :math:`^{(a)}`. For reciprocal media, the scattering coefficients and propagators are identical in a medium and its adjoint. We have defined the scattering and propagation in the adjoint medium only for flux-normalisation.</span>
+<span class="sd">        Set &#39;AdjointMedium=True&#39; to compute scattering coefficients and </span>
+<span class="sd">        propagators in an adjoint medium :math:`^{(a)}`. We have defined the </span>
+<span class="sd">        scattering and propagation in the adjoint medium only for </span>
+<span class="sd">        flux-normalisation.</span>
 <span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    </span>
 <span class="sd">    class</span>
-<span class="sd">        A class to model a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:</span>
+<span class="sd">        A class to model a wavefield in a 1.5D non-reciprocal medium in the </span>
+<span class="sd">        horizontal-wavenumber frequency domain. The following instances are </span>
+<span class="sd">        defined:</span>
 <span class="sd">            - **x3vec**: :math:`x_3`.</span>
 <span class="sd">            - **avec**: :math:`\\alpha`.</span>
-<span class="sd">            - **bvec**: :math:`\\beta`.</span>
+<span class="sd">            - **b11vec**: :math:`\\beta_{11}`.</span>
+<span class="sd">            - **b13vec**: :math:`\\beta_{13}`.</span>
+<span class="sd">            - **b33vec**: :math:`\\beta_{33}`.</span>
 <span class="sd">            - **g1vec**: :math:`\gamma_1`.</span>
 <span class="sd">            - **g3vec**: :math:`\gamma_3`.</span>
 <span class="sd">            - **ReciprocalMedium**: True for reciprocal media, False for non-reciprocal media.</span>
-<span class="sd">            - **AdjointMedium**: If True, propagation and scatteing are defined in a medium and in its adjoint.</span>
+<span class="sd">            - **AdjointMedium**: If True, propagation and scattering are defined in a medium and in its adjoint.</span>
 <span class="sd">            - **k3**: Vertical-wavenumber for positive &#39;k1&#39;.</span>
 <span class="sd">            - **k3n**: Vertical-wavenumber for negative &#39;k1&#39;.</span>
 <span class="sd">            </span>
@@ -273,54 +309,87 @@
 <span class="sd">   &quot;&quot;&quot;</span>    
   
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nt</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">nr</span><span class="p">,</span><span class="n">dx1</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-                 <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
-                 <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                 <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">b11vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">b13vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                 <span class="n">b33vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                 <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         
         <span class="c1"># Inherit __init__ from Wavefield_NRM_k1_w</span>
         <span class="n">Wavefield_NRM_k1_w</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">nt</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="n">nr</span><span class="p">,</span><span class="n">dx1</span><span class="p">,</span><span class="n">verbose</span><span class="p">,</span><span class="n">eps</span><span class="p">)</span>
         
         <span class="c1"># Check if medium parameters are passed as arrays</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x3vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">avec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bvec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g1vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g3vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec, avec, bvec, g1vec and g3vec have to be of the type numpy.ndarray.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x3vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">avec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> 
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b11vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b13vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> 
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">b33vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g1vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> 
+        <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g3vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec, avec, b11vec, b13vec, b33vec, &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;g1vec and g3vec have to be of the type numpy.ndarray.&#39;</span><span class="p">)</span>
             
-        <span class="c1"># Set gamma_1 and gamma_3 by default equal to zero</span>
-        <span class="k">if</span> <span class="n">g1vec</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># Set beta_{13}, gamma_1 and gamma_3 by default equal to zero</span>
+        <span class="k">if</span> <span class="n">b13vec</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">b13vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">avec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">g1vec</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">g1vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">avec</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">g3vec</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">g3vec</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">g3vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">avec</span><span class="p">)</span>
             
         <span class="c1"># Force the medium parameters to have identical shape</span>
-        <span class="k">if</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">avec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">bvec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">g1vec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">g3vec</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec, avec, bvec, g1vec and g3vec have to be of identical shape.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">avec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">b11vec</span><span class="o">.</span><span class="n">shape</span> 
+            <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">b13vec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">b33vec</span><span class="o">.</span><span class="n">shape</span> 
+            <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">g1vec</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">shape</span><span class="o">!=</span><span class="n">g3vec</span><span class="o">.</span><span class="n">shape</span><span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec, avec, b11vec, b13vec, b33vec, &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;g1vec and g3vec have to be of identical shape.&#39;</span><span class="p">)</span>
         
         <span class="c1"># Force the medium parameters to be 1-dimensional, i.e. e.g. avec.shape=(n,)</span>
         <span class="k">if</span> <span class="n">x3vec</span><span class="o">.</span><span class="n">ndim</span><span class="o">!=</span><span class="mi">1</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec.ndim, avec.ndim, bvec.ndim, g1vec.ndim and g3vec.ndim must be one.&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec.ndim, avec.ndim, b11vec.ndim, &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;b13vec.ndim, b33vec.ndim, g1vec.ndim and g3vec.ndim &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;must be one.&#39;</span><span class="p">)</span>
         
         <span class="c1"># Check if x3vec is positive and constantly increasing</span>
         <span class="k">if</span> <span class="n">x3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;</span><span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">x3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">x3vec</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec must only contain constantly increasing values greater than, or equal to zero.&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: x3vec must only contain constantly &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;increasing values greater than, or equal to zero.&#39;</span><span class="p">)</span>
         
         <span class="c1"># Check if Medium choices are bools</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ReciprocalMedium</span><span class="p">,</span><span class="nb">bool</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">AdjointMedium</span><span class="p">,</span><span class="nb">bool</span><span class="p">)</span> <span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: </span><span class="se">\&#39;</span><span class="s1">ReciprocalMedium</span><span class="se">\&#39;</span><span class="s1"> and </span><span class="se">\&#39;</span><span class="s1">AdjointMedium</span><span class="se">\&#39;</span><span class="s1"> must be of the type bool.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>    <span class="nb">isinstance</span><span class="p">(</span><span class="n">ReciprocalMedium</span><span class="p">,</span><span class="nb">bool</span><span class="p">)</span> 
+                <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">AdjointMedium</span><span class="p">,</span><span class="nb">bool</span><span class="p">)</span>   <span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: </span><span class="se">\&#39;</span><span class="s1">ReciprocalMedium</span><span class="se">\&#39;</span><span class="s1"> and &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">AdjointMedium</span><span class="se">\&#39;</span><span class="s1"> must be of the type bool.&#39;</span><span class="p">)</span>
         
         <span class="c1"># Check if medium parameters correspond to a lossless (non-)reciprocal medium</span>
         <span class="k">if</span> <span class="n">ReciprocalMedium</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">avec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">bvec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">g1vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">g3vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: In lossless non-reciprocal media the imaginary value of avec, bvec, g1vec and g3vec has to be zero.&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">avec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span>      <span class="ow">or</span> <span class="n">b11vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> 
+                <span class="ow">or</span> <span class="n">b13vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">b33vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> 
+                <span class="ow">or</span> <span class="n">g1vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span>  <span class="ow">or</span> <span class="n">g3vec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: In lossless non-reciprocal media &#39;</span>
+                         <span class="s1">&#39;avec, b11vec, b13vec, b33vec, g1vec and g3vec have &#39;</span>
+                         <span class="o">+</span><span class="s1">&#39;to be real-valued.&#39;</span><span class="p">)</span>
+        <span class="c1"># The updated equations do not address reciprocal media. Therefore,</span>
+        <span class="c1"># I am not making any assumptions about their real- and imaginary</span>
+        <span class="c1"># parts before Kees confirms the missing expressions.</span>
         <span class="k">elif</span> <span class="n">ReciprocalMedium</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">avec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">bvec</span><span class="o">.</span><span class="n">imag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">g1vec</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span> <span class="ow">or</span> <span class="n">g3vec</span><span class="o">.</span><span class="n">real</span><span class="o">.</span><span class="n">any</span><span class="p">()</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
-                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: In lossless reciprocal media the imaginary value of avec and bvec has to be zero, the real value of g1vec and g3vec has to be zero.&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: This version (2.0) does not yet &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;include expressions for reciprocal media. To consider &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;reciprocal media set </span><span class="se">\&#39;</span><span class="s1">ReciprocalMedium=False</span><span class="se">\&#39;</span><span class="s1"> and &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">g1vec = 0</span><span class="se">\&#39;</span><span class="s1"> and </span><span class="se">\&#39;</span><span class="s1">g3vec = 0</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+<span class="c1">#            if (avec.imag.any()!=0      or b11vec.imag.any()!=0 </span>
+<span class="c1">#                or b13vec.imag.any()!=0 or b33vec.imag.any()!=0 </span>
+<span class="c1">#                or g1vec.real.any()!=0  or g3vec.real.any()!=0 ):</span>
+<span class="c1">#                sys.exit(&#39;Layered_NRM_k1_w: In lossless reciprocal media avec,&#39;</span>
+<span class="c1">#                         +&#39; b11vec, b13vec and b33vec have to be real-valued, &#39;</span>
+<span class="c1">#                         +&#39;g1vec and g3vec have to be only imaginary-valued.&#39;)</span>
             
         <span class="c1"># Set medium parameters </span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span> <span class="o">=</span> <span class="n">x3vec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">avec</span> <span class="o">=</span> <span class="n">avec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bvec</span> <span class="o">=</span> <span class="n">bvec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span> <span class="o">=</span> <span class="n">g1vec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span> <span class="o">=</span> <span class="n">g3vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span>  <span class="o">=</span> <span class="n">x3vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">avec</span>   <span class="o">=</span> <span class="n">avec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span> <span class="o">=</span> <span class="n">b11vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span> <span class="o">=</span> <span class="n">b13vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b31vec</span> <span class="o">=</span> <span class="n">b13vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">b33vec</span> <span class="o">=</span> <span class="n">b33vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span>  <span class="o">=</span> <span class="n">g1vec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span>  <span class="o">=</span> <span class="n">g3vec</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="o">=</span> <span class="n">ReciprocalMedium</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="o">=</span> <span class="n">AdjointMedium</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span>    <span class="o">=</span> <span class="n">AdjointMedium</span>
         
         <span class="c1"># Calculate vertical ray-parameter p3=p3(+p1) p3n=p3(-p1) </span>
         <span class="c1"># Note: By default python uses opposite sign convention for evanescent waves as Kees: (-1)**0.5=1j</span>
@@ -354,192 +423,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>  <span class="o">=</span> <span class="n">K3</span><span class="o">**</span><span class="mf">0.5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span> <span class="o">=</span> <span class="n">K3n</span><span class="o">**</span><span class="mf">0.5</span>
         
-    <span class="c1"># The initial fk mask function was mathematically more elegant but very </span>
-    <span class="c1"># very slow and unflexible. Therefore, I replaced it.</span>
-<span class="c1">#    def FK1_mask_k1_w(self,RelativeTaperLength=2**(-5),wmax=None):</span>
-<span class="c1">#        &quot;&quot;&quot;returns a mask that mutes evanescent waves in the :math:`k_1`-:math:`\omega` domain.</span>
-<span class="c1">#        </span>
-<span class="c1">#        Parameters</span>
-<span class="c1">#        ----------</span>
-<span class="c1">#            </span>
-<span class="c1">#        RelativeTaperLength : int, float, optional</span>
-<span class="c1">#            The product of \&#39;RelativeTaperLength\&#39; and the number of spatial samples \&#39;nr\&#39; determines the taper length. The default value is \&#39;RelativeTaperLength\&#39;:math:`=2^{-5}.`</span>
-<span class="c1">#            </span>
-<span class="c1">#        wmax : int, float, complex, optional</span>
-<span class="c1">#            Cut-off frequency :math:`\omega_{\mathrm{max}}` in :math:`s^{-1}`.</span>
-<span class="c1">#            </span>
-<span class="c1">#        Returns</span>
-<span class="c1">#        -------</span>
-<span class="c1">#        </span>
-<span class="c1">#        dict</span>
-<span class="c1">#            A dictionary that contains the ,</span>
-<span class="c1">#                - **FK**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually. Shape (nf,nr,n).</span>
-<span class="c1">#                - **FK_global**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model. Shape (nf,nr).</span>
-<span class="c1">#                - **FK_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually. Shape (nf,nr,n).</span>
-<span class="c1">#                - **FK_global_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model. Shape (nf,nr).</span>
-<span class="c1">#                - **FKn**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually (for sign-inverted :math:`k_1`). Shape (nf,nr,n).</span>
-<span class="c1">#                - **FKn_global**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model (for sign-inverted :math:`k_1`). Shape (nf,nr).</span>
-<span class="c1">#                - **FKn_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually (for sign-inverted :math:`k_1`). Shape (nf,nr,n).</span>
-<span class="c1">#                - **FKn_global_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model (for sign-inverted :math:`k_1`). Shape (nf,nr).</span>
-<span class="c1">#                - **taperlen**: Taper length in number of samples.</span>
-<span class="c1">#            All masks are stored as complex valued arrays because they will be applied to complex-valued arrays.</span>
-<span class="c1">#            </span>
-<span class="c1">#        Examples</span>
-<span class="c1">#        --------</span>
-<span class="c1">#        </span>
-<span class="c1">#        &gt;&gt;&gt; # Initialise wavefield</span>
-<span class="c1">#        &gt;&gt;&gt; from Layered_NRM_k1_w import Layered_NRM_k1_w as LM</span>
-<span class="c1">#        &gt;&gt;&gt; F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),</span>
-<span class="c1">#        &gt;&gt;&gt;      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,</span>
-<span class="c1">#        &gt;&gt;&gt;      g1vec=1j*np.array([0.8,2,1.3])*1e-4,</span>
-<span class="c1">#        &gt;&gt;&gt;      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,</span>
-<span class="c1">#        &gt;&gt;&gt;      ReciprocalMedium=True)</span>
-<span class="c1">#        </span>
-<span class="c1">#        &gt;&gt;&gt; # Create fk mask with a cut-off frequency at 200 1/s</span>
-<span class="c1">#        &gt;&gt;&gt; Mask=F.FK1_mask_k1_w(wmax=200)</span>
-<span class="c1">#        &gt;&gt;&gt; Tapered_fk_mask = Mask[&#39;FK_tap&#39;]</span>
-<span class="c1">#        </span>
-<span class="c1">#        .. todo::</span>
-<span class="c1">#        </span>
-<span class="c1">#        Tapering of the edge of the :math:`\omega`-:math:`k_1` mask is done by </span>
-<span class="c1">#        matrix-matrix multiplication (numpy.dot) with a smoothing matrix *S*. </span>
-<span class="c1">#        This operation is very inefficient, and needs to be opimised.</span>
-<span class="c1">#        </span>
-<span class="c1">#            </span>
-<span class="c1">#        &quot;&quot;&quot;</span>
-<span class="c1">#        # Check if RelativeTaperLength is a float or an int</span>
-<span class="c1">#        if not ( isinstance(RelativeTaperLength,int) </span>
-<span class="c1">#              or isinstance(RelativeTaperLength,float) ):</span>
-<span class="c1">#            sys.exit(&#39;FK1_mask_k1_w: \&#39;RelativeTaperLength\&#39; must be of the type int or float.&#39;)</span>
-<span class="c1">#            </span>
-<span class="c1">#        # Check that RelativeTaperLength is not smaller than zero</span>
-<span class="c1">#        if RelativeTaperLength &lt; 0:</span>
-<span class="c1">#            sys.exit(&#39;FK1_mask_k1_w: \&#39;RelativeTaperLength\&#39; must be greater than, or equal to zero.&#39;)</span>
-<span class="c1">#            </span>
-<span class="c1">#        # Check if wmax is a float or an int or a complex</span>
-<span class="c1">#        if wmax is not None:</span>
-<span class="c1">#            if not ( isinstance(wmax,int) </span>
-<span class="c1">#                  or isinstance(wmax,float) </span>
-<span class="c1">#                  or isinstance(wmax,complex)):</span>
-<span class="c1">#                sys.exit(&#39;FK1_mask_k1_w: \&#39;wmax\&#39; must be of the type int, float or complex.&#39;)</span>
-<span class="c1">#       </span>
-<span class="c1">#            # Check that wmax is not smaller than zero</span>
-<span class="c1">#            if wmax.real &lt; 0:</span>
-<span class="c1">#                sys.exit(&#39;FK1_mask_k1_w: \&#39;wmax\&#39; must be greater than, or equal to zero.&#39;)</span>
-<span class="c1">#            </span>
-<span class="c1">#        # Sharp-edged FK mask</span>
-<span class="c1">#        FK  = np.ones((self.nf,self.nr,self.x3vec.size),dtype=complex)</span>
-<span class="c1">#        FKn = np.ones((self.nf,self.nr,self.x3vec.size),dtype=complex)</span>
-<span class="c1">#        </span>
-<span class="c1">#        # For complex-valued frequencies:</span>
-<span class="c1">#        if self.eps is not None:</span>
-<span class="c1">#            # Compute K3 without adding an imaginary constant</span>
-<span class="c1">#            # Hence we have to subtract epsilon from the frequencies</span>
-<span class="c1">#            K3  = np.zeros((self.nf,self.nr,self.x3vec.size),dtype=complex)</span>
-<span class="c1">#            K3n = K3.copy()</span>
-<span class="c1">#            W   = self.W_K1_grid()[&#39;Wgrid&#39;] - 1j*self.eps</span>
-<span class="c1">#            K1  = self.W_K1_grid()[&#39;K1gridfft&#39;]</span>
-<span class="c1">#            if self.ReciprocalMedium is True:</span>
-<span class="c1">#                tmp = self.avec*self.bvec + self.g1vec**2 + self.g3vec**2</span>
-<span class="c1">#                for layer in range(self.x3vec.size):</span>
-<span class="c1">#                    K3[:,:,layer] = tmp[layer]*W**2 - K1**2</span>
-<span class="c1">#                K3n = K3.copy()</span>
-<span class="c1">#            elif self.ReciprocalMedium is False:</span>
-<span class="c1">#                tmp = self.avec*self.bvec - self.g1vec**2</span>
-<span class="c1">#                for layer in range(self.x3vec.size):</span>
-<span class="c1">#                    K3[:,:,layer]  = tmp[layer]*W**2 + 2*self.g1vec[layer]*K1*W - K1**2</span>
-<span class="c1">#                    K3n[:,:,layer] = tmp[layer]*W**2 - 2*self.g1vec[layer]*K1*W - K1**2</span>
-<span class="c1">#            K3  = K3**0.5</span>
-<span class="c1">#            K3n = K3n**0.5</span>
-<span class="c1">#            </span>
-<span class="c1">#        # For real-valued frequencies:</span>
-<span class="c1">#        else:</span>
-<span class="c1">#            K3 = self.K3</span>
-<span class="c1">#            K3n = self.K3n</span>
-<span class="c1">#            </span>
-<span class="c1">#        FK[K3.imag   != 0] = 0</span>
-<span class="c1">#        FKn[K3n.imag != 0] = 0</span>
-<span class="c1">#        FK_global  = np.prod(FK,-1)</span>
-<span class="c1">#        FKn_global = np.prod(FKn,-1)</span>
-<span class="c1">#        </span>
-<span class="c1">#        # Tapered FK mask: Cosine taper</span>
-<span class="c1">#        taperlen = int(RelativeTaperLength*self.nr)</span>
-<span class="c1">#        if taperlen != 0:</span>
-<span class="c1">#            </span>
-<span class="c1">#            # Construct matrix to smooth sharp edges along the k1 dimension</span>
-<span class="c1">#            S   = np.zeros((self.nr,self.nr),dtype=complex)</span>
-<span class="c1">#            tap = (        np.cos(np.linspace(-np.pi/2,0,taperlen))</span>
-<span class="c1">#                   /np.sum(np.cos(np.linspace(-np.pi/2,0,taperlen))) )</span>
-<span class="c1">#                   </span>
-<span class="c1">#            # Smooth positive k1 values</span>
-<span class="c1">#            col = np.zeros(self.nr)</span>
-<span class="c1">#            col[:taperlen]=tap</span>
-<span class="c1">#            for i in range(self.nk-1):</span>
-<span class="c1">#                S[:,i]=np.roll(col,i)</span>
-<span class="c1">#                </span>
-<span class="c1">#            # Smooth negative k1 values</span>
-<span class="c1">#            col = np.zeros(self.nr)</span>
-<span class="c1">#            col[0] = tap[0]</span>
-<span class="c1">#            col[-taperlen+1:] = tap[-1:0:-1]</span>
-<span class="c1">#            for i in range(self.nk-1,self.nr):</span>
-<span class="c1">#                S[:,i]=np.roll(col,i)</span>
-<span class="c1">#        </span>
-<span class="c1">#            # Apply Smooth matrix to the sharp-edged FK mask   </span>
-<span class="c1">#            FK_tap  = np.ones((self.nf,self.nr,self.x3vec.size),</span>
-<span class="c1">#                                  dtype=complex)</span>
-<span class="c1">#            FKn_tap = np.ones((self.nf,self.nr,self.x3vec.size),</span>
-<span class="c1">#                                  dtype=complex)</span>
-<span class="c1">#            for layer in range(self.x3vec.size):</span>
-<span class="c1">#                FK_tap[:,:,layer]  = ( FK[:,:,layer]</span>
-<span class="c1">#                                      *FK[:,:,layer].dot(S))</span>
-<span class="c1">#                FKn_tap[:,:,layer] = ( FKn[:,:,layer]</span>
-<span class="c1">#                                      *FKn[:,:,layer].dot(S))</span>
-<span class="c1">#                FK_global_tap  = FK_global.dot(S)</span>
-<span class="c1">#                FKn_global_tap = FKn_global.dot(S)</span>
-<span class="c1">#        else:</span>
-<span class="c1">#            FK_tap  = FK.copy()</span>
-<span class="c1">#            FKn_tap = FKn.copy()</span>
-<span class="c1">#            FK_global_tap  = FK_global.copy()</span>
-<span class="c1">#            FKn_global_tap = FKn_global.copy()</span>
-<span class="c1">#        </span>
-<span class="c1">#        # Mask to cut-off frequencies greater than wmax</span>
-<span class="c1">#        if (wmax is not None) and (taperlen != 0):</span>
-<span class="c1">#            ind = int(np.ceil(wmax.real/self.Dw()))</span>
-<span class="c1">#            </span>
-<span class="c1">#            if ind &gt; 0:</span>
-<span class="c1">#                M   = np.ones((self.nf,self.nr,1),dtype=complex)</span>
-<span class="c1">#                M[ind:,:,0] = 0</span>
-<span class="c1">#                M = np.repeat(M,FK.shape[-1],axis=2)</span>
-<span class="c1">#                FK         = M*FK</span>
-<span class="c1">#                FK_global  = M[:,:,0] * FK_global</span>
-<span class="c1">#                FKn        = M*FKn</span>
-<span class="c1">#                FKn_global = M[:,:,0] * FKn_global</span>
-<span class="c1">#                </span>
-<span class="c1">#                if taperlen &lt; ind:</span>
-<span class="c1">#                    M[ind-taperlen:ind,0,0] = (</span>
-<span class="c1">#                        np.cos(np.linspace(0,np.pi/2,taperlen+1))[1:])</span>
-<span class="c1">#                    M[:,:,0]   = np.repeat(M[:,:1,0],FK.shape[1],axis=1)</span>
-<span class="c1">#                    M          = np.repeat(M[:,:,:1],FK.shape[2],axis=2)</span>
-<span class="c1">#                FK_tap         = M*FK_tap</span>
-<span class="c1">#                FK_global_tap  = M[:,:,0] * FK_global_tap</span>
-<span class="c1">#                FKn_tap        = M*FKn_tap</span>
-<span class="c1">#                FKn_global_tap = M[:,:,0] * FKn_global_tap</span>
-<span class="c1">#            else:</span>
-<span class="c1">#                FK        = 0*FK</span>
-<span class="c1">#                FK_global = 0*FK_global</span>
-<span class="c1">#                FK_tap        = 0*FK_tap</span>
-<span class="c1">#                FK_global_tap = 0*FK_global_tap</span>
-<span class="c1">#                </span>
-<span class="c1">#                FKn        = 0*FKn</span>
-<span class="c1">#                FKn_global = 0*FKn_global</span>
-<span class="c1">#                FKn_tap        = 0*FKn_tap</span>
-<span class="c1">#                FKn_global_tap = 0*FKn_global_tap</span>
-<span class="c1">#        </span>
-<span class="c1">#        out = {&#39;FK&#39;:FK,&#39;FK_global&#39;:FK_global,&#39;FK_tap&#39;:FK_tap,</span>
-<span class="c1">#               &#39;FK_global_tap&#39;:FK_global_tap,</span>
-<span class="c1">#               &#39;FKn&#39;:FKn,&#39;FKn_global&#39;:FKn_global,&#39;FKn_tap&#39;:FKn_tap,</span>
-<span class="c1">#               &#39;FKn_global_tap&#39;:FKn_global_tap,&#39;taperlen&#39;:taperlen}</span>
-<span class="c1">#        return out</span>
     
 <div class="viewcode-block" id="Layered_NRM_k1_w.FK1_mask_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.FK1_mask_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">FK1_mask_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">),</span><span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">Opening</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;returns a mask that mutes evanescent waves in the :math:`k_1`-</span>

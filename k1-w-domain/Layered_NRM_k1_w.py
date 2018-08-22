@@ -3,7 +3,7 @@
 """
 Routines for modelling wavefields in 1.5D non-reciprocal media.
 
-.. module:: Wavefield_NRM_k1_w
+.. module:: Wavefield_NRM_k1_w-v2.0
 
 :Authors:
     Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()
@@ -17,9 +17,14 @@ import numpy as np
 import sys
 
 class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
-    """is a class to model wavefields in 1.5D (non-)reciprocal media in the horizontal-wavenumber frequency domain.
+    """is a class to model wavefields in 1.5D (non-)reciprocal media in the 
+    horizontal-wavenumber frequency domain.
         
-    The class Layered_NRM_k1_w defines a 1.5D (non-)reciprocal medium and a scalar wavefield. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space ('nr', 'dx1') as well as in time ('nt', 'dt').
+    The class Layered_NRM_k1_w defines a 1.5D (non-)reciprocal medium and a 
+    scalar wavefield. We consider all horizontal-wavenumbers and all 
+    frequencies, that are sampled by the given number of samples and by the 
+    given sample intervals, in space ('nr', 'dx1') as well as in time 
+    ('nt', 'dt').
 
     Parameters
     ----------
@@ -40,45 +45,76 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         Set 'verbose=True' to receive feedback in the command line.
         
     eps : int, float, optional
-        A real-valued scalar can be assigned to 'eps' to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,
-            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega`,
-        which is ensured if the function **K1W2X1T** is used, 'eps'(:math:`=\epsilon`) should be positive to the suppress wrap-around effect from positive to negative time,
-            :math:`f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega`.
+        A real-valued scalar can be assigned to 'eps' to reduce the wrap-around 
+        effect of wavefields in the time domain. If the inverse Fourier 
+        transform is defined as,
+            :math:`f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} 
+            \mathrm{d}\omega`,
+        which is ensured if the function **K1W2X1T** is used, 'eps' 
+        (:math:`=\epsilon`) should be positive to the suppress wrap-around 
+        effect from positive to negative time,
+            :math:`f(t) \mathrm{e}^{- \epsilon t} = 
+            \int F(\omega + \mathrm{j} \epsilon) \; 
+            \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} 
+            \mathrm{d}\omega`.
         Recommended value eps = :math:`\\frac{3 nf}{dt}`.
         
     x3vec : numpy.ndarray
-        Vertical spatial vector :math:`x_3`, for n layers 'x3vec' must have the shape (n,). We define the :math:`x_3`-axis as downward-pointing. Implicitly, the first value on the :math:`x_3`-axis is zero (not stored in 'x3vec').
+        Vertical spatial vector :math:`x_3`, for n layers 'x3vec' must have the 
+        shape (n,). We define the :math:`x_3`-axis as downward-pointing. 
+        Implicitly, the first value on the :math:`x_3`-axis is zero (not stored 
+        in 'x3vec').
     
     avec : numpy.ndarray
-        Medium parameter :math:`\\alpha` (real-valued), for n layers 'avec' must have the shape (n,).
+        Medium parameter :math:`\\alpha` (real-valued), for n layers 'avec' 
+        must have the shape (n,).
         
-    bvec : numpy.ndarray
-        Medium parameter :math:`\\beta` (real-valued), for n layers 'bvec' must have the shape (n,).
+    b11vec : numpy.ndarray
+        Medium parameter :math:`\\beta_{11}` (real-valued), for n layers 
+        'b11vec' must have the shape (n,).
+        
+    b13vec : numpy.ndarray, optional
+        Medium parameter :math:`\\beta_{13}` (real-valued), for n layers 
+        'b13vec' must have the shape (n,).
+        
+    b33vec : numpy.ndarray
+        Medium parameter :math:`\\beta_{33}` (real-valued), for n layers 
+        'b33vec' must have the shape (n,).
     
     g1vec : numpy.ndarray, optional
-        Medium parameter :math:`\gamma_1` (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers 'g1vec' must have the shape (n,).
+        Medium parameter :math:`\gamma_1` (real-valued for non-reciprocal 
+        media), for n layers 'g1vec' must have the shape (n,).
         
     g3vec : numpy.ndarray, optional
-        Medium parameter :math:`\gamma_3` (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers 'g3vec' must have the shape (n,).
+        Medium parameter :math:`\gamma_3` (real-valued for non-reciprocal 
+        media), for n layers 'g3vec' must have the shape (n,).
         
     ReciprocalMedium : bool, optional
-        For non-reciprocal media set 'ReciprocalMedium=False', for reciprocal media set 'ReciprocalMedium=True'.
+        For non-reciprocal media set 'ReciprocalMedium=False', for reciprocal 
+        media set 'ReciprocalMedium=True'.
         
     AdjointMedium : bool, optional
-        Set 'AdjointMedium=True' to compute scattering coefficients and propagators in an adjoint medium :math:`^{(a)}`. For reciprocal media, the scattering coefficients and propagators are identical in a medium and its adjoint. We have defined the scattering and propagation in the adjoint medium only for flux-normalisation.
+        Set 'AdjointMedium=True' to compute scattering coefficients and 
+        propagators in an adjoint medium :math:`^{(a)}`. We have defined the 
+        scattering and propagation in the adjoint medium only for 
+        flux-normalisation.
         
     Returns
     -------
     
     class
-        A class to model a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:
+        A class to model a wavefield in a 1.5D non-reciprocal medium in the 
+        horizontal-wavenumber frequency domain. The following instances are 
+        defined:
             - **x3vec**: :math:`x_3`.
             - **avec**: :math:`\\alpha`.
-            - **bvec**: :math:`\\beta`.
+            - **b11vec**: :math:`\\beta_{11}`.
+            - **b13vec**: :math:`\\beta_{13}`.
+            - **b33vec**: :math:`\\beta_{33}`.
             - **g1vec**: :math:`\gamma_1`.
             - **g3vec**: :math:`\gamma_3`.
             - **ReciprocalMedium**: True for reciprocal media, False for non-reciprocal media.
-            - **AdjointMedium**: If True, propagation and scatteing are defined in a medium and in its adjoint.
+            - **AdjointMedium**: If True, propagation and scattering are defined in a medium and in its adjoint.
             - **k3**: Vertical-wavenumber for positive 'k1'.
             - **k3n**: Vertical-wavenumber for negative 'k1'.
             
@@ -218,54 +254,87 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
    """    
   
     def __init__(self,nt,dt,nr,dx1,verbose=False,eps=None,x3vec=np.zeros(1),
-                 avec=np.zeros(1),bvec=np.zeros(1),g1vec=np.zeros(1),
-                 g3vec=np.zeros(1),ReciprocalMedium=False,AdjointMedium=False):
+                 avec=np.zeros(1),b11vec=np.zeros(1),b13vec=np.zeros(1),
+                 b33vec=np.zeros(1),g1vec=np.zeros(1),g3vec=np.zeros(1),
+                 ReciprocalMedium=False,AdjointMedium=False):
         
         # Inherit __init__ from Wavefield_NRM_k1_w
         Wavefield_NRM_k1_w.__init__(self,nt,dt,nr,dx1,verbose,eps)
         
         # Check if medium parameters are passed as arrays
-        if not ( isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) and isinstance(g3vec,np.ndarray) ):
-            sys.exit('Layered_NRM_k1_w: x3vec, avec, bvec, g1vec and g3vec have to be of the type numpy.ndarray.')
+        if not ( isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) 
+        and isinstance(b11vec,np.ndarray) and isinstance(b13vec,np.ndarray) 
+        and isinstance(b33vec,np.ndarray) and isinstance(g1vec,np.ndarray) 
+        and isinstance(g3vec,np.ndarray) ):
+            sys.exit('Layered_NRM_k1_w: x3vec, avec, b11vec, b13vec, b33vec, '
+                     +'g1vec and g3vec have to be of the type numpy.ndarray.')
             
-        # Set gamma_1 and gamma_3 by default equal to zero
-        if g1vec.all() == np.zeros(1):
+        # Set beta_{13}, gamma_1 and gamma_3 by default equal to zero
+        if b13vec == np.zeros(1):
+            b13vec = np.zeros_like(avec)
+        if g1vec == np.zeros(1):
             g1vec = np.zeros_like(avec)
-        if g3vec.all() == np.zeros(1):
+        if g3vec == np.zeros(1):
             g3vec = np.zeros_like(avec)
             
         # Force the medium parameters to have identical shape
-        if x3vec.shape!=avec.shape or x3vec.shape!=bvec.shape or x3vec.shape!=g1vec.shape or x3vec.shape!=g3vec.shape:
-            sys.exit('Layered_NRM_k1_w: x3vec, avec, bvec, g1vec and g3vec have to be of identical shape.')
+        if (x3vec.shape!=avec.shape or x3vec.shape!=b11vec.shape 
+            or x3vec.shape!=b13vec.shape or x3vec.shape!=b33vec.shape 
+            or x3vec.shape!=g1vec.shape or x3vec.shape!=g3vec.shape):
+            sys.exit('Layered_NRM_k1_w: x3vec, avec, b11vec, b13vec, b33vec, '
+                     +'g1vec and g3vec have to be of identical shape.')
         
         # Force the medium parameters to be 1-dimensional, i.e. e.g. avec.shape=(n,)
         if x3vec.ndim!=1:
-            sys.exit('Layered_NRM_k1_w: x3vec.ndim, avec.ndim, bvec.ndim, g1vec.ndim and g3vec.ndim must be one.')
+            sys.exit('Layered_NRM_k1_w: x3vec.ndim, avec.ndim, b11vec.ndim, '
+                     +'b13vec.ndim, b33vec.ndim, g1vec.ndim and g3vec.ndim '
+                     +'must be one.')
         
         # Check if x3vec is positive and constantly increasing
         if x3vec[0]<0 or (x3vec[1:]-x3vec[:-1] <= 0).any():
-            sys.exit('Layered_NRM_k1_w: x3vec must only contain constantly increasing values greater than, or equal to zero.')
+            sys.exit('Layered_NRM_k1_w: x3vec must only contain constantly '
+                     +'increasing values greater than, or equal to zero.')
         
         # Check if Medium choices are bools
-        if not ( isinstance(ReciprocalMedium,bool) and isinstance(AdjointMedium,bool) ):
-            sys.exit('Layered_NRM_k1_w: \'ReciprocalMedium\' and \'AdjointMedium\' must be of the type bool.')
+        if not (    isinstance(ReciprocalMedium,bool) 
+                and isinstance(AdjointMedium,bool)   ):
+            sys.exit('Layered_NRM_k1_w: \'ReciprocalMedium\' and '
+                     +'\'AdjointMedium\' must be of the type bool.')
         
         # Check if medium parameters correspond to a lossless (non-)reciprocal medium
         if ReciprocalMedium == False:
-            if avec.imag.any()!=0 or bvec.imag.any()!=0 or g1vec.imag.any()!=0 or g3vec.imag.any()!=0:
-                sys.exit('Layered_NRM_k1_w: In lossless non-reciprocal media the imaginary value of avec, bvec, g1vec and g3vec has to be zero.')
+            if (avec.imag.any()!=0      or b11vec.imag.any()!=0 
+                or b13vec.imag.any()!=0 or b33vec.imag.any()!=0 
+                or g1vec.imag.any()!=0  or g3vec.imag.any()!=0 ):
+                sys.exit('Layered_NRM_k1_w: In lossless non-reciprocal media '
+                         'avec, b11vec, b13vec, b33vec, g1vec and g3vec have '
+                         +'to be real-valued.')
+        # The updated equations do not address reciprocal media. Therefore,
+        # I am not making any assumptions about their real- and imaginary
+        # parts before Kees confirms the missing expressions.
         elif ReciprocalMedium == True:
-            if avec.imag.any()!=0 or bvec.imag.any()!=0 or g1vec.real.any()!=0 or g3vec.real.any()!=0:
-                sys.exit('Layered_NRM_k1_w: In lossless reciprocal media the imaginary value of avec and bvec has to be zero, the real value of g1vec and g3vec has to be zero.')
+            sys.exit('Layered_NRM_k1_w: This version (2.0) does not yet '
+                     +'include expressions for reciprocal media. To consider '
+                     +'reciprocal media set \'ReciprocalMedium=False\' and '
+                     +'\'g1vec = 0\' and \'g3vec = 0\'.')
+#            if (avec.imag.any()!=0      or b11vec.imag.any()!=0 
+#                or b13vec.imag.any()!=0 or b33vec.imag.any()!=0 
+#                or g1vec.real.any()!=0  or g3vec.real.any()!=0 ):
+#                sys.exit('Layered_NRM_k1_w: In lossless reciprocal media avec,'
+#                         +' b11vec, b13vec and b33vec have to be real-valued, '
+#                         +'g1vec and g3vec have to be only imaginary-valued.')
             
         # Set medium parameters 
-        self.x3vec = x3vec
-        self.avec = avec
-        self.bvec = bvec
-        self.g1vec = g1vec
-        self.g3vec = g3vec
+        self.x3vec  = x3vec
+        self.avec   = avec
+        self.b11vec = b11vec
+        self.b13vec = b13vec
+        self.b31vec = b13vec
+        self.b33vec = b33vec
+        self.g1vec  = g1vec
+        self.g3vec  = g3vec
         self.ReciprocalMedium = ReciprocalMedium
-        self.AdjointMedium = AdjointMedium
+        self.AdjointMedium    = AdjointMedium
         
         # Calculate vertical ray-parameter p3=p3(+p1) p3n=p3(-p1) 
         # Note: By default python uses opposite sign convention for evanescent waves as Kees: (-1)**0.5=1j
@@ -299,192 +368,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         self.K3  = K3**0.5
         self.K3n = K3n**0.5
         
-    # The initial fk mask function was mathematically more elegant but very 
-    # very slow and unflexible. Therefore, I replaced it.
-#    def FK1_mask_k1_w(self,RelativeTaperLength=2**(-5),wmax=None):
-#        """returns a mask that mutes evanescent waves in the :math:`k_1`-:math:`\omega` domain.
-#        
-#        Parameters
-#        ----------
-#            
-#        RelativeTaperLength : int, float, optional
-#            The product of \'RelativeTaperLength\' and the number of spatial samples \'nr\' determines the taper length. The default value is \'RelativeTaperLength\':math:`=2^{-5}.`
-#            
-#        wmax : int, float, complex, optional
-#            Cut-off frequency :math:`\omega_{\mathrm{max}}` in :math:`s^{-1}`.
-#            
-#        Returns
-#        -------
-#        
-#        dict
-#            A dictionary that contains the ,
-#                - **FK**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually. Shape (nf,nr,n).
-#                - **FK_global**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model. Shape (nf,nr).
-#                - **FK_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually. Shape (nf,nr,n).
-#                - **FK_global_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model. Shape (nf,nr).
-#                - **FKn**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually (for sign-inverted :math:`k_1`). Shape (nf,nr,n).
-#                - **FKn_global**: Sharp-edged :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model (for sign-inverted :math:`k_1`). Shape (nf,nr).
-#                - **FKn_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in each layer indivually (for sign-inverted :math:`k_1`). Shape (nf,nr,n).
-#                - **FKn_global_tap**: Tapered :math:`\omega`-:math:`k_1` mask, mutes the evanescent wavefield in the entire model (for sign-inverted :math:`k_1`). Shape (nf,nr).
-#                - **taperlen**: Taper length in number of samples.
-#            All masks are stored as complex valued arrays because they will be applied to complex-valued arrays.
-#            
-#        Examples
-#        --------
-#        
-#        >>> # Initialise wavefield
-#        >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
-#        >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),
-#        >>>      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
-#        >>>      g1vec=1j*np.array([0.8,2,1.3])*1e-4,
-#        >>>      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,
-#        >>>      ReciprocalMedium=True)
-#        
-#        >>> # Create fk mask with a cut-off frequency at 200 1/s
-#        >>> Mask=F.FK1_mask_k1_w(wmax=200)
-#        >>> Tapered_fk_mask = Mask['FK_tap']
-#        
-#        .. todo::
-#        
-#        Tapering of the edge of the :math:`\omega`-:math:`k_1` mask is done by 
-#        matrix-matrix multiplication (numpy.dot) with a smoothing matrix *S*. 
-#        This operation is very inefficient, and needs to be opimised.
-#        
-#            
-#        """
-#        # Check if RelativeTaperLength is a float or an int
-#        if not ( isinstance(RelativeTaperLength,int) 
-#              or isinstance(RelativeTaperLength,float) ):
-#            sys.exit('FK1_mask_k1_w: \'RelativeTaperLength\' must be of the type int or float.')
-#            
-#        # Check that RelativeTaperLength is not smaller than zero
-#        if RelativeTaperLength < 0:
-#            sys.exit('FK1_mask_k1_w: \'RelativeTaperLength\' must be greater than, or equal to zero.')
-#            
-#        # Check if wmax is a float or an int or a complex
-#        if wmax is not None:
-#            if not ( isinstance(wmax,int) 
-#                  or isinstance(wmax,float) 
-#                  or isinstance(wmax,complex)):
-#                sys.exit('FK1_mask_k1_w: \'wmax\' must be of the type int, float or complex.')
-#       
-#            # Check that wmax is not smaller than zero
-#            if wmax.real < 0:
-#                sys.exit('FK1_mask_k1_w: \'wmax\' must be greater than, or equal to zero.')
-#            
-#        # Sharp-edged FK mask
-#        FK  = np.ones((self.nf,self.nr,self.x3vec.size),dtype=complex)
-#        FKn = np.ones((self.nf,self.nr,self.x3vec.size),dtype=complex)
-#        
-#        # For complex-valued frequencies:
-#        if self.eps is not None:
-#            # Compute K3 without adding an imaginary constant
-#            # Hence we have to subtract epsilon from the frequencies
-#            K3  = np.zeros((self.nf,self.nr,self.x3vec.size),dtype=complex)
-#            K3n = K3.copy()
-#            W   = self.W_K1_grid()['Wgrid'] - 1j*self.eps
-#            K1  = self.W_K1_grid()['K1gridfft']
-#            if self.ReciprocalMedium is True:
-#                tmp = self.avec*self.bvec + self.g1vec**2 + self.g3vec**2
-#                for layer in range(self.x3vec.size):
-#                    K3[:,:,layer] = tmp[layer]*W**2 - K1**2
-#                K3n = K3.copy()
-#            elif self.ReciprocalMedium is False:
-#                tmp = self.avec*self.bvec - self.g1vec**2
-#                for layer in range(self.x3vec.size):
-#                    K3[:,:,layer]  = tmp[layer]*W**2 + 2*self.g1vec[layer]*K1*W - K1**2
-#                    K3n[:,:,layer] = tmp[layer]*W**2 - 2*self.g1vec[layer]*K1*W - K1**2
-#            K3  = K3**0.5
-#            K3n = K3n**0.5
-#            
-#        # For real-valued frequencies:
-#        else:
-#            K3 = self.K3
-#            K3n = self.K3n
-#            
-#        FK[K3.imag   != 0] = 0
-#        FKn[K3n.imag != 0] = 0
-#        FK_global  = np.prod(FK,-1)
-#        FKn_global = np.prod(FKn,-1)
-#        
-#        # Tapered FK mask: Cosine taper
-#        taperlen = int(RelativeTaperLength*self.nr)
-#        if taperlen != 0:
-#            
-#            # Construct matrix to smooth sharp edges along the k1 dimension
-#            S   = np.zeros((self.nr,self.nr),dtype=complex)
-#            tap = (        np.cos(np.linspace(-np.pi/2,0,taperlen))
-#                   /np.sum(np.cos(np.linspace(-np.pi/2,0,taperlen))) )
-#                   
-#            # Smooth positive k1 values
-#            col = np.zeros(self.nr)
-#            col[:taperlen]=tap
-#            for i in range(self.nk-1):
-#                S[:,i]=np.roll(col,i)
-#                
-#            # Smooth negative k1 values
-#            col = np.zeros(self.nr)
-#            col[0] = tap[0]
-#            col[-taperlen+1:] = tap[-1:0:-1]
-#            for i in range(self.nk-1,self.nr):
-#                S[:,i]=np.roll(col,i)
-#        
-#            # Apply Smooth matrix to the sharp-edged FK mask   
-#            FK_tap  = np.ones((self.nf,self.nr,self.x3vec.size),
-#                                  dtype=complex)
-#            FKn_tap = np.ones((self.nf,self.nr,self.x3vec.size),
-#                                  dtype=complex)
-#            for layer in range(self.x3vec.size):
-#                FK_tap[:,:,layer]  = ( FK[:,:,layer]
-#                                      *FK[:,:,layer].dot(S))
-#                FKn_tap[:,:,layer] = ( FKn[:,:,layer]
-#                                      *FKn[:,:,layer].dot(S))
-#                FK_global_tap  = FK_global.dot(S)
-#                FKn_global_tap = FKn_global.dot(S)
-#        else:
-#            FK_tap  = FK.copy()
-#            FKn_tap = FKn.copy()
-#            FK_global_tap  = FK_global.copy()
-#            FKn_global_tap = FKn_global.copy()
-#        
-#        # Mask to cut-off frequencies greater than wmax
-#        if (wmax is not None) and (taperlen != 0):
-#            ind = int(np.ceil(wmax.real/self.Dw()))
-#            
-#            if ind > 0:
-#                M   = np.ones((self.nf,self.nr,1),dtype=complex)
-#                M[ind:,:,0] = 0
-#                M = np.repeat(M,FK.shape[-1],axis=2)
-#                FK         = M*FK
-#                FK_global  = M[:,:,0] * FK_global
-#                FKn        = M*FKn
-#                FKn_global = M[:,:,0] * FKn_global
-#                
-#                if taperlen < ind:
-#                    M[ind-taperlen:ind,0,0] = (
-#                        np.cos(np.linspace(0,np.pi/2,taperlen+1))[1:])
-#                    M[:,:,0]   = np.repeat(M[:,:1,0],FK.shape[1],axis=1)
-#                    M          = np.repeat(M[:,:,:1],FK.shape[2],axis=2)
-#                FK_tap         = M*FK_tap
-#                FK_global_tap  = M[:,:,0] * FK_global_tap
-#                FKn_tap        = M*FKn_tap
-#                FKn_global_tap = M[:,:,0] * FKn_global_tap
-#            else:
-#                FK        = 0*FK
-#                FK_global = 0*FK_global
-#                FK_tap        = 0*FK_tap
-#                FK_global_tap = 0*FK_global_tap
-#                
-#                FKn        = 0*FKn
-#                FKn_global = 0*FKn_global
-#                FKn_tap        = 0*FKn_tap
-#                FKn_global_tap = 0*FKn_global_tap
-#        
-#        out = {'FK':FK,'FK_global':FK_global,'FK_tap':FK_tap,
-#               'FK_global_tap':FK_global_tap,
-#               'FKn':FKn,'FKn_global':FKn_global,'FKn_tap':FKn_tap,
-#               'FKn_global_tap':FKn_global_tap,'taperlen':taperlen}
-#        return out
     
     def FK1_mask_k1_w(self,RelativeTaperLength=2**(-5),wmax=None,Opening=1.0):
         """returns a mask that mutes evanescent waves in the :math:`k_1`-

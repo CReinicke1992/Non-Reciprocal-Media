@@ -69,7 +69,7 @@
   <div class="section" id="module-Wavefield_NRM_k1_w">
 <span id="wavefield-nrm-k1-w-module"></span><h1>Wavefield_NRM_k1_w module<a class="headerlink" href="#module-Wavefield_NRM_k1_w" title="Permalink to this headline">¶</a></h1>
 <p>Routines for modelling wavefields in 1.5D non-reciprocal media.</p>
-<span class="target" id="module-Wavefield_NRM_k1_w"></span><table class="docutils field-list" frame="void" rules="none">
+<span class="target" id="module-Wavefield_NRM_k1_w-v2.0"></span><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -83,8 +83,13 @@
 <dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w">
 <em class="property">class </em><code class="descclassname">Wavefield_NRM_k1_w.</code><code class="descname">Wavefield_NRM_k1_w</code><span class="sig-paren">(</span><em>nt</em>, <em>dt</em>, <em>nr</em>, <em>dx1</em>, <em>verbose=False</em>, <em>eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>is a class to define a scalar wavefield in the horizontal-wavenumber frequency domain (<span class="math notranslate">\(k_1-\omega\)</span>).</p>
-<p>The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space (‘nr’, ‘dx1’) as well as in time (‘nt’, ‘dt’).</p>
+<p>is a class to define a scalar wavefield in the horizontal-wavenumber 
+frequency domain (<span class="math notranslate">\(k_1-\omega\)</span>).</p>
+<p>The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield 
+in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers 
+and all frequencies, that are sampled by the given number of samples and by 
+the given sample intervals, in space (‘nr’, ‘dx1’) as well as in time 
+(‘nt’, ‘dt’).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -111,34 +116,44 @@
 </div></blockquote>
 <p><strong>eps</strong> : int, float, optional</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>A real-valued scalar can be assigned to ‘eps’ to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,</dt>
-<dd><p class="first last"><span class="math notranslate">\(f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega\)</span>,</p>
-</dd>
-<dt>which is ensured if the function <strong>K1W2X1T</strong> is used, ‘eps’(<span class="math notranslate">\(=\epsilon\)</span>) should be positive to the suppress wrap-around effect from positive to negative time,</dt>
-<dd><p class="first last"><span class="math notranslate">\(f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega\)</span>.</p>
-</dd>
-</dl>
+<div><p>A real-valued scalar can be assigned to ‘eps’ to reduce the wrap-around 
+effect of wavefields in the time domain. If the inverse Fourier 
+transform is defined as,</p>
+<blockquote>
+<div><p><span class="math notranslate">\(f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} 
+\mathrm{d}\omega\)</span>,</p>
+</div></blockquote>
+<p>which is ensured if the function <strong>K1W2X1T</strong> is used, ‘eps’ 
+(<span class="math notranslate">\(=\epsilon\)</span>) should be positive to the suppress wrap-around 
+effect from positive to negative time,</p>
+<blockquote>
+<div><p><span class="math notranslate">\(f(t) \mathrm{e}^{- \epsilon t} = 
+\int F(\omega + \mathrm{j} \epsilon) \; 
+\mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} 
+\mathrm{d}\omega\)</span>.</p>
+</div></blockquote>
 <p>Recommended value eps = <span class="math notranslate">\(\frac{3 nf}{dt}\)</span>.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">class</p>
 <blockquote class="last">
-<div><dl class="docutils">
-<dt>A class to define a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:</dt>
-<dd><ul class="first last simple">
+<div><p>A class to define a wavefield in a 1.5D non-reciprocal medium in the 
+horizontal-wavenumber frequency domain. The following instances are 
+defined:</p>
+<blockquote>
+<div><ul class="simple">
 <li><strong>nt</strong>: Number of time samples.</li>
 <li><strong>dt</strong>: Time sample interval in seconds.</li>
 <li><strong>nr</strong>: Number of space samples.</li>
 <li><strong>dx1</strong>: Number of space samples.</li>
-<li><strong>verbose</strong>: If one sets ‘verbose=True’ feedback will be output in the command line.</li>
-<li><strong>eps</strong>: Scalar constant to reduce temporal wrap-around effect.</li>
-<li><strong>nf</strong>: Number of positive time samples <span class="math notranslate">\(=0.5 nt + 1\)</span>.</li>
-<li><strong>nk</strong>: Number of positive space samples <span class="math notranslate">\(=0.5 nr + 1\)</span>.</li>
+<li><strong>verbose</strong>: If one sets ‘verbose=True’ feedback will be output</li>
 </ul>
-</dd>
-</dl>
+<p>in the command line.
+- <strong>eps</strong>: Scalar constant to reduce temporal wrap-around effect.
+- <strong>nf</strong>: Number of positive time samples <span class="math notranslate">\(=0.5 nt + 1\)</span>.
+- <strong>nk</strong>: Number of positive space samples <span class="math notranslate">\(=0.5 nr + 1\)</span>.</p>
+</div></blockquote>
 </div></blockquote>
 </td>
 </tr>
@@ -147,21 +162,26 @@
 <p class="rubric">Notes</p>
 <dl class="docutils">
 <dt>We format the data as described below.</dt>
-<dd><ul class="first last simple">
-<li>Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.</li>
-<li>Wavefields are in the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain.</li>
-<li>The zero frequency component is placed at the first index position of the first dimension.</li>
-<li>The zero horizontal-wavenumber component is placed at the first index position of the second dimension.</li>
-<li><dl class="first docutils">
-<dt>If the wavefield is transformed to the space-time domain: </dt>
-<dd><ul class="first last">
-<li>The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples.</li>
-<li>The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.</li>
+<dd><ul class="first simple">
+<li>Wavefields are saved in an array of dimensions (nf,nr) in the</li>
 </ul>
-</dd>
-</dl>
-</li>
+<p>frequency domain and (nt,nr) in the time domain.
+- Wavefields are in the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain.
+- The zero frequency component is placed at the first index position of 
+the first dimension.
+- The zero horizontal-wavenumber component is placed at the first index 
+position of the second dimension.
+- If the wavefield is transformed to the space-time domain:</p>
+<blockquote class="last">
+<div><ul class="simple">
+<li>The zero time component is placed at the first index position of</li>
 </ul>
+<p>the first dimension, followed by nt/2-1 positive time samples and 
+nt/2 negative time samples. 
+- The zero offset component is placed at the first index position 
+of the second dimension, followed by nr/2-1 positive offset samples 
+and nr/2 negative offset samples.</p>
+</div></blockquote>
 </dd>
 </dl>
 <p class="rubric">Examples</p>

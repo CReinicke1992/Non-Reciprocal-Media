@@ -76,7 +76,7 @@
   <div class="section" id="module-Layered_NRM_k1_w">
 <span id="layered-nrm-k1-w-module"></span><h1>Layered_NRM_k1_w module<a class="headerlink" href="#module-Layered_NRM_k1_w" title="Permalink to this headline">¶</a></h1>
 <p>Routines for modelling wavefields in 1.5D non-reciprocal media.</p>
-<span class="target" id="module-Wavefield_NRM_k1_w"></span><table class="docutils field-list" frame="void" rules="none">
+<span class="target" id="module-Wavefield_NRM_k1_w-v2.0"></span><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -88,10 +88,15 @@
 </table>
 <dl class="class">
 <dt id="Layered_NRM_k1_w.Layered_NRM_k1_w">
-<em class="property">class </em><code class="descclassname">Layered_NRM_k1_w.</code><code class="descname">Layered_NRM_k1_w</code><span class="sig-paren">(</span><em>nt</em>, <em>dt</em>, <em>nr</em>, <em>dx1</em>, <em>verbose=False</em>, <em>eps=None</em>, <em>x3vec=array([0.])</em>, <em>avec=array([0.])</em>, <em>bvec=array([0.])</em>, <em>g1vec=array([0.])</em>, <em>g3vec=array([0.])</em>, <em>ReciprocalMedium=False</em>, <em>AdjointMedium=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">Layered_NRM_k1_w.</code><code class="descname">Layered_NRM_k1_w</code><span class="sig-paren">(</span><em>nt</em>, <em>dt</em>, <em>nr</em>, <em>dx1</em>, <em>verbose=False</em>, <em>eps=None</em>, <em>x3vec=array([0.])</em>, <em>avec=array([0.])</em>, <em>b11vec=array([0.])</em>, <em>b13vec=array([0.])</em>, <em>b33vec=array([0.])</em>, <em>g1vec=array([0.])</em>, <em>g3vec=array([0.])</em>, <em>ReciprocalMedium=False</em>, <em>AdjointMedium=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w" title="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wavefield_NRM_k1_w.Wavefield_NRM_k1_w</span></code></a></p>
-<p>is a class to model wavefields in 1.5D (non-)reciprocal media in the horizontal-wavenumber frequency domain.</p>
-<p>The class Layered_NRM_k1_w defines a 1.5D (non-)reciprocal medium and a scalar wavefield. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space (‘nr’, ‘dx1’) as well as in time (‘nt’, ‘dt’).</p>
+<p>is a class to model wavefields in 1.5D (non-)reciprocal media in the 
+horizontal-wavenumber frequency domain.</p>
+<p>The class Layered_NRM_k1_w defines a 1.5D (non-)reciprocal medium and a 
+scalar wavefield. We consider all horizontal-wavenumbers and all 
+frequencies, that are sampled by the given number of samples and by the 
+given sample intervals, in space (‘nr’, ‘dx1’) as well as in time 
+(‘nt’, ‘dt’).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -118,63 +123,95 @@
 </div></blockquote>
 <p><strong>eps</strong> : int, float, optional</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>A real-valued scalar can be assigned to ‘eps’ to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,</dt>
-<dd><p class="first last"><span class="math notranslate">\(f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega\)</span>,</p>
-</dd>
-<dt>which is ensured if the function <strong>K1W2X1T</strong> is used, ‘eps’(<span class="math notranslate">\(=\epsilon\)</span>) should be positive to the suppress wrap-around effect from positive to negative time,</dt>
-<dd><p class="first last"><span class="math notranslate">\(f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega\)</span>.</p>
-</dd>
-</dl>
+<div><p>A real-valued scalar can be assigned to ‘eps’ to reduce the wrap-around 
+effect of wavefields in the time domain. If the inverse Fourier 
+transform is defined as,</p>
+<blockquote>
+<div><p><span class="math notranslate">\(f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} 
+\mathrm{d}\omega\)</span>,</p>
+</div></blockquote>
+<p>which is ensured if the function <strong>K1W2X1T</strong> is used, ‘eps’ 
+(<span class="math notranslate">\(=\epsilon\)</span>) should be positive to the suppress wrap-around 
+effect from positive to negative time,</p>
+<blockquote>
+<div><p><span class="math notranslate">\(f(t) \mathrm{e}^{- \epsilon t} = 
+\int F(\omega + \mathrm{j} \epsilon) \; 
+\mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} 
+\mathrm{d}\omega\)</span>.</p>
+</div></blockquote>
 <p>Recommended value eps = <span class="math notranslate">\(\frac{3 nf}{dt}\)</span>.</p>
 </div></blockquote>
 <p><strong>x3vec</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Vertical spatial vector <span class="math notranslate">\(x_3\)</span>, for n layers ‘x3vec’ must have the shape (n,). We define the <span class="math notranslate">\(x_3\)</span>-axis as downward-pointing. Implicitly, the first value on the <span class="math notranslate">\(x_3\)</span>-axis is zero (not stored in ‘x3vec’).</p>
+<div><p>Vertical spatial vector <span class="math notranslate">\(x_3\)</span>, for n layers ‘x3vec’ must have the 
+shape (n,). We define the <span class="math notranslate">\(x_3\)</span>-axis as downward-pointing. 
+Implicitly, the first value on the <span class="math notranslate">\(x_3\)</span>-axis is zero (not stored 
+in ‘x3vec’).</p>
 </div></blockquote>
 <p><strong>avec</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\alpha\)</span> (real-valued), for n layers ‘avec’ must have the shape (n,).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\alpha\)</span> (real-valued), for n layers ‘avec’ 
+must have the shape (n,).</p>
 </div></blockquote>
-<p><strong>bvec</strong> : numpy.ndarray</p>
+<p><strong>b11vec</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued), for n layers ‘bvec’ must have the shape (n,).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{11}\)</span> (real-valued), for n layers 
+‘b11vec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>b13vec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{13}\)</span> (real-valued), for n layers 
+‘b13vec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>b33vec</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{33}\)</span> (real-valued), for n layers 
+‘b33vec’ must have the shape (n,).</p>
 </div></blockquote>
 <p><strong>g1vec</strong> : numpy.ndarray, optional</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\gamma_1\)</span> (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers ‘g1vec’ must have the shape (n,).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_1\)</span> (real-valued for non-reciprocal 
+media), for n layers ‘g1vec’ must have the shape (n,).</p>
 </div></blockquote>
 <p><strong>g3vec</strong> : numpy.ndarray, optional</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers ‘g3vec’ must have the shape (n,).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (real-valued for non-reciprocal 
+media), for n layers ‘g3vec’ must have the shape (n,).</p>
 </div></blockquote>
 <p><strong>ReciprocalMedium</strong> : bool, optional</p>
 <blockquote>
-<div><p>For non-reciprocal media set ‘ReciprocalMedium=False’, for reciprocal media set ‘ReciprocalMedium=True’.</p>
+<div><p>For non-reciprocal media set ‘ReciprocalMedium=False’, for reciprocal 
+media set ‘ReciprocalMedium=True’.</p>
 </div></blockquote>
 <p><strong>AdjointMedium</strong> : bool, optional</p>
 <blockquote>
-<div><p>Set ‘AdjointMedium=True’ to compute scattering coefficients and propagators in an adjoint medium <span class="math notranslate">\(^{(a)}\)</span>. For reciprocal media, the scattering coefficients and propagators are identical in a medium and its adjoint. We have defined the scattering and propagation in the adjoint medium only for flux-normalisation.</p>
+<div><p>Set ‘AdjointMedium=True’ to compute scattering coefficients and 
+propagators in an adjoint medium <span class="math notranslate">\(^{(a)}\)</span>. We have defined the 
+scattering and propagation in the adjoint medium only for 
+flux-normalisation.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">class</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>A class to model a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:</dt>
-<dd><ul class="first last simple">
+<div><p>A class to model a wavefield in a 1.5D non-reciprocal medium in the 
+horizontal-wavenumber frequency domain. The following instances are 
+defined:</p>
+<blockquote>
+<div><ul class="simple">
 <li><strong>x3vec</strong>: <span class="math notranslate">\(x_3\)</span>.</li>
 <li><strong>avec</strong>: <span class="math notranslate">\(\alpha\)</span>.</li>
-<li><strong>bvec</strong>: <span class="math notranslate">\(\beta\)</span>.</li>
+<li><strong>b11vec</strong>: <span class="math notranslate">\(\beta_{11}\)</span>.</li>
+<li><strong>b13vec</strong>: <span class="math notranslate">\(\beta_{13}\)</span>.</li>
+<li><strong>b33vec</strong>: <span class="math notranslate">\(\beta_{33}\)</span>.</li>
 <li><strong>g1vec</strong>: <span class="math notranslate">\(\gamma_1\)</span>.</li>
 <li><strong>g3vec</strong>: <span class="math notranslate">\(\gamma_3\)</span>.</li>
 <li><strong>ReciprocalMedium</strong>: True for reciprocal media, False for non-reciprocal media.</li>
-<li><strong>AdjointMedium</strong>: If True, propagation and scatteing are defined in a medium and in its adjoint.</li>
+<li><strong>AdjointMedium</strong>: If True, propagation and scattering are defined in a medium and in its adjoint.</li>
 <li><strong>k3</strong>: Vertical-wavenumber for positive ‘k1’.</li>
 <li><strong>k3n</strong>: Vertical-wavenumber for negative ‘k1’.</li>
 </ul>
-</dd>
-</dl>
+</div></blockquote>
 </div></blockquote>
 <div class="admonition-todo last admonition" id="index-0">
 <p class="first admonition-title">Todo</p>
