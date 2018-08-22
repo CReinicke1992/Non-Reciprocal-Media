@@ -960,11 +960,13 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         """
         
         # Check if x3 is a scalar or an array of the shape (n,).
-        if not ( np.isscalar(x3) 
-                or ( isinstance(x3,np.ndarray) and x3.ndim == 1) ):
-            sys.exit('Insert_layer: The input variable \'x3\' must be either a scalar, or an array of shape (n,).')
+        if not (    isinstance(x3,int) 
+                or  isinstance(x3,float) 
+                or (isinstance(x3,np.ndarray) and x3.ndim == 1) ):
+            sys.exit('Insert_layer: The input variable \'x3\' must be either a '
+                     +'scalar, or an array of shape (n,).')
         
-        if np.isscalar(x3):
+        if isinstance(x3,int) or  isinstance(x3,float):
             x3 = np.array([x3])
         
         # Check if x3 is real-valued.
@@ -982,9 +984,6 @@ class Layered_NRM_p_w(Wavefield_NRM_p_w):
         G3vec = self.g3vec
         P3    = self.p3
         P3n   = self.p3n
-        
-        if np.isscalar(x3):
-            x3 = np.array([x3])
         
         for i in range(np.size(x3)):
         

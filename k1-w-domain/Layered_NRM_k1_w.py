@@ -494,8 +494,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         ----------
             
         RelativeTaperLength : int, float, optional
-            The product of \'RelativeTaperLength\' and the number of spatial 
-            samples \'nr\' determines the taper length. The default value is 
+            The product of \'RelativeTaperLength\' and the number of temporal 
+            samples \'nt\' determines the taper length. The default value is 
             \'RelativeTaperLength\':math:`=2^{-5}.`
             
         wmax : int, float, complex, optional
@@ -635,92 +635,69 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         FK_global_tap  = FK_global.copy()
         FKn_global_tap = FKn_global.copy()
         
-        # Tapered FK mask: Cosine taper
-        taperlen = int(RelativeTaperLength*self.nr)
+        # Taper length
+        taperlen = int(RelativeTaperLength*self.nt)
+        
         if taperlen != 0:
-            
-            
-            
-            tap = (np.cos(np.linspace(0,np.pi/2,taperlen)))**2
-            
-            for freq in range(self.nf):
+
+            # Define sine taper
+            # If complex-valued frequencies are used they must be included in
+            # the taper. Otherwise the amplitudes are falsified.
+            w  = self.Wvec()[:,0]
+            def SineTaper(start,ind):
+                w0 = np.real(w[ind])
+                tap = np.sin( (w[start:start+taperlen]-w0)
+                              /(self.Dw()*(taperlen-1)  )
+                              *np.pi*0.5)
+                return tap**2
+                        
+            # Define taper for each wavenumber
+            for WavNum in range(self.nr):
                 
                 # FK_global
-                ind = np.where(FK_global[freq,:]==0)[0]
-                if ind.size != 0:
-                    i1  = ind[0]    
-                    i2  = ind[-1]
+                i1 = np.where(FK_global[:,WavNum]==1)[0]
+                if i1.size != 0:
+                    i1  = i1[0]    
                 
-                    if i1 - taperlen < 0:
-                        if i1 > 0:
-                            FK_global_tap[freq,:i1] = tap[-i1:]
+                    if i1 + taperlen <= self.nf:
+                        FK_global_tap[i1:i1+taperlen,WavNum] = SineTaper(i1,i1)
+                      
                     else:
-                        FK_global_tap[freq,i1-taperlen:i1] = tap
-                    
-                    
-                    if i2+1+taperlen > self.nr:
-                        if i2+1 < self.nr:
-                            FK_global_tap[freq,i2+1:] = tap[::-1][:self.nr-i2-1] 
-                    else:
-                        FK_global_tap[freq,i2+1:i2+1+taperlen] = tap[::-1]
+                        FK_global_tap[i1:,WavNum] = SineTaper(i1,i1)[:self.nf-i1]
                    
-                # FKn_global    
-                ind = np.where(FKn_global[freq,:]==0)[0]
-                if ind.size != 0:
-                    i1  = ind[0]    
-                    i2  = ind[-1]
+                # FKn_global
+                i1 = np.where(FKn_global[:,WavNum]==1)[0]
+                if i1.size != 0:
+                    i1  = i1[0]    
                 
-                    if i1 - taperlen < 0:
-                        if i1 > 0:
-                            FKn_global_tap[freq,:i1] = tap[-i1:]
+                    if i1 + taperlen <= self.nf:
+                        FKn_global_tap[i1:i1+taperlen,WavNum] = SineTaper(i1,i1)
+                       
                     else:
-                        FKn_global_tap[freq,i1-taperlen:i1] = tap
-                    
-                    
-                    if i2+1+taperlen > self.nr:
-                        if i2+1 < self.nr:
-                            FKn_global_tap[freq,i2+1:] = tap[::-1][:self.nr-i2-1] 
-                    else:
-                        FKn_global_tap[freq,i2+1:i2+1+taperlen] = tap[::-1]
+                        FKn_global_tap[i1:,WavNum] = SineTaper(i1,i1)[:self.nf-i1]
                 
                 for layer in range(self.x3vec.size):
                     # FK
-                    ind = np.where(FK[freq,:,layer]==0)[0]
-                    if ind.size != 0:
-                        i1  = ind[0]    
-                        i2  = ind[-1]
+                    i1 = np.where(FK[:,WavNum,layer]==1)[0]
+                    if i1.size != 0:
+                        i1  = i1[0]    
                     
-                        if i1 - taperlen < 0:
-                            if i1 > 0:
-                                FK_tap[freq,:i1,layer] = tap[-i1:]
-                        else:
-                            FK_tap[freq,i1-taperlen:i1,layer] = tap
+                        if i1 + taperlen <= self.nf:
+                            FK_tap[i1:i1+taperlen,WavNum,layer] = SineTaper(i1,i1)
                         
-                        
-                        if i2+1+taperlen > self.nr:
-                            if i2+1 < self.nr:
-                                FK_tap[freq,i2+1:,layer] = tap[::-1][:self.nr-i2-1] 
                         else:
-                            FK_tap[freq,i2+1:i2+1+taperlen,layer] = tap[::-1]
+                            FK_tap[i1:,WavNum,layer] = SineTaper(i1,i1)[:self.nf-i1]
                             
                     # FKn
-                    ind = np.where(FKn[freq,:,layer]==0)[0]
-                    if ind.size != 0:
-                        i1  = ind[0]    
-                        i2  = ind[-1]
+                    i1 = np.where(FKn[:,WavNum,layer]==1)[0]
+                    if i1.size != 0:
+                        i1  = i1[0]    
                     
-                        if i1 - taperlen < 0:
-                            if i1 > 0:
-                                FKn_tap[freq,:i1,layer] = tap[-i1:]
-                        else:
-                            FKn_tap[freq,i1-taperlen:i1,layer] = tap
+                        if i1 + taperlen <= self.nf:
+                            FKn_tap[i1:i1+taperlen,WavNum,layer] = SineTaper(i1,i1)
                         
-                        
-                        if i2+1+taperlen > self.nr:
-                            if i2+1 < self.nr:
-                                FKn_tap[freq,i2+1:,layer] = tap[::-1][:self.nr-i2-1] 
                         else:
-                            FKn_tap[freq,i2+1:i2+1+taperlen,layer] = tap[::-1]
+                            FKn_tap[i1:,WavNum,layer] = SineTaper(i1,i1)[:self.nf-i1]
         
         # Mask to cut-off frequencies greater than wmax
         if wmax is not None:
@@ -736,8 +713,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 FKn_global = M[:,:,0] * FKn_global
                 
                 if taperlen < ind:
-                    M[ind-taperlen:ind,0,0] = (
-                        np.cos(np.linspace(0,np.pi/2,taperlen+1))[1:])**2
+                    M[ind-taperlen:ind,0,0] = SineTaper(ind-taperlen,ind)
                     M[:,:,0]   = np.repeat(M[:,:1,0],FK.shape[1],axis=1)
                     M          = np.repeat(M[:,:,:1],FK.shape[2],axis=2)
                 FK_tap         = M*FK_tap
