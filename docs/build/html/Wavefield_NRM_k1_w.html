@@ -1,0 +1,656 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Wavefield_NRM_k1_w module &#8212; Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Layered_NRM_k1_w module" href="Layered_NRM_k1_w.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Layered_NRM_k1_w.html" title="Layered_NRM_k1_w module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">k1-w-domain</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Layered_NRM_k1_w.html"
+                        title="previous chapter">Layered_NRM_k1_w module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Wavefield_NRM_k1_w.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Wavefield_NRM_k1_w">
+<span id="wavefield-nrm-k1-w-module"></span><h1>Wavefield_NRM_k1_w module<a class="headerlink" href="#module-Wavefield_NRM_k1_w" title="Permalink to this headline">¶</a></h1>
+<p>Routines for modelling wavefields in 1.5D non-reciprocal media.</p>
+<span class="target" id="module-Wavefield_NRM_k1_w"></span><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Christian Reinicke (<a class="reference external" href="mailto:c&#46;reinicke&#37;&#52;&#48;tudelft&#46;nl">c<span>&#46;</span>reinicke<span>&#64;</span>tudelft<span>&#46;</span>nl</a>), Kees Wapenaar (), and Evert Slob ()</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Copyright:</th><td class="field-body">Christian Reinicke (<a class="reference external" href="mailto:c&#46;reinicke&#37;&#52;&#48;tudelft&#46;nl">c<span>&#46;</span>reinicke<span>&#64;</span>tudelft<span>&#46;</span>nl</a>), Kees Wapenaar (), and Evert Slob ()</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w">
+<em class="property">class </em><code class="descclassname">Wavefield_NRM_k1_w.</code><code class="descname">Wavefield_NRM_k1_w</code><span class="sig-paren">(</span><em>nt</em>, <em>dt</em>, <em>nr</em>, <em>dx1</em>, <em>verbose=False</em>, <em>eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>is a class to define a scalar wavefield in the horizontal-wavenumber frequency domain (<span class="math notranslate">\(k_1-\omega\)</span>).</p>
+<p>The class Wavefield_NRM_k1_w defines the parameters of a scalar wavefield in a 1.5D (non-)reciprocal medium. We consider all horizontal-wavenumbers and all frequencies, that are sampled by the given number of samples and by the given sample intervals, in space (‘nr’, ‘dx1’) as well as in time (‘nt’, ‘dt’).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nt</strong> : int</p>
+<blockquote>
+<div><p>Number of time samples.</p>
+</div></blockquote>
+<p><strong>dt</strong> : int, float</p>
+<blockquote>
+<div><p>Time sample interval in seconds.</p>
+</div></blockquote>
+<p><strong>nr</strong> : int</p>
+<blockquote>
+<div><p>Number of space samples.</p>
+</div></blockquote>
+<p><strong>dx1</strong> : int, float</p>
+<blockquote>
+<div><p>Space sample interval in metres.</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘verbose=True’ to receive feedback in the command line.</p>
+</div></blockquote>
+<p><strong>eps</strong> : int, float, optional</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>A real-valued scalar can be assigned to ‘eps’ to reduce the wrap-around effect of wavefields in the time domain. If the inverse Fourier transform is defined as,</dt>
+<dd><p class="first last"><span class="math notranslate">\(f(t)  = \int F(\omega) \; \mathrm{e}^{\mathrm{j} \omega t} \mathrm{d}\omega\)</span>,</p>
+</dd>
+<dt>which is ensured if the function <strong>K1W2X1T</strong> is used, ‘eps’(<span class="math notranslate">\(=\epsilon\)</span>) should be positive to the suppress wrap-around effect from positive to negative time,</dt>
+<dd><p class="first last"><span class="math notranslate">\(f(t) \mathrm{e}^{- \epsilon t} = \int F(\omega + \mathrm{j} \epsilon) \; \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} \mathrm{d}\omega\)</span>.</p>
+</dd>
+</dl>
+<p>Recommended value eps = <span class="math notranslate">\(\frac{3 nf}{dt}\)</span>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">class</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>A class to define a wavefield in a 1.5D non-reciprocal medium in the horizontal-wavenumber frequency domain. The following instances are defined:</dt>
+<dd><ul class="first last simple">
+<li><strong>nt</strong>: Number of time samples.</li>
+<li><strong>dt</strong>: Time sample interval in seconds.</li>
+<li><strong>nr</strong>: Number of space samples.</li>
+<li><strong>dx1</strong>: Number of space samples.</li>
+<li><strong>verbose</strong>: If one sets ‘verbose=True’ feedback will be output in the command line.</li>
+<li><strong>eps</strong>: Scalar constant to reduce temporal wrap-around effect.</li>
+<li><strong>nf</strong>: Number of positive time samples <span class="math notranslate">\(=0.5 nt + 1\)</span>.</li>
+<li><strong>nk</strong>: Number of positive space samples <span class="math notranslate">\(=0.5 nr + 1\)</span>.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<dl class="docutils">
+<dt>We format the data as described below.</dt>
+<dd><ul class="first last simple">
+<li>Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.</li>
+<li>Wavefields are in the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain.</li>
+<li>The zero frequency component is placed at the first index position of the first dimension.</li>
+<li>The zero horizontal-wavenumber component is placed at the first index position of the second dimension.</li>
+<li><dl class="first docutils">
+<dt>If the wavefield is transformed to the space-time domain: </dt>
+<dd><ul class="first last">
+<li>The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples.</li>
+<li>The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise a wavefield class</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Dk1">
+<code class="descname">Dk1</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Dk1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Dk1" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns horizontal-wavenumber sampling interval <span class="math notranslate">\(\Delta k_1\)</span> in <span class="math notranslate">\(\mathrm{m}^{-1}\)</span>.</p>
+<p>The horizontal-wavenumber sampling interval is defined by the space sampling interval <span class="math notranslate">\(\Delta x_1\)</span> (‘dx1’) and the number of space samples ‘nr’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">float</p>
+<blockquote class="last">
+<div><p>Horizontal-wavenumber sample interval in <span class="math notranslate">\(\mathrm{m}^{-1}\)</span> <span class="math notranslate">\(\Delta k_1\)</span> <span class="math notranslate">\(= \frac{2 \pi}{\Delta x_1 \; nr}\)</span>.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">Dk1</span><span class="p">()</span>
+<span class="go">0.002454369260617026</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.K1vec">
+<code class="descname">K1vec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.K1vec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.K1vec" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a vector of all horizontal-wavenumber samples <span class="math notranslate">\(k_1\)</span> in <span class="math notranslate">\(\mathrm{m}^{-1}\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><blockquote>
+<div><dl class="docutils">
+<dt>Dictionary that contains the horizontal-wavenumber vector:</dt>
+<dd><ul class="first last simple">
+<li><strong>k1vec</strong>: nr/2 negative horizontal-wavenumbers are placed in the first part, followed by zero horizontal-wavenumber (index position nr/2), and nr/2-1 positive horizontal-wavenumbers.</li>
+<li><strong>k1vecfft</strong>: zero horizontal-wavenumber is placed at the first index position, followed by nr/2-1 positive horizontal-wavenumbers, and nr/2 negative horizontal-wavenumbers.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+<p>The vector has the shape (nr,1). The Nyquist component is negative.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">K1vec</span><span class="p">()[</span><span class="s1">&#39;k1vecfft&#39;</span><span class="p">][</span><span class="n">F</span><span class="o">.</span><span class="n">nk</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">-0.6283185307179586</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Dw">
+<code class="descname">Dw</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Dw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Dw" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns frequency sampling interval <span class="math notranslate">\(\Delta\)</span> <span class="math notranslate">\(\omega\)</span> in radians.</p>
+<p>The frequency sampling interval is defined by the time sampling interval <span class="math notranslate">\(\Delta t\)</span> (‘dt’) and the number of time samples ‘nt’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">float</p>
+<blockquote class="last">
+<div><p>Frequency sample interval in radians <span class="math notranslate">\(\Delta \omega\)</span> <span class="math notranslate">\(= \frac{2 \pi}{\Delta t \; nt}\)</span></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">Dw</span><span class="p">()</span>
+<span class="go">1.227184630308513</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Wvec">
+<code class="descname">Wvec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Wvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a vector of all frequency samples <span class="math notranslate">\(\omega\)</span> in radians.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>Frequency vector, zero frequency is placed at the first index position. The vector has the shape (nf,1). If ‘self.eps’ is defined, an imaginary constant <span class="math notranslate">\(\epsilon\)</span> is added to the frequency vector.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">Wvec</span><span class="p">()</span>
+<span class="go">array([[0.], ..., [628.31853072]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.W_K1_grid">
+<code class="descname">W_K1_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.W_K1_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.W_K1_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns frequency horizontal-wavenumber meshgrids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains a meshgrid</dt>
+<dd><ul class="first last simple">
+<li><strong>Wgrid</strong>: with the frequency vector <em>wvec</em> (the zero frequency sample is placed at the first index position) along the 1st dimension, and nr copies of it along the 2nd dimension.</li>
+<li><strong>Xgrid</strong>: with the offset vector <em>xvec</em> (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension.</li>
+<li><strong>Xgridfft</strong>: with the offset vector <em>xvecfft</em> (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension.</li>
+</ul>
+</dd>
+</dl>
+<p>All output arrays have the shape (nf,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">][:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([ 0.        ,  1.22718463,  2.45436926, ..., 628.3185307179587])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Xvec">
+<code class="descname">Xvec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Xvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Xvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a vector of all spatial samples <span class="math notranslate">\(x_1\)</span> in metres.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains the offset vector,</dt>
+<dd><ul class="first last simple">
+<li><strong>xvec</strong>: zero offset placed at the center.</li>
+<li><strong>xvecfft</strong>: zero offset placed at the first index position.</li>
+</ul>
+</dd>
+</dl>
+<p>Both vectors have the shape (nr,1).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">Xvec</span><span class="p">()[</span><span class="s1">&#39;xvec&#39;</span><span class="p">]</span>
+<span class="go">array([[-1280.], ...,[ 1275.]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Tvec">
+<code class="descname">Tvec</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Tvec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Tvec" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a vector of all time samples <span class="math notranslate">\(t\)</span> in seconds.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains the time vector, </dt>
+<dd><ul class="first last simple">
+<li><strong>tvec</strong>: zero time placed at the center.</li>
+<li><strong>tvecfft</strong>: zero time placed at the first index position.</li>
+</ul>
+</dd>
+</dl>
+<p>Both vectors have the shape (nt,1).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">Tvec</span><span class="p">()[</span><span class="s1">&#39;tvec&#39;</span><span class="p">]</span>
+<span class="go">array([[-2.56 ], ..., [ 2.555]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.T_X_grid">
+<code class="descname">T_X_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.T_X_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.T_X_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns time-space meshgrids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains the meshgrid</dt>
+<dd><ul class="first last simple">
+<li><strong>Tgrid</strong>: with the time vector <em>tvec</em> (the zero time sample is placed in the center) along the 1st dimension, and nr copies of it along the 2nd dimension.</li>
+<li><strong>Xgrid</strong>: with the offset vector <em>xvec</em> (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension.</li>
+<li><strong>Tgridfft</strong>: with the time vector <em>tvecfft</em> (the zero time sample is placed at the first index position) along the 1st dimension, and nr copies of it along the 2nd dimension.</li>
+<li><strong>Xgridfft</strong>: with the offset vector <em>xvecfft</em> (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension.</li>
+</ul>
+</dd>
+</dl>
+<p>All output arrays have the shape (nt,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">T_X_grid</span><span class="p">()[</span><span class="s1">&#39;Tgridfft&#39;</span><span class="p">][:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([ 0.   ,  0.005,  0.01 , ..., -0.015, -0.01 , -0.005])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.W_X_grid">
+<code class="descname">W_X_grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.W_X_grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.W_X_grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns two frequency-space meshgrids.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains a meshgrid</dt>
+<dd><ul class="first last simple">
+<li><strong>Wgrid</strong>: with the frequency vector <em>wvec</em> (the zero frequency sample is placed at the first index position) along the 1st dimension, and nr copies of it along the 2nd dimension.</li>
+<li><strong>Xgrid</strong>: with the offset vector <em>xvec</em> (the zero offset sample is placed in the center) along the 2nd dimension, and nt copies of it along the 1st dimension.</li>
+<li><strong>Xgridfft</strong>: with the offset vector <em>xvecfft</em> (the zero offset sample is placed at the first index position) along the 2nd dimension, and nt copies of it along the 1st dimension.</li>
+</ul>
+</dd>
+</dl>
+<p>All output arrays have the shape (nf,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Wavefield_NRM_k1_w</span> <span class="k">import</span> <span class="n">Wavefield_NRM_k1_w</span> <span class="k">as</span> <span class="n">WF</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">WF</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">W_X_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">][:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">array([ 0.        ,  1.22718463,  2.45436926, ..., 628.3185307179587])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.K1W2X1T">
+<code class="descname">K1W2X1T</code><span class="sig-paren">(</span><em>array_k1w</em>, <em>NumPy_fft_Sign_Convention=False</em>, <em>K1W_fft_Same_Sign=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.K1W2X1T"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.K1W2X1T" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies an inverse Fourier transform from the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain to  the <span class="math notranslate">\(x_1\)</span>-<span class="math notranslate">\(t\)</span> domain.</p>
+<p>We assume that the space-time domain signal is real-valued (<span class="math notranslate">\(x_1\)</span>-<span class="math notranslate">\(t\)</span> domain). Therefore, we use the NumPy function <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.fft.irfftn</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>array_k1w</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Array in the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain, shape (nf,nr).</p>
+</div></blockquote>
+<p><strong>NumPy_fft_Sign_Convention</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘NumPy_fft_Sign_Convention=True’ if the temporal inverse Fourier transform is defined with same sign convention as Numpy’s <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.fft.ifft</span></code>: <span class="math notranslate">\(\int \cdot \; \mathrm{e}^{+\mathrm{j} \omega t} \mathrm{d}\omega\)</span>.</p>
+</div></blockquote>
+<p><strong>K1W_fft_Same_Sign</strong> : bool, optional</p>
+<blockquote>
+<div><ul class="simple">
+<li>Set ‘K1W_fft_Same_Sign=True’ to apply the temporal and the spatial inverse Fourier tansform with the same signs in the exponential: <span class="math notranslate">\(\int\int \cdot \; \mathrm{e}^{\pm(\mathrm{j} \omega t + \mathrm{j} k_1 x_1)} \mathrm{d}k_1 \; \mathrm{d}\omega\)</span>.</li>
+<li>Set ‘K1W_fft_Same_Sign=False’ to apply the temporal and the spatial inverse Fourier tansform with opposite signs in the exponential: <span class="math notranslate">\(\int\int \cdot \; \mathrm{e}^{\pm(\mathrm{j} \omega t - \mathrm{j} k_1 x_1)} \mathrm{d}k_1 \; \mathrm{d}\omega\)</span>.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>Real-valued array in the <span class="math notranslate">\(x_1\)</span>-<span class="math notranslate">\(t\)</span> domain, shape (nt,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>In the sub-class <strong>Layered_NRM_k1_w</strong>, we define the wavefield propagators with a positive sign, <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(+j k_3'(\omega) \Delta x_3)\)</span>. Thus, we implicitly assume that the temporal inverse Fourier transfrom is defined with a negative sign in the exponential function, which is why we set by default ‘NumPy_fft_Sign_Convention=False’.</li>
+<li><dl class="first docutils">
+<dt>By default, we set ‘K1W_fft_Same_Sign=False’, i.e. the default definition of the inverse Fourier transform is,</dt>
+<dd><span class="math notranslate">\(f(x_1,t)= \frac{1}{(2\pi)^2} \int \int F(k_1,\omega) \; \mathrm{e}^{-\mathrm{j}\omega t + \mathrm{j} k_1 x_1} \; \mathrm{d}\omega \; \mathrm{d}k_1\)</span>.</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.X1T2K1W">
+<code class="descname">X1T2K1W</code><span class="sig-paren">(</span><em>array_x1t</em>, <em>NumPy_fft_Sign_Convention=False</em>, <em>K1W_fft_Same_Sign=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.X1T2K1W"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.X1T2K1W" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies a forward Fourier transform from the <span class="math notranslate">\(x_1\)</span>-<span class="math notranslate">\(t\)</span> domain to the <span class="math notranslate">\(k1_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain.</p>
+<p>We assume that the space-time domain signal is real-valued (<span class="math notranslate">\(x_1\)</span>-<span class="math notranslate">\(t\)</span> domain). Therefore, we use the NumPy function <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.fft.rfftn</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>array_pt</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Real-valued array in the <span class="math notranslate">\(x_1\)</span>-<span class="math notranslate">\(t\)</span> domain, shape (nt,nr).</p>
+</div></blockquote>
+<p><strong>NumPy_fft_Sign_Convention</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘NumPy_fft_Sign_Convention=True’ if the temporal forward Fourier transform is defined with same sign convention as Numpy’s <code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.fft.fft</span></code>: <span class="math notranslate">\(\int \cdot \; \mathrm{e}^{-\mathrm{j} \omega t} \mathrm{d}t\)</span>.</p>
+</div></blockquote>
+<p><strong>K1W_fft_Same_Sign</strong> : bool, optional</p>
+<blockquote>
+<div><ul class="simple">
+<li>Set ‘K1W_fft_Same_Sign=True’ to apply the temporal and the spatial forward Fourier tansform with the same signs in the exponential: <span class="math notranslate">\(\int\int \cdot \; \mathrm{e}^{\pm(\mathrm{j} \omega t + \mathrm{j} k_1 x_1)} \mathrm{d}x_1 \; \mathrm{d}t\)</span>.</li>
+<li>Set ‘K1W_fft_Same_Sign=False’ to apply the temporal and the spatial forward Fourier tansform with opposite signs in the exponential: <span class="math notranslate">\(\int\int \cdot \; \mathrm{e}^{\pm(\mathrm{j} \omega t - \mathrm{j} k_1 x_1)} \mathrm{d}x_1 \; \mathrm{d}t\)</span>.</li>
+</ul>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>Array in the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain, shape (nf,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>In the sub-class <strong>Layered_NRM_k1_w</strong> we define the wavefield propagators with a positive sign, <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(+j k_3'(\omega) \Delta x_3)\)</span>. Thus, we implicitly assume that the temporal forward Fourier transfrom is defined with a positive sign in the exponential, which is why we set by default ‘NumPy_fft_Sign_Convention=False’.</li>
+<li><dl class="first docutils">
+<dt>By default, we set ‘K1W_fft_Same_Sign=False’, i.e. the default definition of the forward Fourier transform is,</dt>
+<dd><span class="math notranslate">\(F(k_1,\omega)=\int \int f(x_1,\omega) \mathrm{e}^{+\mathrm{j}\omega t - \mathrm{j} k_1 x_1} \; \mathrm{d}t \; \mathrm{d}x_1\)</span>.</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w">
+<code class="descname">RickerWavelet_w</code><span class="sig-paren">(</span><em>f0=None</em>, <em>w0=None</em>, <em>NormalisationToOne=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.RickerWavelet_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes a Ricker wavelet in the frequency domain.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>f0</strong> : int, float, optional</p>
+<blockquote>
+<div><p>Value of the most energetic frequency <span class="math notranslate">\(f_0\)</span> in Hz.</p>
+</div></blockquote>
+<p><strong>w0</strong> : int, float, optional</p>
+<blockquote>
+<div><p>Value of the most energetic frequency <span class="math notranslate">\(\omega_0\)</span> in radians.</p>
+</div></blockquote>
+<p><strong>NormalisationToOne</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘NormalisationToOne=False’ to keep the analytic scaling of the 
+Ricker wavelet.  For ‘NormalisationToOne=True’ the Ricker wavelet 
+is scaled by the inverse of the amplitude of the peak frequency 
+<span class="math notranslate">\(\frac{2}{\mathrm{e}\sqrt{\pi}\omega_0}\)</span>.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>Array of the shape (nf,nr). The Ricker wavelet (in the frequency 
+domain) is saved along the first dimension and copied nr times 
+along the second dimension.</p>
+<p><span class="math notranslate">\(R(\omega) = \frac{2\omega^2}{\sqrt{\pi}\omega_0^3}
+\mathrm{e}^{-\frac{\omega^2}{\omega_0^2}}\)</span></p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<table class="docutils citation" frame="void" id="r1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[R1]</a></td><td><ol class="first last upperalpha simple" start="25">
+<li>Wang, “Frequencies of the Ricker wavelet,” Geophysics 80.2</li>
+</ol>
+</td></tr>
+</tbody>
+</table>
+<p>(2015): A31-A37.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t">
+<code class="descname">Gain_t</code><span class="sig-paren">(</span><em>RelativeTaperLength=0.03125</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Gain_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes a gain function in the time domain to compensate for the 
+imaginary constant <span class="math notranslate">\(\epsilon\)</span> added to the frequencies
+<span class="math notranslate">\(\omega' = \omega + \mathrm{j}\epsilon\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>RelativeTaperLength</strong> : int, float, optional</p>
+<blockquote>
+<div><p>The product of ‘RelativeTaperLength’ and the number of temporal 
+samples ‘nt’ determines the taper length. The default value is 
+‘RelativeTaperLength’<span class="math notranslate">\(=2^{-5}.\)</span></p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">numpy.ndarray</p>
+<blockquote class="last">
+<div><p>Array of the shape (nt,nr). The exponential gain function 
+<span class="math notranslate">\(\mathrm{e}^{\epsilon t}\)</span> is sorted along the first dimension 
+(time zero element followed by positive time samples, then negative 
+time samples).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Layered_NRM_k1_w.html" title="Layered_NRM_k1_w module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >k1-w-domain</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Christian Reinicke, Kees Wapenaar, and Evert Slob.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>

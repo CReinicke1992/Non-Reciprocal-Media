@@ -1,0 +1,36 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}p-w-domain}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}Layered\_NRM\_p\_w module}{1}{section.1.1}
+\contentsline {paragraph}{Notes}{3}{paragraph*.5}
+\contentsline {paragraph}{References}{3}{paragraph*.6}
+\contentsline {paragraph}{Examples}{3}{paragraph*.7}
+\contentsline {paragraph}{Notes}{4}{paragraph*.9}
+\contentsline {paragraph}{References}{4}{paragraph*.10}
+\contentsline {paragraph}{Examples}{4}{paragraph*.11}
+\contentsline {paragraph}{Notes}{5}{paragraph*.13}
+\contentsline {paragraph}{References}{5}{paragraph*.14}
+\contentsline {paragraph}{Examples}{6}{paragraph*.15}
+\contentsline {paragraph}{Examples}{6}{paragraph*.17}
+\contentsline {paragraph}{Notes}{7}{paragraph*.19}
+\contentsline {paragraph}{References}{8}{paragraph*.20}
+\contentsline {paragraph}{Examples}{8}{paragraph*.21}
+\contentsline {paragraph}{Notes}{9}{paragraph*.23}
+\contentsline {paragraph}{References}{9}{paragraph*.24}
+\contentsline {paragraph}{Examples}{9}{paragraph*.25}
+\contentsline {paragraph}{References}{11}{paragraph*.27}
+\contentsline {paragraph}{Examples}{11}{paragraph*.28}
+\contentsline {paragraph}{References}{12}{paragraph*.30}
+\contentsline {paragraph}{Examples}{12}{paragraph*.31}
+\contentsline {section}{\numberline {1.2}Wavefield\_NRM\_p\_w module}{13}{section.1.2}
+\contentsline {paragraph}{Notes}{14}{paragraph*.34}
+\contentsline {paragraph}{Examples}{14}{paragraph*.35}
+\contentsline {paragraph}{Examples}{14}{paragraph*.37}
+\contentsline {paragraph}{Notes}{15}{paragraph*.39}
+\contentsline {paragraph}{Notes}{15}{paragraph*.41}
+\contentsline {paragraph}{Examples}{16}{paragraph*.43}
+\contentsline {paragraph}{Examples}{16}{paragraph*.45}
+\contentsline {paragraph}{Examples}{16}{paragraph*.47}
+\contentsline {paragraph}{Examples}{17}{paragraph*.49}
+\contentsline {paragraph}{Examples}{17}{paragraph*.51}
+\contentsline {chapter}{\numberline {2}Indices and tables}{19}{chapter.2}
+\contentsline {chapter}{Python Module Index}{21}{section*.52}

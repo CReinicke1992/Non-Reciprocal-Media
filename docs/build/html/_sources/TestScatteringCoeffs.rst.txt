@@ -1,0 +1,7 @@
+TestScatteringCoeffs module
+===========================
+
+.. automodule:: TestScatteringCoeffs
+    :members:
+    :undoc-members:
+    :show-inheritance:

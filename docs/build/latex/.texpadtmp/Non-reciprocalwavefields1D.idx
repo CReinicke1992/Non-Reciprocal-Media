@@ -1,0 +1,21 @@
+\indexentry{Layered\_NRM\_p\_w (module)|hyperpage}{1}
+\indexentry{Wavefield\_NRM\_p\_w (module)|hyperpage}{1}
+\indexentry{Layered\_NRM\_p\_w (class in Layered\_NRM\_p\_w)|hyperpage}{1}
+\indexentry{FocusingFunction\_p\_w() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{3}
+\indexentry{GreensFunction\_p\_w() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{4}
+\indexentry{Insert\_layer() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{6}
+\indexentry{L\_eigenvectors\_p\_w() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{7}
+\indexentry{RT\_p\_w() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{8}
+\indexentry{RT\_response\_p\_w() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{10}
+\indexentry{W\_propagators\_p\_w() (Layered\_NRM\_p\_w.Layered\_NRM\_p\_w method)|hyperpage}{11}
+\indexentry{Wavefield\_NRM\_p\_w (module)|hyperpage}{13}
+\indexentry{Wavefield\_NRM\_p\_w (module)|hyperpage}{13}
+\indexentry{Wavefield\_NRM\_p\_w (class in Wavefield\_NRM\_p\_w)|hyperpage}{13}
+\indexentry{Dw() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{14}
+\indexentry{PT2PW() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{14}
+\indexentry{PW2PT() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{15}
+\indexentry{T\_X\_grid() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{15}
+\indexentry{Tvec() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{16}
+\indexentry{W\_X\_grid() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{16}
+\indexentry{Wvec() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{16}
+\indexentry{Xvec() (Wavefield\_NRM\_p\_w.Wavefield\_NRM\_p\_w method)|hyperpage}{17}

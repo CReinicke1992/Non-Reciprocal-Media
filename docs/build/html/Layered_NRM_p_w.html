@@ -1,0 +1,892 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Layered_NRM_p_w module &#8212; Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</title>
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/Layered_NRM_p_w.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-Layered_NRM_p_w">
+<span id="layered-nrm-p-w-module"></span><h1>Layered_NRM_p_w module<a class="headerlink" href="#module-Layered_NRM_p_w" title="Permalink to this headline">¶</a></h1>
+<p>Routines for modelling wavefields in 1D non-reciprocal media.</p>
+<span class="target" id="module-Wavefield_NRM_p_w"></span><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Authors:</th><td class="field-body">Christian Reinicke (<a class="reference external" href="mailto:c&#46;reinicke&#37;&#52;&#48;tudelft&#46;nl">c<span>&#46;</span>reinicke<span>&#64;</span>tudelft<span>&#46;</span>nl</a>), Kees Wapenaar (), and Evert Slob ()</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Copyright:</th><td class="field-body">Christian Reinicke (<a class="reference external" href="mailto:c&#46;reinicke&#37;&#52;&#48;tudelft&#46;nl">c<span>&#46;</span>reinicke<span>&#64;</span>tudelft<span>&#46;</span>nl</a>), Kees Wapenaar (), and Evert Slob ()</td>
+</tr>
+</tbody>
+</table>
+<dl class="class">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w">
+<em class="property">class </em><code class="descclassname">Layered_NRM_p_w.</code><code class="descname">Layered_NRM_p_w</code><span class="sig-paren">(</span><em>nt</em>, <em>dt</em>, <em>nr=1</em>, <em>dx1=1</em>, <em>verbose=False</em>, <em>x3vec=array([0.])</em>, <em>avec=array([0.])</em>, <em>bvec=array([0.])</em>, <em>g1vec=array([0.])</em>, <em>g3vec=array([0.])</em>, <em>p1=None</em>, <em>ReciprocalMedium=False</em>, <em>AdjointMedium=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="Wavefield_NRM_p_w.html#Wavefield_NRM_p_w.Wavefield_NRM_p_w" title="Wavefield_NRM_p_w.Wavefield_NRM_p_w"><code class="xref py py-class docutils literal notranslate"><span class="pre">Wavefield_NRM_p_w.Wavefield_NRM_p_w</span></code></a></p>
+<p>is a class to model wavefields in 1D (non-)reciprocal media in the ray-parameter frequency domain.</p>
+<p>The class Layered_NRM_p_w defines a 1D (non-)reciprocal medium and a scalar wavefield. We consider a single horizontal ray-parameter ‘p1’ and all frequencies that are sampled by the given number of time samples ‘nt’ and the time sample interval ‘dt’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>nt</strong> : int</p>
+<blockquote>
+<div><p>Number of time samples.</p>
+</div></blockquote>
+<p><strong>dt</strong> : int, float</p>
+<blockquote>
+<div><p>Time sample interval in seconds.</p>
+</div></blockquote>
+<p><strong>nr</strong> : int, optional</p>
+<blockquote>
+<div><p>Number of space samples.</p>
+</div></blockquote>
+<p><strong>dx1</strong> : int, float, optional</p>
+<blockquote>
+<div><p>Space sample interval.</p>
+</div></blockquote>
+<p><strong>verbose</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘verbose=True’ to receive feedback in the command line.</p>
+</div></blockquote>
+<p><strong>x3vec</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Vertical spatial vector <span class="math notranslate">\(x_3\)</span>, for n layers ‘x3vec’ must have the shape (n,). We define the <span class="math notranslate">\(x_3\)</span>-axis as downward-pointing. Implicitly, the first value on the <span class="math notranslate">\(x_3\)</span>-axis is zero (not stored in ‘x3vec’).</p>
+</div></blockquote>
+<p><strong>avec</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\alpha\)</span> (real-valued), for n layers ‘avec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>bvec</strong> : numpy.ndarray</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued), for n layers ‘bvec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>g1vec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_1\)</span> (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers ‘g1vec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>g3vec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers ‘g3vec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>p1</strong> : int, float</p>
+<blockquote>
+<div><p>Horizontal ray-parameter in seconds per metre.</p>
+</div></blockquote>
+<p><strong>ReciprocalMedium</strong> : bool, optional</p>
+<blockquote>
+<div><p>For non-reciprocal media set ‘ReciprocalMedium=False’, for reciprocal media set ‘ReciprocalMedium=True’.</p>
+</div></blockquote>
+<p><strong>AdjointMedium</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘AdjointMedium=True’ to compute scattering coefficients and propagators in an adjoint medium <span class="math notranslate">\(^{(a)}\)</span>. For reciprocal media, the scattering coefficients and propagators are identical in a medium and its adjoint. We have defined the scattering and propagation in the adjoint medium only for flux-normalisation.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">class</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>A class to model a wavefield in a 1D non-reciprocal medium in the ray-parameter frequency domain. The following instances are defined:</dt>
+<dd><blockquote class="first">
+<div><ul class="simple">
+<li><strong>x3vec</strong>: <span class="math notranslate">\(x_3\)</span>.</li>
+</ul>
+</div></blockquote>
+<ul class="last simple">
+<li><strong>avec</strong>: <span class="math notranslate">\(\alpha\)</span>.</li>
+<li><strong>bvec</strong>: <span class="math notranslate">\(\beta\)</span>.</li>
+<li><strong>g1vec</strong>: <span class="math notranslate">\(\gamma_1\)</span>.</li>
+<li><strong>g3vec</strong>: <span class="math notranslate">\(\gamma_3\)</span>.</li>
+<li><strong>p1</strong>: Horizontal ray-parameter.</li>
+<li><strong>ReciprocalMedium</strong>: True for reciprocal media, False for non-reciprocal media.</li>
+<li><strong>AdjointMedium</strong>: If True, propagation and scatteing are defined in a medium and in its adjoint.</li>
+<li><strong>p3</strong>: Vertical ray-parameter for positive ‘p1’.</li>
+<li><strong>p3n</strong>: Vertical ray-parameter for negative ‘p1’.</li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>We format the data as described below.</dt>
+<dd><ul class="first last">
+<li>Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.</li>
+<li>Wavefields are in the p- <span class="math notranslate">\(\omega\)</span> domain.</li>
+<li>The zero frequency component is placed at the first index position.</li>
+<li>If the wavefield is transformed to the time domain, the zero time component is placed at the first index position, followed by nt/2-1 positive time samples and nt/2 negative time samples.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>For evanescent waves, Kees makes a sign choice for the vertical ray-parameter,</dt>
+<dd><ul class="first last">
+<li><span class="math notranslate">\(p_3' = -j \sqrt{p_1^2 - (\alpha \beta + \gamma_1^2 + \gamma_3^2)}\)</span>.</li>
+</ul>
+</dd>
+<dt>By default, <strong>NumPy</strong> makes the oppostie sign choice, </dt>
+<dd><ul class="first last">
+<li><span class="math notranslate">\(p_3' = +j \sqrt{p_1^2 - (\alpha \beta + \gamma_1^2 + \gamma_3^2)}\)</span>.</li>
+</ul>
+</dd>
+<dt>We stick to the sign choice by <strong>NumPy</strong>. Thus, we will also change the sign choice for the propagators,</dt>
+<dd><ul class="first last">
+<li>Kees chose: <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(-j \omega p_3' \Delta x_3)\)</span>.</li>
+<li>We choose: <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(+j \omega p_3' \Delta x_3)\)</span>.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield in a layered non-reciprocal medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span><span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span><span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Wavefield Quantities</strong>
+(Do not change the table!)</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="26%" />
+<col width="20%" />
+<col width="20%" />
+<col width="15%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head"><em>TE</em></th>
+<th class="head"><em>TM</em></th>
+<th class="head"><em>Ac. (fluid)</em></th>
+<th class="head"><em>SH (solid)</em></th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>P</strong></td>
+<td><span class="math notranslate">\(E_2\)</span></td>
+<td><span class="math notranslate">\(H_2\)</span></td>
+<td><span class="math notranslate">\(p\)</span></td>
+<td><span class="math notranslate">\(v_2\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{Q}_1\)</span></td>
+<td><span class="math notranslate">\(H_3\)</span></td>
+<td><span class="math notranslate">\(-E_3\)</span></td>
+<td><span class="math notranslate">\(v_1\)</span></td>
+<td><span class="math notranslate">\(-\tau_{21}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\mathbf{Q}_3\)</span></td>
+<td><span class="math notranslate">\(-H_1\)</span></td>
+<td><span class="math notranslate">\(E_1\)</span></td>
+<td><span class="math notranslate">\(v_3\)</span></td>
+<td><span class="math notranslate">\(-\tau_{23}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{\alpha}\)</span></td>
+<td><span class="math notranslate">\(\epsilon\)</span></td>
+<td><span class="math notranslate">\(\mu\)</span></td>
+<td><span class="math notranslate">\(\kappa\)</span></td>
+<td><span class="math notranslate">\(\rho\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\mathbf{\beta}\)</span></td>
+<td><span class="math notranslate">\(\mu\)</span></td>
+<td><span class="math notranslate">\(\epsilon\)</span></td>
+<td><span class="math notranslate">\(\rho\)</span></td>
+<td><span class="math notranslate">\(1/\mu\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{\gamma}_1\)</span></td>
+<td><span class="math notranslate">\(\xi_{23}\)</span></td>
+<td><span class="math notranslate">\(-\zeta_{23}\)</span></td>
+<td><span class="math notranslate">\(d_1\)</span></td>
+<td><span class="math notranslate">\(e_1\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\mathbf{\gamma}_3\)</span></td>
+<td><span class="math notranslate">\(-\xi_{21}\)</span></td>
+<td><span class="math notranslate">\(\zeta_{21}\)</span></td>
+<td><span class="math notranslate">\(d_3\)</span></td>
+<td><span class="math notranslate">\(e_3\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{\delta}_1\)</span></td>
+<td><span class="math notranslate">\(\zeta_{32}\)</span></td>
+<td><span class="math notranslate">\(-\xi_{32}\)</span></td>
+<td><span class="math notranslate">\(e_1\)</span></td>
+<td><span class="math notranslate">\(d_1\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\mathbf{\delta}_3\)</span></td>
+<td><span class="math notranslate">\(-\zeta_{12}\)</span></td>
+<td><span class="math notranslate">\(\xi_{12}\)</span></td>
+<td><span class="math notranslate">\(e_3\)</span></td>
+<td><span class="math notranslate">\(d_3\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{B}\)</span></td>
+<td><span class="math notranslate">\(-J_2^e\)</span></td>
+<td><span class="math notranslate">\(-J_2^m\)</span></td>
+<td><span class="math notranslate">\(q\)</span></td>
+<td><span class="math notranslate">\(f_2\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\mathbf{C}_1\)</span></td>
+<td><span class="math notranslate">\(-J_3^m\)</span></td>
+<td><span class="math notranslate">\(J_3^e\)</span></td>
+<td><span class="math notranslate">\(f_1\)</span></td>
+<td><span class="math notranslate">\(2h_{21}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{C}_3\)</span></td>
+<td><span class="math notranslate">\(J_1^m\)</span></td>
+<td><span class="math notranslate">\(-J_1^e\)</span></td>
+<td><span class="math notranslate">\(f_3\)</span></td>
+<td><span class="math notranslate">\(2h_{23}\)</span></td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.L_eigenvectors_p_w">
+<code class="descname">L_eigenvectors_p_w</code><span class="sig-paren">(</span><em>beta=None</em>, <em>g3=None</em>, <em>p3=None</em>, <em>p3n=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.L_eigenvectors_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.L_eigenvectors_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the eigenvector matrix ‘L’ and its inverse ‘Linv’, either in flux- or in pressure-normalisation for a single vertical ray-parameter ‘p3’ inside a homogeneous layer. If ‘AdjointMedium=True’, <strong>L_eigenvectors_p_w</strong> also computes the eigenvector matrix in the adjoint medium ‘La’ and its inverse ‘Lainv’.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>beta</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span>  (real-valued).</p>
+</div></blockquote>
+<p><strong>g3</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span>.</p>
+</div></blockquote>
+<p><strong>p3</strong> : int, float</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a positive horizontal ray-parameter <span class="math notranslate">\(p_1\)</span>.</p>
+</div></blockquote>
+<p><strong>p3n</strong> : int, float, optional (required if ‘AdjointMedium=True’)</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a negative horizontal ray-parameter <span class="math notranslate">\(p_1\)</span>.</p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>L</strong>: The eigenvector matrix.</li>
+<li><strong>Linv</strong>: The inverse of the eigenvector matrix.</li>
+<li><strong>La</strong>: The eigenvector matrix (adjoint medium).</li>
+<li><strong>Lainv</strong>: The inverse of the eigenvector matrix (adjoint medium).</li>
+</ul>
+</dd>
+</dl>
+<p>All eigenvector matrices are stored in a in a (2x2)-array.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>The eigenvector matrix ‘L’ and its inverse ‘Linv’ are different for reciprocal and non-reciprocal media.</li>
+<li>For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium.</li>
+<li>We have defined the eigenvectors of the adjoint medium only for flux-normalisation.</li>
+</ul>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield in a layered non-reciprocal medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span> <span class="n">nt</span><span class="o">=</span><span class="mi">1024</span> <span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span> <span class="p">,</span> <span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">])</span> <span class="p">,</span> <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span> <span class="p">,</span> <span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span> <span class="p">,</span> <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">])</span> <span class="p">,</span> <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">])</span> <span class="p">,</span> <span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span> <span class="p">,</span> <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute eigenvectors in flux-normalisation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Lvecs</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">L_eigenvectors_p_w</span><span class="p">(</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span><span class="n">g3</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span><span class="n">p3</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Eigenvector matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">L</span> <span class="o">=</span> <span class="n">Lvecs</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span>
+<span class="go">([[15.8113883 +0.j, 15.8113883 +0.j],[ 0.03162278+0.j, -0.03162278+0.j]])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Inverse eigenvector matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Linv</span> <span class="o">=</span> <span class="n">Lvecs</span><span class="p">[</span><span class="s1">&#39;Linv&#39;</span><span class="p">]</span>
+<span class="go">([[  0.03162278+0.j,  15.8113883 +0.j],[  0.03162278+0.j, -15.8113883 -0.j]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.RT_p_w">
+<code class="descname">RT_p_w</code><span class="sig-paren">(</span><em>beta_u=None</em>, <em>g3_u=None</em>, <em>p3_u=None</em>, <em>p3n_u=None</em>, <em>beta_l=None</em>, <em>g3_l=None</em>, <em>p3_l=None</em>, <em>p3n_l=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.RT_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.RT_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the scattering coefficients at an horizontal interface, either in flux- or in pressure-normalisation. The variables with subscript ‘u’ refer to the medium parameters in the upper half-space, the variables with subscript ‘l’ refer to the medium parameters in the lower half-space. We consider a single horizontal ray-parameter <span class="math notranslate">\(p_1\)</span>, which is associated with a vertical ray-parameter ‘p3_u’ in the upper half-space and ‘p3_l’ in the lower half-space. If one sets ‘AdjointMedium=True’, <strong>RT_p_w</strong> also computes the scattering coefficients in the adjoint medium.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>beta_u</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued) (upper half-space).</p>
+</div></blockquote>
+<p><strong>g3_u</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (upper half-space).</p>
+</div></blockquote>
+<p><strong>p3_u</strong> : int, float</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a positive horizontal ray-parameter <span class="math notranslate">\(p_1\)</span> (upper half-space).</p>
+</div></blockquote>
+<p><strong>p3n_u</strong> : int, float, optional (required if ‘AdjointMedium=True’)</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a negative horizontal ray-parameter <span class="math notranslate">\(p_1\)</span> (upper half-space).</p>
+</div></blockquote>
+<p><strong>beta_l</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued) (lower half-space).</p>
+</div></blockquote>
+<p><strong>g3_l</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (lower half-space).</p>
+</div></blockquote>
+<p><strong>p3_l</strong> : int, float</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a positive horizontal ray-parameter <span class="math notranslate">\(p_1\)</span> (lower half-space).</p>
+</div></blockquote>
+<p><strong>p3n_l</strong> : int, float, optional (required if ‘AdjointMedium=True’)</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a negative horizontal ray-parameter <span class="math notranslate">\(p_1\)</span> (lower half-space).</p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>rP</strong>: Reflection coefficient from above.</li>
+<li><strong>tP</strong>: Transmission coefficient from above ‘tP’.</li>
+<li><strong>rM</strong>: Reflection coefficient from below.</li>
+<li><strong>tM</strong>: Transmission coefficient from below.</li>
+<li><strong>rPa</strong>: Reflection coefficient from above (adjoint medium).</li>
+<li><strong>tPa</strong>: Transmission coefficient from above (adjoint medium).</li>
+<li><strong>rMa</strong>: Reflection coefficient from below (adjoint medium).</li>
+<li><strong>tMa</strong>: Transmission coefficient from below (adjoint medium).</li>
+</ul>
+</dd>
+</dl>
+<p>All scattering coefficients are stored as scalars.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium.</li>
+<li>We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</li>
+</ul>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create wavefield F for positive horizontal ray-parameter p1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span><span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span><span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ScatCoeffs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">RT_p_w</span><span class="p">(</span><span class="n">beta_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">g3_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p3_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p3n_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">p3n</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">beta_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">g3_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p3_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p3n_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">p3n</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rplus</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rP&#39;</span><span class="p">]</span>
+<span class="go">(0.8620013269525346+0.5069060192304582j)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create wavefield Fn for negative horizontal ray-parameter p1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Fn</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span><span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span><span class="n">p1</span><span class="o">=-</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ScatCoeffsn</span> <span class="o">=</span> <span class="n">Fn</span><span class="o">.</span><span class="n">RT_p_w</span><span class="p">(</span><span class="n">beta_u</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">g3_u</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p3_u</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">p3n_u</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">p3n</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">beta_l</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">g3_l</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p3_l</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">p3</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">p3n_l</span><span class="o">=</span><span class="n">Fn</span><span class="o">.</span><span class="n">p3n</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># In non-reciprocal media, for flux-normalisation, the reflection coefficients</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># in true medium for positive horizontal ray-parameter p1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># and in adjoint medium for negative horizontal ray-parameter p1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># are identical:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rP&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">ScatCoeffsn</span><span class="p">[</span><span class="s1">&#39;rPa&#39;</span><span class="p">])</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.W_propagators_p_w">
+<code class="descname">W_propagators_p_w</code><span class="sig-paren">(</span><em>p3=None</em>, <em>p3n=None</em>, <em>g3=None</em>, <em>dx3=None</em>, <em>w=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.W_propagators_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.W_propagators_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the downgoing propagator ‘wP’ and the upgoing progagator ‘wM’ for a single vertical ray-parameter ‘p3’ and a vertical distance ‘dx3’ (downward pointing <span class="math notranslate">\(x_3\)</span>-axis).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>p3</strong> : int, float</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a positive horizontal ray-parameter <span class="math notranslate">\(p_1\)</span>.</p>
+</div></blockquote>
+<p><strong>p3n</strong> : int, float, optional (required if ‘AdjointMedium=True’)</p>
+<blockquote>
+<div><p>Vertical ray-parameter <span class="math notranslate">\(p_3\)</span> for a negative horizontal ray-parameter <span class="math notranslate">\(p_1\)</span>.</p>
+</div></blockquote>
+<p><strong>g3</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span>.</p>
+</div></blockquote>
+<p><strong>dx3</strong> : int, float</p>
+<blockquote>
+<div><p>Vertical propagation distance <span class="math notranslate">\(\Delta x_3\)</span> (downward pointing <span class="math notranslate">\(x_3\)</span>-axis).</p>
+</div></blockquote>
+<p><strong>w</strong> : int, float, optional</p>
+<blockquote>
+<div><p>Frequency <span class="math notranslate">\(\omega\)</span> in radians. By default the propagators are computed for all sampled (positive) frequencies.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>wP</strong>: Downward propagator <span class="math notranslate">\(\tilde{w}^+\)</span>.</li>
+<li><strong>wM</strong>: Upward propagator <span class="math notranslate">\(\tilde{w}^-\)</span>.</li>
+<li><strong>wPa</strong>: Downward propagator <span class="math notranslate">\(\tilde{w}^{+(a)}\)</span> (adjoint medium).</li>
+<li><strong>wMa</strong>: Upward propagator <span class="math notranslate">\(\tilde{w}^{-(a)}\)</span> (adjoint medium).</li>
+</ul>
+</dd>
+</dl>
+<p>All propagators are stored either in an arrays of shape (nf,1), or as a scalar (if the variable’w’ is set). The variables ‘wPa’ and ‘wMa’ are computed only if one sets ‘AdjointMedium=True’.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span><span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span><span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">W</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">W_propagators_p_w</span><span class="p">(</span> <span class="n">p3</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">p3</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">p3n</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">p3n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">g3</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">,</span> <span class="n">dx3</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">x3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">F</span><span class="o">.</span><span class="n">x3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">W</span><span class="p">[</span><span class="s1">&#39;wP&#39;</span><span class="p">]</span>
+<span class="go">[[ 1.00000000e+00+0.        j],[0.24690276+0.34159244j],...,[1.07001473e-192-1.48037608e-192j]]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># The propagator has nf samples because it is computed only for positive frequencies</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">W</span><span class="p">[</span><span class="s1">&#39;wP&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<span class="go">(513, 1)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># AdjointMedium=False, hence, we expect output &#39;None&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">W</span><span class="p">[</span><span class="s1">&#39;wPa&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.RT_response_p_w">
+<code class="descname">RT_response_p_w</code><span class="sig-paren">(</span><em>x3vec=None</em>, <em>avec=None</em>, <em>bvec=None</em>, <em>g1vec=None</em>, <em>g3vec=None</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.RT_response_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.RT_response_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the reflection and transmission responses from above and from below. If medium parameters are given the computed responses are associated with the given parameters medium. Otherwise, the medium parameters defined in <strong>Layered_NRM_p_w</strong> are used.</p>
+<p>The medium responses are associated to measurements at <span class="math notranslate">\(x_3=0\)</span> and at <span class="math notranslate">\(x_3=\)</span> ‘x3vec[-2]’ <span class="math notranslate">\(+\epsilon\)</span>, where <span class="math notranslate">\(\epsilon\)</span> is an infinitesimally small positive constant. Hence, the propagation from <span class="math notranslate">\(x_3=0\)</span> to the shallowest interface is included. However, the propagation through the deepest layer is excluded.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x3vec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Vertical spatial vector <span class="math notranslate">\(x_3\)</span>, for n layers ‘x3vec’ must have the shape (n,). We define the <span class="math notranslate">\(x_3\)</span>-axis as downward-pointing. Implicitly, the first value on the <span class="math notranslate">\(x_3\)</span>-axis is zero (not stored in ‘x3vec’).</p>
+</div></blockquote>
+<p><strong>avec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\alpha\)</span> (real-valued), for n layers ‘avec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>bvec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued), for n layers ‘bvec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>g1vec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_1\)</span> (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers ‘g1vec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>g3vec</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (real-valued for non-reciprocal media or imaginary-valued for reciprocal media), for n layers ‘g3vec’ must have the shape (n,).</p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’.</p>
+</div></blockquote>
+<p><strong>InternalMultiples</strong> : bool, optional</p>
+<blockquote>
+<div><p>To model internal multiples set ‘InternalMultiples=True’. To ignore internal multiples set ‘InternalMultiples=False’.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>RP</strong>: Reflection response from above.</li>
+<li><strong>TP</strong>: Transmission response from above.</li>
+<li><strong>RM</strong>: Reflection response from below.</li>
+<li><strong>TM</strong>: Transmission response from below.</li>
+<li><strong>RPa</strong>: Reflection response from above (adjoint medium).</li>
+<li><strong>TPa</strong>: Transmission response from above (adjoint medium).</li>
+<li><strong>RMa</strong>: Reflection response from below (adjoint medium).</li>
+<li><strong>TMa</strong>: Transmission response from below (adjoint medium).</li>
+</ul>
+</dd>
+</dl>
+<p>All medium responses are stored in arrays of shape (nf,1). The variables ‘RPa’, ‘TPa’, ‘RMa’ and ‘TMa’ are computed only if one sets ‘AdjointMedium=True’.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise a wavefield in a 1D reciprocal medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Here, the parameters are chosen such that the wavefield is purely propagating (not evanescent)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">100</span><span class="p">,</span><span class="mi">500</span><span class="p">,</span><span class="mi">1000</span><span class="p">,</span><span class="mi">1010</span><span class="p">]),</span><span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">5</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.5</span><span class="p">]),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.25</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Model the medium responses</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Responses</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">RT_response_p_w</span><span class="p">(</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span><span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Here are your first medium responses:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rplus</span> <span class="o">=</span> <span class="n">Responses</span><span class="p">[</span><span class="s1">&#39;RP&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Tplus</span> <span class="o">=</span> <span class="n">Responses</span><span class="p">[</span><span class="s1">&#39;TP&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Verify if conservation of energy is satisfied</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Rplus</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">*</span><span class="n">Rplus</span><span class="o">+</span><span class="n">Tplus</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span><span class="o">*</span><span class="n">Tplus</span>
+<span class="go">([[1.+0.j], [1.+0.j], ..., [1.+0.j]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.Insert_layer">
+<code class="descname">Insert_layer</code><span class="sig-paren">(</span><em>x3</em>, <em>UpdateSelf=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.Insert_layer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.Insert_layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>inserts a transparent interface at the depth level ‘x3’. If ‘x3’ coincides with an interface of the model the model’s interface is left unchanged. If ‘x3’ is a vector it is interpreted as multiple depth levels at which transparent interfaces will be inserted.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x3</strong> : int, float, numpy.ndarray</p>
+<blockquote>
+<div><p>A depth level, or a vector of depth levels, at which a transparent interface will be inserted. The variable ‘x3’ either must be a scalar, or have the shape (n,). Each element of ‘x3’ must be real-valued and greater than, or equal to zero.</p>
+</div></blockquote>
+<p><strong>UpdateSelf</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘UpdateSelf=True’ to not only output an updated model but also update the ‘self’ parameters.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>x3vec</strong>: Updated depth vector.</li>
+<li><strong>avec</strong>: Updated <span class="math notranslate">\(\alpha\)</span> vector.</li>
+<li><strong>bvec</strong>: Updated <span class="math notranslate">\(\beta\)</span> vector.</li>
+<li><strong>g1vec</strong>: Updated <span class="math notranslate">\(\gamma_1\)</span> vector.</li>
+<li><strong>g3vec</strong>: Updated <span class="math notranslate">\(\gamma_3\)</span> vector.</li>
+<li><strong>p3</strong>: Updated <span class="math notranslate">\(p_3(p_1)\)</span> vector.</li>
+<li><strong>p3n</strong>: Updated <span class="math notranslate">\(p_3(-p_1)\)</span> vector.</li>
+</ul>
+</dd>
+</dl>
+<p>All medium parameter vectors are stored in arrays of shape (n,).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise a wavefield in a 1D reciprocal medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">]),</span><span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span><span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span><span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Insert a transparent layer at x3=1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Updated depth vector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;x3vec&#39;</span><span class="p">]</span>
+<span class="go">array([  1,  10, 150, 200])</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Updated alpha vector</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">out</span><span class="p">[</span><span class="s1">&#39;avec&#39;</span><span class="p">]</span>
+<span class="go">array([1, 1, 2, 3])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.GreensFunction_p_w">
+<code class="descname">GreensFunction_p_w</code><span class="sig-paren">(</span><em>x3R</em>, <em>x3S</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.GreensFunction_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.GreensFunction_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the one-way Green’s functions for a receiver and source depth defined by the input variables ‘x3R’ and ‘x3S’. The one-way wavefields are decomposed at the receiver- and at the source-side. We define the receiver and source depths just below ‘x3R’ and ‘x3S’, respectively (this is important if the receiver or source depth coincides with an interface).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x3R</strong> : int,float</p>
+<blockquote>
+<div><p>Receiver depth.</p>
+</div></blockquote>
+<p><strong>x3S</strong> : int, float</p>
+<blockquote>
+<div><p>Source depth.</p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’.</p>
+</div></blockquote>
+<p><strong>InternalMultiples</strong> : bool, optional</p>
+<blockquote>
+<div><p>To model internal multiples set ‘InternalMultiples=True’. To ignore internal multiples set ‘InternalMultiples=False’.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>GPP</strong>: Green’s function <span class="math notranslate">\(G^{+,+}\)</span> (true medium).</li>
+<li><strong>GPM</strong>: Green’s function <span class="math notranslate">\(G^{+,-}\)</span> (true medium).</li>
+<li><strong>GMP</strong>: Green’s function <span class="math notranslate">\(G^{-,+}\)</span> (true medium).</li>
+<li><strong>GMM</strong>: Green’s function <span class="math notranslate">\(G^{-,-}\)</span> (true medium).</li>
+<li><strong>GPPa</strong>: Green’s function <span class="math notranslate">\(G^{+,+}\)</span> (adjoint medium).</li>
+<li><strong>GPMa</strong>: Green’s function <span class="math notranslate">\(G^{+,-}\)</span> (adjoint medium).</li>
+<li><strong>GMPa</strong>: Green’s function <span class="math notranslate">\(G^{-,+}\)</span> (adjoint medium).</li>
+<li><strong>GMMa</strong>: Green’s function <span class="math notranslate">\(G^{-,-}\)</span> (adjoint medium).</li>
+</ul>
+</dd>
+</dl>
+<p>All medium responses are stored in arrays of shape (nf,1). The variables ‘GPPa’, ‘GPMa’, ‘GMPa’ and ‘GMMa’ are computed only if one sets ‘AdjointMedium=True’.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>The superscript ‘+’ and ‘-‘ refer to downgoing and upgoing waves, respectively.</li>
+<li>The first superscript refers to the wavefield at the receiver-side.</li>
+<li>The second superscript refers to the wavefield at the source-side.</li>
+</ul>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span> <span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">GreensFunction_p_w</span><span class="p">(</span><span class="n">x3R</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">x3S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                         <span class="n">InternalMultiples</span><span class="o">=</span><span class="n">InternalMultiples</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RT</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">RT_response_p_w</span><span class="p">(</span><span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                     <span class="n">InternalMultiples</span><span class="o">=</span><span class="n">InternalMultiples</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">RT</span><span class="p">[</span><span class="s1">&#39;RP&#39;</span><span class="p">]</span><span class="o">-</span><span class="n">G</span><span class="p">[</span><span class="s1">&#39;GMP&#39;</span><span class="p">]</span>
+<span class="go">0.0</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_p_w.Layered_NRM_p_w.FocusingFunction_p_w">
+<code class="descname">FocusingFunction_p_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_p_w.html#Layered_NRM_p_w.FocusingFunction_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_p_w.Layered_NRM_p_w.FocusingFunction_p_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the focusing functions between the top surface (<span class="math notranslate">\(x_3=0\)</span>) and the focusing depth defined by the input variable ‘x3F’. We define the focusing depth just below ‘x3F’. Hence, if the focusing depth coincides with an interface the focusing function focuses below that interface.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x3F</strong> : int,float</p>
+<blockquote>
+<div><p>Focusing depth.</p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’. Until now, this function only models the focusing function for flux-normalisation.</p>
+</div></blockquote>
+<p><strong>InternalMultiples</strong> : bool, optional</p>
+<blockquote>
+<div><p>To model internal multiples set ‘InternalMultiples=True’. To ignore internal multiples set ‘InternalMultiples=False’.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>Dictionary that contains </dt>
+<dd><ul class="first last simple">
+<li><strong>FP</strong>: Downgoing focusing function.</li>
+<li><strong>RP</strong>: Reflection response from above.</li>
+<li><strong>TP</strong>: Transmission response from above.</li>
+<li><strong>FM</strong>: Upgoing focusing function.</li>
+<li><strong>RM</strong>: Reflection response from below.</li>
+<li><strong>TM</strong>: Transmission response from below.</li>
+<li><strong>FPa</strong>: Downgoing focusing function (adjoint medium).</li>
+<li><strong>RPa</strong>: Reflection response from above (adjoint medium).</li>
+<li><strong>TPa</strong>: Transmission response from above (adjoint medium).</li>
+<li><strong>FMa</strong>: Upgoing focusing function (adjoint medium).</li>
+<li><strong>RMa</strong>: Reflection response from below (adjoint medium).</li>
+<li><strong>TMa</strong>: Transmission response from below (adjoint medium).</li>
+</ul>
+</dd>
+</dl>
+<p>All medium responses are stored in arrays of shape (nf,1). The variables ‘FPa’, ‘RPa’, ‘TPa’, ‘FMa’, ‘RMa’ and ‘TMa’ are computed only if one sets ‘AdjointMedium=True’.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><dl class="first docutils">
+<dt>The downgoing focusing funtion <span class="math notranslate">\(\tilde{F}_1^+\)</span> is computed by inverting the expressions for the transmission from above <span class="math notranslate">\(\tilde{T}^+\)</span>:</dt>
+<dd><span class="math notranslate">\(\tilde{F}_{1,n}^+ = \tilde{F}_{1,n-1}^+ (\tilde{w}_n^+)^{-1} (1 - \tilde{w}_n^+ \tilde{R}_{n-1}^{\cap} \tilde{w}_n^- \tilde{r}_n^{\cup} )^{-1} (\tilde{t}_n^+)^{-1}\)</span></dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>The upgoing focusing function is computed by applying the reflection response <span class="math notranslate">\(R^{\cup}\)</span> on the downgoing focusing funtion <span class="math notranslate">\(\tilde{F}_1^+\)</span>:</dt>
+<dd><span class="math notranslate">\(\tilde{F}_{1,n}^- = \tilde{R}^{\cup} \tilde{F}_{1,n}^+\)</span>.</dd>
+</dl>
+</li>
+</ul>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span> <span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span>
+<span class="gp">&gt;&gt;&gt; </span>      <span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Christian Reinicke, Kees Wapenaar, and Evert Slob.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.7.2.
+    </div>
+  </body>
+</html>
