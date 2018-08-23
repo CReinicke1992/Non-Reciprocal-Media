@@ -125,27 +125,27 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         :math:`\omega'=\omega+\mathrm{j}\epsilon` the vertical wavenumber 
         definition becomes 
     
-                :math:`k_3=\sqrt{(\\alpha \\beta -\gamma_1^2)\omega' 
+                :math:`k_3=\sqrt{(\\alpha \\beta_{11} -\gamma_1^2)\omega' 
                 + 2\gamma_1 k_1 \omega' -k_1^2} = 
-                \sqrt{(\\alpha \\beta - \gamma_1^2) (\omega -\epsilon^2) 
+                \sqrt{(\\alpha \\beta_{11} - \gamma_1^2) (\omega -\epsilon^2) 
                 + 2\gamma_1 k_1 \omega -k_1^2 
                 + \mathrm{j} 2 \epsilon 
-                [\omega (\\alpha \\beta -\gamma_1^2) + \gamma_1 k_1]}` .
+                [\omega (\\alpha \\beta_{11} -\gamma_1^2) + \gamma_1 k_1]}` .
         
             Hence, if 
               
                 :math:`\mathrm{sign}(\epsilon 
-                [\omega (\\alpha \\beta -\gamma_1^2) + \gamma_1 k_1]) < 0`, 
+                [\omega (\\alpha \\beta_{11} -\gamma_1^2) + \gamma_1 k_1]) < 0`, 
               
             the imaginary part of :math:`k_3` becomes negative, and the 
             wavefield components :math:`\mathrm{e}^{\mathrm{j}k_3 x_3}` become 
             unstable. I fix that by manually modifying the vertical wavenumber 
             to 
     
-                :math:`k_{3,mod} = \sqrt{(\\alpha \\beta -\gamma_1^2) 
+                :math:`k_{3,mod} = \sqrt{(\\alpha \\beta_{11} -\gamma_1^2) 
                 (\omega - \epsilon^2) + 2\gamma_1 k_1 \omega -k_1^2 
                 + \mathrm{j} 2 \Vert \epsilon 
-                [\omega (\\alpha \\beta -\gamma_1^2) + \gamma_1 k_1] \Vert}` .
+                [\omega (\\alpha \\beta_{11} -\gamma_1^2) + \gamma_1 k_1] \Vert}` .
     
             For those :math:`\omega`-:math:`k_1` components for which the 
             absolute value in :math:`k_{3,mod}` has an effect, I effectively 
@@ -168,7 +168,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             :math:`\epsilon >0`.
             
         (2) In reciprocal media, for Im(:math:`\gamma_i`) :math:`\\neq 0`, 
-        energy conservation does not hold for evanescent waves.
+        energy conservation does not hold for evanescent waves. (Reciprocal 
+        media are not yet included in version 2.0. However, when reciprocal
+        media are included this remark should be checked carefully.)
             
         
     Notes
@@ -183,12 +185,16 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             - The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples. 
             - The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.
         - For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,
-        \t:math:`k_3' = -j \sqrt{k_1^2 - \omega^2 (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.
+        
+        \t:math:`k_3=-j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)  \omega^2}`.
+        
         - By default, **NumPy** makes the oppostie sign choice, 
-        \t:math:`k_3' = +j \sqrt{k_1^2 - \omega^2 (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.
+        
+        \t:math:`k_3=+j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)\omega^2}`.
+        
         - For convenience, we stick to **NumPy**'s sign choice. Thus, we will also adapt the sign choice for the propagators,
-              - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(-j k_3' \Delta x_3)`.
-              - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(+j k_3' \Delta x_3)`.
+              - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\pm \lambda^{\pm} \Delta x_3)`.
+              - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\mp \lambda^{\pm} \Delta x_3)`.
         
     References
     ----------
@@ -203,12 +209,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     >>> import numpy as np
     
     >>> # Initialise wavefield in a layered non-reciprocal medium
-    >>> F=LM(nt=1024, dt=0.005, nr=512, dx1=12.5 , 
+    >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,
     >>>      x3vec=np.array([1.1,2.2,3.7]), avec=np.array([1,2,3])*1e-3, 
-    >>>      bvec=np.array([1.4,3.14,2])*1e-4, 
-    >>>      g1vec=1j*np.array([0.8,2,1.3])*1e-4, 
-    >>>      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4, 
-    >>>      ReciprocalMedium=True)  
+    >>>      b11vec=np.array([1.4,3.14,2])*1e-4, 
+    >>>      b13vec=np.array([0.4,2.4,1.2])*1e-4,
+    >>>      b33vec=np.array([1.4,3.14,2])*1e-4,
+    >>>      g1vec=np.array([0.8,2,1.3])*1e-4,
+    >>>      g3vec=np.array([1.8,0.7,2.3])*1e-4,
+    >>>      ReciprocalMedium=False)
     
     >>> # Get a meshgrid of the vertical-wavenumber
     >>> F.K3.shape
@@ -216,39 +224,44 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     
     >>> # Get the vertical-wavenumber for omega=delta omega,  and k1=0
     >>> F.K3[1,0,0]
-    (0.0003903913295999063+0j)
+    (0.00044855235013677386+0j)
     
     **Wavefield Quantities**
     (Do not change the table!)
     
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    |                           | *TE*               | *TM*               | *Ac. (fluid)* | *SH (solid)*       |
-    +===========================+====================+====================+===============+====================+
-    | **P**                     | :math:`E_2`        | :math:`H_2`        | :math:`p`     | :math:`v_2`        |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{Q}_1`      | :math:`H_3`        | :math:`-E_3`       | :math:`v_1`   | :math:`-\\tau_{21}` |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{Q}_3`      | :math:`-H_1`       | :math:`E_1`        | :math:`v_3`   | :math:`-\\tau_{23}` |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{\\alpha}`   | :math:`\epsilon`   | :math:`\mu`        | :math:`\kappa`| :math:`\\rho`       |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{\\beta}`    | :math:`\mu`        | :math:`\epsilon`   | :math:`\\rho`  | :math:`1/\mu`      |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{\gamma}_1` | :math:`\\xi_{23}`   | :math:`-\zeta_{23}`| :math:`d_1`   | :math:`e_1`        |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{\gamma}_3` | :math:`-\\xi_{21}`  | :math:`\zeta_{21}` | :math:`d_3`   | :math:`e_3`        |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{\delta}_1` | :math:`\zeta_{32}` | :math:`-\\xi_{32}`  | :math:`e_1`   | :math:`d_1`        |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{\delta}_3` | :math:`-\zeta_{12}`| :math:`\\xi_{12}`   | :math:`e_3`   | :math:`d_3`        |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{B}`        | :math:`-J_2^e`     | :math:`-J_2^m`     | :math:`q`     | :math:`f_2`        |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{C}_1`      | :math:`-J_3^m`     | :math:`J_3^e`      | :math:`f_1`   | :math:`2h_{21}`    |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-    | :math:`\mathbf{C}_3`      | :math:`J_1^m`      | :math:`-J_1^e`     | :math:`f_3`   | :math:`2h_{23}`    |
-    +---------------------------+--------------------+--------------------+---------------+--------------------+
-
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    |                                        | *TE*                       | *TM*                   | *Ac. (meta)*                             | *Ac. (rotat)*                           | *SH (solid)*                       |
+    +========================================+============================+========================+==========================================+=========================================+====================================+
+    | **P**                                  | :math:`E_2`                | :math:`H_2`            | :math:`\sigma`                           | :math:`\sigma`                          | :math:`v_2`                        |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\mathbf{Q}_1`                   | :math:`H_3`                | :math:`-E_3`           | :math:`v_1`                              | :math:`v_1`                             | :math:`-\\tau_{21}`                 |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\mathbf{Q}_3`                   | :math:`-H_1`               | :math:`E_1`            | :math:`v_3`                              | :math:`v_3`                             | :math:`-\\tau_{23}`                 |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\alpha}`            | :math:`\epsilon_{22}`      | :math:`\mu_{22}`       | :math:`\\frac{1}{K}`                      | :math:`\kappa`                          | :math:`\mathcal{R}_{22}`           |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\beta}_{11}`        | :math:`\mu_{33}`           | :math:`\epsilon_{33}`  | :math:`\mathcal{R}_{11}`                 | :math:`\\rho`                            | :math:`4 s_{1221}`                 |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\beta}_{13}`        | :math:`-\mu_{31}`          | :math:`-\epsilon_{31}` | :math:`\mathcal{R}_{13}`                 | :math:`\\frac{2\\rho\Omega_2}{j\omega}`   | :math:`4 s_{1223}`                 |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\beta}_{31}`        | :math:`-\mu_{13}`          | :math:`-\epsilon_{13}` | :math:`\mathcal{R}_{31}`                 | :math:`-\\frac{2\\rho\Omega_2}{j\omega}`  | :math:`4 s_{3221}`                 |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\beta}_{33}`        | :math:`\mu_{11}`           | :math:`\epsilon_{11}`  | :math:`\mathcal{R}_{33}`                 | :math:`\\rho`                            | :math:`4 s_{3223}`                 |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\gamma}_{1}`        |  :math:`\\xi_{23}`          | :math:`-\zeta_{23}`    | :math:`\\frac{\\theta_{mm1}}{3K}`          |                                         |  :math:`-2 \\xi_{221}`              |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\gamma}_{3}`        |  :math:`-\\xi_{21}`         | :math:`\zeta_{21}`     | :math:`\\frac{\\theta_{mm3}}{3K}`          |                                         |  :math:`-2 \\xi_{223}`              |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\chi}_{1}`          |  :math:`\zeta_{32}`        | :math:`-\\xi_{32}`      | :math:`-\\frac{\eta_{1ll}}{3K}`           |                                         | :math:`-2 \zeta_{122}`             |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\\boldsymbol{\\chi}_{3}`          |  :math:`-\zeta_{12}`       | :math:`\\xi_{12}`       | :math:`-\\frac{\eta_{3ll}}{3K}`           |                                         | :math:`-2 \zeta_{322}`             |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | **B**                                  | :math:`-J_2^e`             | :math:`-J_2^m`         | :math:`q`                                | :math:`q`                               | :math:`f_2`                        |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\mathbf{C}_1`                   | :math:`-J_3^m`             | :math:`J_3^e`          | :math:`f_1`                              | :math:`f_1`                             | :math:`2h_{12}`                    |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
+    | :math:`\mathbf{C}_3`                   | :math:`J_1^m`              | :math:`-J_1^e`         | :math:`f_3`                              | :math:`f_3`                             | :math:`2h_{32}`                    |
+    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+
     
 
    """    
@@ -270,11 +283,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                      +'g1vec and g3vec have to be of the type numpy.ndarray.')
             
         # Set beta_{13}, gamma_1 and gamma_3 by default equal to zero
-        if b13vec == np.zeros(1):
+        if b13vec.all() == np.zeros(1):
             b13vec = np.zeros_like(avec)
-        if g1vec == np.zeros(1):
+        if g1vec.all() == np.zeros(1):
             g1vec = np.zeros_like(avec)
-        if g3vec == np.zeros(1):
+        if g3vec.all() == np.zeros(1):
             g3vec = np.zeros_like(avec)
             
         # Force the medium parameters to have identical shape
@@ -343,12 +356,12 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         W   = self.W_K1_grid()['Wgrid']
         K1  = self.W_K1_grid()['K1gridfft']
         if self.ReciprocalMedium is True:
-            tmp = self.avec*self.bvec + self.g1vec**2 + self.g3vec**2
+            tmp = self.avec*self.b11vec + self.g1vec**2 + self.g3vec**2
             for layer in range(self.x3vec.size):
                 K3[:,:,layer] = tmp[layer]*W**2 - K1**2
             K3n = K3.copy()
         elif self.ReciprocalMedium is False:
-            tmp = self.avec*self.bvec - self.g1vec**2
+            tmp = self.avec*self.b11vec - self.g1vec**2
             if self.eps is None:
                 for layer in range(self.x3vec.size):
                     K3[:,:,layer]  = tmp[layer]*W**2 + 2*self.g1vec[layer]*K1*W - K1**2
@@ -501,7 +514,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 Q[:,:,layer] = Opening**2*tmp[layer]*W**2 - K1**2
             Qn = Q.copy()
         else:
-            tmp = self.avec*self.bvec - self.g1vec**2
+            tmp = self.avec*self.b11vec - self.g1vec**2
             for layer in range(self.x3vec.size):
                 Q[:,:,layer]  = ( Opening**2*tmp[layer]*W**2 
                                  + 2*self.g1vec[layer]*K1*W - K1**2 )
@@ -620,6 +633,125 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                'FKn_global_tap':FKn_global_tap,'taperlen':taperlen}
         return out
         
+    def Eigenvalues_k1_w(self):
+        """computes the eigenvalues :math:`\lambda^{\pm}` of the two-way 
+        operator matrix :math:`\\rm{\\bf A}` in the wavenumber-frequency 
+        domain.
+        
+        Returns
+        -------
+    
+        dict
+            Dictionary that contains 
+            
+                - **LP**: The eigenvalue :math:`\lambda^{+}`.
+                - **LM**: The eigenvalue :math:`\lambda^{-}`.
+                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1`. 
+                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1`.   
+                
+            All eigenvalue matrices are stored in a in a (nf,nr)-array. The 
+            dimensions correspond to all combinations of frequencies 
+            :math:`\omega` and horizontal-wavenumbers :math:`k_1`.
+        
+        
+        .. todo::
+            
+            (1) Check if the eigenvalues have to be modified for reciprocal 
+            media.
+            
+            
+            (2) Check if :math:`\\beta_{11} \\beta_{33} - \\beta_{13}^2 \geq 0` 
+            holds in general.
+        
+        Notes
+        -----
+            - The eigenvalues are associated with non-reciprocal media.
+        
+        References
+        ----------
+        Kees document as soon as it is published.
+
+        Examples
+        --------
+
+        >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
+        >>> import numpy as np
+        >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),
+                 avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,
+                 b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,
+                 g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,
+                 ReciprocalMedium=False)
+        
+        >>> # Compute the eigenvalue lambda_plus
+        >>> Lam = F.Eigenvalues_k1_w()
+        >>> lP = Lam["LP"]
+        >>> lP[1,0,0]  # Evaluate for k1=0 and \omega = \Delta \omega
+        0.0006226976760655292j
+        
+        """
+        
+        # Frequency and horizontal-wavenumber meshgrids
+        Om = self.W_K1_grid()['Wgrid']
+        K1 = self.W_K1_grid()['K1gridfft']
+        
+        if self.ReciprocalMedium is False:
+            
+            LP  = np.zeros((self.nf,self.nr,self.x3vec.size),dtype=complex)
+            LM = LP.copy()
+        
+            for layer in range(self.x3vec.size):
+                
+                tmp1 = ( K1*self.b13vec[layer] 
+                         + Om*(  self.b11vec[layer]*self.g3vec[layer] 
+                               - self.b13vec[layer]*self.g1vec[layer] ) ) 
+                        
+                tmp2 = ( np.sqrt(  self.b11vec[layer]*self.b33vec[layer] 
+                                 - self.b13vec[layer]**2 ) 
+                        *self.K3[:,:,layer]*np.sign(self.b11vec[layer]) )
+                
+                LP[:,:,layer] = 1j*(tmp1 + tmp2) / self.b11vec[layer]
+                LM[:,:,layer] = 1j*(tmp1 - tmp2) / self.b11vec[layer]
+                    
+            if self.AdjointMedium is True:
+                LPn = LP.copy()
+                LMn = LP.copy()
+                
+                for layer in range(self.x3vec.size):
+                
+                    tmp1 = ( -K1*self.b13vec[layer] 
+                              + Om*(  self.b11vec[layer]*self.g3vec[layer] 
+                                    - self.b13vec[layer]*self.g1vec[layer] ) ) 
+                            
+                    tmp2 = ( np.sqrt(  self.b11vec[layer]*self.b33vec[layer] 
+                                     - self.b13vec[layer]**2 ) 
+                            *self.K3n[:,:,layer]*np.sign(self.b11vec[layer]) )
+                    
+                    LPn[:,:,layer] = 1j*(tmp1 + tmp2) / self.b11vec[layer]
+                    LMn[:,:,layer] = 1j*(tmp1 - tmp2) / self.b11vec[layer]
+            else:
+                LPn = None
+                LMn = None
+                
+            if self.verbose is True:
+                print('\nEigenvalues_k1_w (ReciprocalMedium is False)')
+                print('---------------------------------------------')
+                print('For non-reciprocal media, we compute the eigenvalues '
+                      +'under the assumption that (b11*b33 - b13**2) is '
+                      +'greater than, or equal to zero.')
+        
+        elif self.ReciprocalMedium is True:
+            
+            #####################
+            # NOT YET IMPLEMENTED
+            #####################
+            if self.verbose is True:
+                print('\nEigenvalues_k1_w (ReciprocalMedium is True)')
+                print('--------------------------------------------')
+                print('For reciprocal media, the eigenvalues are not yet '
+                      +'implemented.')
+        
+        return {"LP":LP,"LM":LM,"LPn":LPn,"LMn":LMn}
+    
     def L_eigenvectors_k1_w(self,beta=None,g3=None,K3=None,K3n=None,normalisation='flux'):
         """computes the eigenvector matrix 'L' and its inverse 'Linv', either in flux- or in pressure-normalisation for the vertical-wavenumber 'K3' inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid that contains all combinations of frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. If \'AdjointMedium=True\', **L_eigenvectors_k1_w** also computes the eigenvector matrix in the adjoint medium 'La' and its inverse 'Lainv'. 
         

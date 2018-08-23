@@ -180,27 +180,27 @@
 <span class="sd">        :math:`\omega&#39;=\omega+\mathrm{j}\epsilon` the vertical wavenumber </span>
 <span class="sd">        definition becomes </span>
 <span class="sd">    </span>
-<span class="sd">                :math:`k_3=\sqrt{(\\alpha \\beta -\gamma_1^2)\omega&#39; </span>
+<span class="sd">                :math:`k_3=\sqrt{(\\alpha \\beta_{11} -\gamma_1^2)\omega&#39; </span>
 <span class="sd">                + 2\gamma_1 k_1 \omega&#39; -k_1^2} = </span>
-<span class="sd">                \sqrt{(\\alpha \\beta - \gamma_1^2) (\omega -\epsilon^2) </span>
+<span class="sd">                \sqrt{(\\alpha \\beta_{11} - \gamma_1^2) (\omega -\epsilon^2) </span>
 <span class="sd">                + 2\gamma_1 k_1 \omega -k_1^2 </span>
 <span class="sd">                + \mathrm{j} 2 \epsilon </span>
-<span class="sd">                [\omega (\\alpha \\beta -\gamma_1^2) + \gamma_1 k_1]}` .</span>
+<span class="sd">                [\omega (\\alpha \\beta_{11} -\gamma_1^2) + \gamma_1 k_1]}` .</span>
 <span class="sd">        </span>
 <span class="sd">            Hence, if </span>
 <span class="sd">              </span>
 <span class="sd">                :math:`\mathrm{sign}(\epsilon </span>
-<span class="sd">                [\omega (\\alpha \\beta -\gamma_1^2) + \gamma_1 k_1]) &lt; 0`, </span>
+<span class="sd">                [\omega (\\alpha \\beta_{11} -\gamma_1^2) + \gamma_1 k_1]) &lt; 0`, </span>
 <span class="sd">              </span>
 <span class="sd">            the imaginary part of :math:`k_3` becomes negative, and the </span>
 <span class="sd">            wavefield components :math:`\mathrm{e}^{\mathrm{j}k_3 x_3}` become </span>
 <span class="sd">            unstable. I fix that by manually modifying the vertical wavenumber </span>
 <span class="sd">            to </span>
 <span class="sd">    </span>
-<span class="sd">                :math:`k_{3,mod} = \sqrt{(\\alpha \\beta -\gamma_1^2) </span>
+<span class="sd">                :math:`k_{3,mod} = \sqrt{(\\alpha \\beta_{11} -\gamma_1^2) </span>
 <span class="sd">                (\omega - \epsilon^2) + 2\gamma_1 k_1 \omega -k_1^2 </span>
 <span class="sd">                + \mathrm{j} 2 \Vert \epsilon </span>
-<span class="sd">                [\omega (\\alpha \\beta -\gamma_1^2) + \gamma_1 k_1] \Vert}` .</span>
+<span class="sd">                [\omega (\\alpha \\beta_{11} -\gamma_1^2) + \gamma_1 k_1] \Vert}` .</span>
 <span class="sd">    </span>
 <span class="sd">            For those :math:`\omega`-:math:`k_1` components for which the </span>
 <span class="sd">            absolute value in :math:`k_{3,mod}` has an effect, I effectively </span>
@@ -223,7 +223,9 @@
 <span class="sd">            :math:`\epsilon &gt;0`.</span>
 <span class="sd">            </span>
 <span class="sd">        (2) In reciprocal media, for Im(:math:`\gamma_i`) :math:`\\neq 0`, </span>
-<span class="sd">        energy conservation does not hold for evanescent waves.</span>
+<span class="sd">        energy conservation does not hold for evanescent waves. (Reciprocal </span>
+<span class="sd">        media are not yet included in version 2.0. However, when reciprocal</span>
+<span class="sd">        media are included this remark should be checked carefully.)</span>
 <span class="sd">            </span>
 <span class="sd">        </span>
 <span class="sd">    Notes</span>
@@ -238,12 +240,16 @@
 <span class="sd">            - The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples. </span>
 <span class="sd">            - The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.</span>
 <span class="sd">        - For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,</span>
-<span class="sd">        \t:math:`k_3&#39; = -j \sqrt{k_1^2 - \omega^2 (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.</span>
+<span class="sd">        </span>
+<span class="sd">        \t:math:`k_3=-j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)  \omega^2}`.</span>
+<span class="sd">        </span>
 <span class="sd">        - By default, **NumPy** makes the oppostie sign choice, </span>
-<span class="sd">        \t:math:`k_3&#39; = +j \sqrt{k_1^2 - \omega^2 (\\alpha \\beta + \gamma_1^2 + \gamma_3^2)}`.</span>
+<span class="sd">        </span>
+<span class="sd">        \t:math:`k_3=+j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)\omega^2}`.</span>
+<span class="sd">        </span>
 <span class="sd">        - For convenience, we stick to **NumPy**&#39;s sign choice. Thus, we will also adapt the sign choice for the propagators,</span>
-<span class="sd">              - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(-j k_3&#39; \Delta x_3)`.</span>
-<span class="sd">              - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(+j k_3&#39; \Delta x_3)`.</span>
+<span class="sd">              - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\pm \lambda^{\pm} \Delta x_3)`.</span>
+<span class="sd">              - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\mp \lambda^{\pm} \Delta x_3)`.</span>
 <span class="sd">        </span>
 <span class="sd">    References</span>
 <span class="sd">    ----------</span>
@@ -258,12 +264,14 @@
 <span class="sd">    &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; # Initialise wavefield in a layered non-reciprocal medium</span>
-<span class="sd">    &gt;&gt;&gt; F=LM(nt=1024, dt=0.005, nr=512, dx1=12.5 , </span>
+<span class="sd">    &gt;&gt;&gt; F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,</span>
 <span class="sd">    &gt;&gt;&gt;      x3vec=np.array([1.1,2.2,3.7]), avec=np.array([1,2,3])*1e-3, </span>
-<span class="sd">    &gt;&gt;&gt;      bvec=np.array([1.4,3.14,2])*1e-4, </span>
-<span class="sd">    &gt;&gt;&gt;      g1vec=1j*np.array([0.8,2,1.3])*1e-4, </span>
-<span class="sd">    &gt;&gt;&gt;      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4, </span>
-<span class="sd">    &gt;&gt;&gt;      ReciprocalMedium=True)  </span>
+<span class="sd">    &gt;&gt;&gt;      b11vec=np.array([1.4,3.14,2])*1e-4, </span>
+<span class="sd">    &gt;&gt;&gt;      b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="sd">    &gt;&gt;&gt;      b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">    &gt;&gt;&gt;      g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="sd">    &gt;&gt;&gt;      g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">    &gt;&gt;&gt;      ReciprocalMedium=False)</span>
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; # Get a meshgrid of the vertical-wavenumber</span>
 <span class="sd">    &gt;&gt;&gt; F.K3.shape</span>
@@ -271,39 +279,44 @@
 <span class="sd">    </span>
 <span class="sd">    &gt;&gt;&gt; # Get the vertical-wavenumber for omega=delta omega,  and k1=0</span>
 <span class="sd">    &gt;&gt;&gt; F.K3[1,0,0]</span>
-<span class="sd">    (0.0003903913295999063+0j)</span>
+<span class="sd">    (0.00044855235013677386+0j)</span>
 <span class="sd">    </span>
 <span class="sd">    **Wavefield Quantities**</span>
 <span class="sd">    (Do not change the table!)</span>
 <span class="sd">    </span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    |                           | *TE*               | *TM*               | *Ac. (fluid)* | *SH (solid)*       |</span>
-<span class="sd">    +===========================+====================+====================+===============+====================+</span>
-<span class="sd">    | **P**                     | :math:`E_2`        | :math:`H_2`        | :math:`p`     | :math:`v_2`        |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{Q}_1`      | :math:`H_3`        | :math:`-E_3`       | :math:`v_1`   | :math:`-\\tau_{21}` |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{Q}_3`      | :math:`-H_1`       | :math:`E_1`        | :math:`v_3`   | :math:`-\\tau_{23}` |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{\\alpha}`   | :math:`\epsilon`   | :math:`\mu`        | :math:`\kappa`| :math:`\\rho`       |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{\\beta}`    | :math:`\mu`        | :math:`\epsilon`   | :math:`\\rho`  | :math:`1/\mu`      |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{\gamma}_1` | :math:`\\xi_{23}`   | :math:`-\zeta_{23}`| :math:`d_1`   | :math:`e_1`        |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{\gamma}_3` | :math:`-\\xi_{21}`  | :math:`\zeta_{21}` | :math:`d_3`   | :math:`e_3`        |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{\delta}_1` | :math:`\zeta_{32}` | :math:`-\\xi_{32}`  | :math:`e_1`   | :math:`d_1`        |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{\delta}_3` | :math:`-\zeta_{12}`| :math:`\\xi_{12}`   | :math:`e_3`   | :math:`d_3`        |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{B}`        | :math:`-J_2^e`     | :math:`-J_2^m`     | :math:`q`     | :math:`f_2`        |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{C}_1`      | :math:`-J_3^m`     | :math:`J_3^e`      | :math:`f_1`   | :math:`2h_{21}`    |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-<span class="sd">    | :math:`\mathbf{C}_3`      | :math:`J_1^m`      | :math:`-J_1^e`     | :math:`f_3`   | :math:`2h_{23}`    |</span>
-<span class="sd">    +---------------------------+--------------------+--------------------+---------------+--------------------+</span>
-
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    |                                        | *TE*                       | *TM*                   | *Ac. (meta)*                             | *Ac. (rotat)*                           | *SH (solid)*                       |</span>
+<span class="sd">    +========================================+============================+========================+==========================================+=========================================+====================================+</span>
+<span class="sd">    | **P**                                  | :math:`E_2`                | :math:`H_2`            | :math:`\sigma`                           | :math:`\sigma`                          | :math:`v_2`                        |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\mathbf{Q}_1`                   | :math:`H_3`                | :math:`-E_3`           | :math:`v_1`                              | :math:`v_1`                             | :math:`-\\tau_{21}`                 |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\mathbf{Q}_3`                   | :math:`-H_1`               | :math:`E_1`            | :math:`v_3`                              | :math:`v_3`                             | :math:`-\\tau_{23}`                 |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\alpha}`            | :math:`\epsilon_{22}`      | :math:`\mu_{22}`       | :math:`\\frac{1}{K}`                      | :math:`\kappa`                          | :math:`\mathcal{R}_{22}`           |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\beta}_{11}`        | :math:`\mu_{33}`           | :math:`\epsilon_{33}`  | :math:`\mathcal{R}_{11}`                 | :math:`\\rho`                            | :math:`4 s_{1221}`                 |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\beta}_{13}`        | :math:`-\mu_{31}`          | :math:`-\epsilon_{31}` | :math:`\mathcal{R}_{13}`                 | :math:`\\frac{2\\rho\Omega_2}{j\omega}`   | :math:`4 s_{1223}`                 |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\beta}_{31}`        | :math:`-\mu_{13}`          | :math:`-\epsilon_{13}` | :math:`\mathcal{R}_{31}`                 | :math:`-\\frac{2\\rho\Omega_2}{j\omega}`  | :math:`4 s_{3221}`                 |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\beta}_{33}`        | :math:`\mu_{11}`           | :math:`\epsilon_{11}`  | :math:`\mathcal{R}_{33}`                 | :math:`\\rho`                            | :math:`4 s_{3223}`                 |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\gamma}_{1}`        |  :math:`\\xi_{23}`          | :math:`-\zeta_{23}`    | :math:`\\frac{\\theta_{mm1}}{3K}`          |                                         |  :math:`-2 \\xi_{221}`              |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\gamma}_{3}`        |  :math:`-\\xi_{21}`         | :math:`\zeta_{21}`     | :math:`\\frac{\\theta_{mm3}}{3K}`          |                                         |  :math:`-2 \\xi_{223}`              |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\chi}_{1}`          |  :math:`\zeta_{32}`        | :math:`-\\xi_{32}`      | :math:`-\\frac{\eta_{1ll}}{3K}`           |                                         | :math:`-2 \zeta_{122}`             |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\\boldsymbol{\\chi}_{3}`          |  :math:`-\zeta_{12}`       | :math:`\\xi_{12}`       | :math:`-\\frac{\eta_{3ll}}{3K}`           |                                         | :math:`-2 \zeta_{322}`             |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | **B**                                  | :math:`-J_2^e`             | :math:`-J_2^m`         | :math:`q`                                | :math:`q`                               | :math:`f_2`                        |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\mathbf{C}_1`                   | :math:`-J_3^m`             | :math:`J_3^e`          | :math:`f_1`                              | :math:`f_1`                             | :math:`2h_{12}`                    |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
+<span class="sd">    | :math:`\mathbf{C}_3`                   | :math:`J_1^m`              | :math:`-J_1^e`         | :math:`f_3`                              | :math:`f_3`                             | :math:`2h_{32}`                    |</span>
+<span class="sd">    +----------------------------------------+----------------------------+------------------------+------------------------------------------+-----------------------------------------+------------------------------------+</span>
 <span class="sd">    </span>
 
 <span class="sd">   &quot;&quot;&quot;</span>    
@@ -325,11 +338,11 @@
                      <span class="o">+</span><span class="s1">&#39;g1vec and g3vec have to be of the type numpy.ndarray.&#39;</span><span class="p">)</span>
             
         <span class="c1"># Set beta_{13}, gamma_1 and gamma_3 by default equal to zero</span>
-        <span class="k">if</span> <span class="n">b13vec</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">b13vec</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">b13vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">avec</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">g1vec</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">g1vec</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">g1vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">avec</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">g3vec</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">g3vec</span><span class="o">.</span><span class="n">all</span><span class="p">()</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">g3vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">avec</span><span class="p">)</span>
             
         <span class="c1"># Force the medium parameters to have identical shape</span>
@@ -398,12 +411,12 @@
         <span class="n">W</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
         <span class="n">K1</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;K1gridfft&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bvec</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span><span class="o">**</span><span class="mi">2</span>
             <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
                 <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span>
             <span class="n">K3n</span> <span class="o">=</span> <span class="n">K3</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bvec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="o">**</span><span class="mi">2</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
                     <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span>
@@ -556,7 +569,7 @@
                 <span class="n">Q</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">Opening</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span>
             <span class="n">Qn</span> <span class="o">=</span> <span class="n">Q</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">bvec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="o">**</span><span class="mi">2</span>
             <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
                 <span class="n">Q</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span> <span class="n">Opening</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> 
                                  <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span>
@@ -675,6 +688,125 @@
                <span class="s1">&#39;FKn_global_tap&#39;</span><span class="p">:</span><span class="n">FKn_global_tap</span><span class="p">,</span><span class="s1">&#39;taperlen&#39;</span><span class="p">:</span><span class="n">taperlen</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
         
+<div class="viewcode-block" id="Layered_NRM_k1_w.Eigenvalues_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.Eigenvalues_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">Eigenvalues_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the eigenvalues :math:`\lambda^{\pm}` of the two-way </span>
+<span class="sd">        operator matrix :math:`\\rm{\\bf A}` in the wavenumber-frequency </span>
+<span class="sd">        domain.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">    </span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
+<span class="sd">                - **LP**: The eigenvalue :math:`\lambda^{+}`.</span>
+<span class="sd">                - **LM**: The eigenvalue :math:`\lambda^{-}`.</span>
+<span class="sd">                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1`. </span>
+<span class="sd">                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1`.   </span>
+<span class="sd">                </span>
+<span class="sd">            All eigenvalue matrices are stored in a in a (nf,nr)-array. The </span>
+<span class="sd">            dimensions correspond to all combinations of frequencies </span>
+<span class="sd">            :math:`\omega` and horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        .. todo::</span>
+<span class="sd">            </span>
+<span class="sd">            (1) Check if the eigenvalues have to be modified for reciprocal </span>
+<span class="sd">            media.</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
+<span class="sd">            (2) Check if :math:`\\beta_{11} \\beta_{33} - \\beta_{13}^2 \geq 0` </span>
+<span class="sd">            holds in general.</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">            - The eigenvalues are associated with non-reciprocal media.</span>
+<span class="sd">        </span>
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        Kees document as soon as it is published.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        &gt;&gt;&gt; from Layered_NRM_k1_w import Layered_NRM_k1_w as LM</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),</span>
+<span class="sd">                 avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">                 b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">                 g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">                 ReciprocalMedium=False)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute the eigenvalue lambda_plus</span>
+<span class="sd">        &gt;&gt;&gt; Lam = F.Eigenvalues_k1_w()</span>
+<span class="sd">        &gt;&gt;&gt; lP = Lam[&quot;LP&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; lP[1,0,0]  # Evaluate for k1=0 and \omega = \Delta \omega</span>
+<span class="sd">        0.0006226976760655292j</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="c1"># Frequency and horizontal-wavenumber meshgrids</span>
+        <span class="n">Om</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
+        <span class="n">K1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;K1gridfft&#39;</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+            
+            <span class="n">LP</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">LM</span> <span class="o">=</span> <span class="n">LP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        
+            <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                
+                <span class="n">tmp1</span> <span class="o">=</span> <span class="p">(</span> <span class="n">K1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> 
+                         <span class="o">+</span> <span class="n">Om</span><span class="o">*</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> 
+                               <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> 
+                        
+                <span class="n">tmp2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b33vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> 
+                                 <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> 
+                        <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span> <span class="p">)</span>
+                
+                <span class="n">LP</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">tmp1</span> <span class="o">+</span> <span class="n">tmp2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+                <span class="n">LM</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">tmp1</span> <span class="o">-</span> <span class="n">tmp2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+                    
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">LPn</span> <span class="o">=</span> <span class="n">LP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">LMn</span> <span class="o">=</span> <span class="n">LP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                
+                <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
+                
+                    <span class="n">tmp1</span> <span class="o">=</span> <span class="p">(</span> <span class="o">-</span><span class="n">K1</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> 
+                              <span class="o">+</span> <span class="n">Om</span><span class="o">*</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> 
+                                    <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> <span class="p">)</span> <span class="p">)</span> 
+                            
+                    <span class="n">tmp2</span> <span class="o">=</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>  <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">b33vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span> 
+                                     <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="p">)</span> 
+                            <span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">])</span> <span class="p">)</span>
+                    
+                    <span class="n">LPn</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">tmp1</span> <span class="o">+</span> <span class="n">tmp2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+                    <span class="n">LMn</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">tmp1</span> <span class="o">-</span> <span class="n">tmp2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">LPn</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">LMn</span> <span class="o">=</span> <span class="kc">None</span>
+                
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Eigenvalues_k1_w (ReciprocalMedium is False)&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;---------------------------------------------&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For non-reciprocal media, we compute the eigenvalues &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;under the assumption that (b11*b33 - b13**2) is &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;greater than, or equal to zero.&#39;</span><span class="p">)</span>
+        
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            
+            <span class="c1">#####################</span>
+            <span class="c1"># NOT YET IMPLEMENTED</span>
+            <span class="c1">#####################</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Eigenvalues_k1_w (ReciprocalMedium is True)&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--------------------------------------------&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the eigenvalues are not yet &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;implemented.&#39;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;LP&quot;</span><span class="p">:</span><span class="n">LP</span><span class="p">,</span><span class="s2">&quot;LM&quot;</span><span class="p">:</span><span class="n">LM</span><span class="p">,</span><span class="s2">&quot;LPn&quot;</span><span class="p">:</span><span class="n">LPn</span><span class="p">,</span><span class="s2">&quot;LMn&quot;</span><span class="p">:</span><span class="n">LMn</span><span class="p">}</span></div>
+    
 <div class="viewcode-block" id="Layered_NRM_k1_w.L_eigenvectors_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">L_eigenvectors_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">g3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the eigenvector matrix &#39;L&#39; and its inverse &#39;Linv&#39;, either in flux- or in pressure-normalisation for the vertical-wavenumber &#39;K3&#39; inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid that contains all combinations of frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. If \&#39;AdjointMedium=True\&#39;, **L_eigenvectors_k1_w** also computes the eigenvector matrix in the adjoint medium &#39;La&#39; and its inverse &#39;Lainv&#39;. </span>
 <span class="sd">        </span>

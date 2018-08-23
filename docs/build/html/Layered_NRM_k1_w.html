@@ -220,27 +220,27 @@ defined:</p>
 definition becomes</p>
 <blockquote>
 <div><blockquote>
-<div><p><span class="math notranslate">\(k_3=\sqrt{(\alpha \beta -\gamma_1^2)\omega' 
+<div><p><span class="math notranslate">\(k_3=\sqrt{(\alpha \beta_{11} -\gamma_1^2)\omega' 
 + 2\gamma_1 k_1 \omega' -k_1^2} = 
-\sqrt{(\alpha \beta - \gamma_1^2) (\omega -\epsilon^2) 
+\sqrt{(\alpha \beta_{11} - \gamma_1^2) (\omega -\epsilon^2) 
 + 2\gamma_1 k_1 \omega -k_1^2 
 + \mathrm{j} 2 \epsilon 
-[\omega (\alpha \beta -\gamma_1^2) + \gamma_1 k_1]}\)</span> .</p>
+[\omega (\alpha \beta_{11} -\gamma_1^2) + \gamma_1 k_1]}\)</span> .</p>
 </div></blockquote>
 <p>Hence, if</p>
 <blockquote>
 <div><p><span class="math notranslate">\(\mathrm{sign}(\epsilon 
-[\omega (\alpha \beta -\gamma_1^2) + \gamma_1 k_1]) &lt; 0\)</span>,</p>
+[\omega (\alpha \beta_{11} -\gamma_1^2) + \gamma_1 k_1]) &lt; 0\)</span>,</p>
 </div></blockquote>
 <p>the imaginary part of <span class="math notranslate">\(k_3\)</span> becomes negative, and the 
 wavefield components <span class="math notranslate">\(\mathrm{e}^{\mathrm{j}k_3 x_3}\)</span> become 
 unstable. I fix that by manually modifying the vertical wavenumber 
 to</p>
 <blockquote>
-<div><p><span class="math notranslate">\(k_{3,mod} = \sqrt{(\alpha \beta -\gamma_1^2) 
+<div><p><span class="math notranslate">\(k_{3,mod} = \sqrt{(\alpha \beta_{11} -\gamma_1^2) 
 (\omega - \epsilon^2) + 2\gamma_1 k_1 \omega -k_1^2 
 + \mathrm{j} 2 \Vert \epsilon 
-[\omega (\alpha \beta -\gamma_1^2) + \gamma_1 k_1] \Vert}\)</span> .</p>
+[\omega (\alpha \beta_{11} -\gamma_1^2) + \gamma_1 k_1] \Vert}\)</span> .</p>
 </div></blockquote>
 <p>For those <span class="math notranslate">\(\omega\)</span>-<span class="math notranslate">\(k_1\)</span> components for which the 
 absolute value in <span class="math notranslate">\(k_{3,mod}\)</span> has an effect, I effectively 
@@ -262,21 +262,24 @@ default settings of the 2D inverse Fourier transform function
 <span class="math notranslate">\(\epsilon &gt;0\)</span>.</p>
 </div></blockquote>
 <p class="last">(2) In reciprocal media, for Im(<span class="math notranslate">\(\gamma_i\)</span>) <span class="math notranslate">\(\neq 0\)</span>, 
-energy conservation does not hold for evanescent waves.</p>
+energy conservation does not hold for evanescent waves. (Reciprocal 
+media are not yet included in version 2.0. However, when reciprocal
+media are included this remark should be checked carefully.)</p>
 </div>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<ul class="simple">
+<ul>
 <li><dl class="first docutils">
 <dt>We format the data as described below.</dt>
 <dd><ul class="first last">
-<li>Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.</li>
+<li><p class="first">Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.</p>
+</li>
 <li><dl class="first docutils">
 <dt>Wavefields are in the <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> domain.</dt>
-<dd><ul class="first last">
+<dd><ul class="first last simple">
 <li>The zero frequency component is placed at the first index position of the first dimension.</li>
 <li>The zero horizontal-wavenumber component is placed at the first index position of the second dimension.</li>
 </ul>
@@ -285,28 +288,28 @@ energy conservation does not hold for evanescent waves.</p>
 </li>
 <li><dl class="first docutils">
 <dt>If the wavefield is transformed to the space-time domain: </dt>
-<dd><ul class="first last">
+<dd><ul class="first last simple">
 <li>The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples.</li>
 <li>The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.</li>
 </ul>
 </dd>
 </dl>
 </li>
-<li><dl class="first docutils">
-<dt>For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,</dt>
-<dd><span class="math notranslate">\(k_3' = -j \sqrt{k_1^2 - \omega^2 (\alpha \beta + \gamma_1^2 + \gamma_3^2)}\)</span>.</dd>
-</dl>
+<li><p class="first">For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,</p>
+<blockquote>
+<div><p><span class="math notranslate">\(k_3=-j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\alpha \beta_{11} -\gamma_1^2)  \omega^2}\)</span>.</p>
+</div></blockquote>
 </li>
-<li><dl class="first docutils">
-<dt>By default, <strong>NumPy</strong> makes the oppostie sign choice, </dt>
-<dd><span class="math notranslate">\(k_3' = +j \sqrt{k_1^2 - \omega^2 (\alpha \beta + \gamma_1^2 + \gamma_3^2)}\)</span>.</dd>
-</dl>
+<li><p class="first">By default, <strong>NumPy</strong> makes the oppostie sign choice,</p>
+<blockquote>
+<div><p><span class="math notranslate">\(k_3=+j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\alpha \beta_{11} -\gamma_1^2)\omega^2}\)</span>.</p>
+</div></blockquote>
 </li>
 <li><dl class="first docutils">
 <dt>For convenience, we stick to <strong>NumPy</strong>’s sign choice. Thus, we will also adapt the sign choice for the propagators,</dt>
-<dd><ul class="first last">
-<li>Kees chose: <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(-j k_3' \Delta x_3)\)</span>.</li>
-<li>We choose: <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(+j k_3' \Delta x_3)\)</span>.</li>
+<dd><ul class="first last simple">
+<li>Kees chose: <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(\pm \lambda^{\pm} \Delta x_3)\)</span>.</li>
+<li>We choose: <span class="math notranslate">\(\tilde{w}^{\pm} = \mathrm{exp}(\mp \lambda^{\pm} \Delta x_3)\)</span>.</li>
 </ul>
 </dd>
 </dl>
@@ -324,12 +327,14 @@ energy conservation does not hold for evanescent waves.</p>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield in a layered non-reciprocal medium</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span> <span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span> <span class="p">,</span> 
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span>
 <span class="gp">&gt;&gt;&gt; </span>     <span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span> <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span> 
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span> 
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span> 
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span> 
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">b11vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span> 
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">b13vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">2.4</span><span class="p">,</span><span class="mf">1.2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">b33vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get a meshgrid of the vertical-wavenumber</span>
@@ -339,24 +344,26 @@ energy conservation does not hold for evanescent waves.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get the vertical-wavenumber for omega=delta omega,  and k1=0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">(0.0003903913295999063+0j)</span>
+<span class="go">(0.00044855235013677386+0j)</span>
 </pre></div>
 </div>
 <p><strong>Wavefield Quantities</strong>
 (Do not change the table!)</p>
 <table border="1" class="docutils">
 <colgroup>
-<col width="26%" />
+<col width="19%" />
+<col width="13%" />
+<col width="11%" />
 <col width="20%" />
-<col width="20%" />
-<col width="15%" />
-<col width="20%" />
+<col width="19%" />
+<col width="17%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">&#160;</th>
 <th class="head"><em>TE</em></th>
 <th class="head"><em>TM</em></th>
-<th class="head"><em>Ac. (fluid)</em></th>
+<th class="head"><em>Ac. (meta)</em></th>
+<th class="head"><em>Ac. (rotat)</em></th>
 <th class="head"><em>SH (solid)</em></th>
 </tr>
 </thead>
@@ -364,12 +371,14 @@ energy conservation does not hold for evanescent waves.</p>
 <tr class="row-even"><td><strong>P</strong></td>
 <td><span class="math notranslate">\(E_2\)</span></td>
 <td><span class="math notranslate">\(H_2\)</span></td>
-<td><span class="math notranslate">\(p\)</span></td>
+<td><span class="math notranslate">\(\sigma\)</span></td>
+<td><span class="math notranslate">\(\sigma\)</span></td>
 <td><span class="math notranslate">\(v_2\)</span></td>
 </tr>
 <tr class="row-odd"><td><span class="math notranslate">\(\mathbf{Q}_1\)</span></td>
 <td><span class="math notranslate">\(H_3\)</span></td>
 <td><span class="math notranslate">\(-E_3\)</span></td>
+<td><span class="math notranslate">\(v_1\)</span></td>
 <td><span class="math notranslate">\(v_1\)</span></td>
 <td><span class="math notranslate">\(-\tau_{21}\)</span></td>
 </tr>
@@ -377,61 +386,92 @@ energy conservation does not hold for evanescent waves.</p>
 <td><span class="math notranslate">\(-H_1\)</span></td>
 <td><span class="math notranslate">\(E_1\)</span></td>
 <td><span class="math notranslate">\(v_3\)</span></td>
+<td><span class="math notranslate">\(v_3\)</span></td>
 <td><span class="math notranslate">\(-\tau_{23}\)</span></td>
 </tr>
-<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{\alpha}\)</span></td>
-<td><span class="math notranslate">\(\epsilon\)</span></td>
-<td><span class="math notranslate">\(\mu\)</span></td>
+<tr class="row-odd"><td><span class="math notranslate">\(\boldsymbol{\alpha}\)</span></td>
+<td><span class="math notranslate">\(\epsilon_{22}\)</span></td>
+<td><span class="math notranslate">\(\mu_{22}\)</span></td>
+<td><span class="math notranslate">\(\frac{1}{K}\)</span></td>
 <td><span class="math notranslate">\(\kappa\)</span></td>
-<td><span class="math notranslate">\(\rho\)</span></td>
+<td><span class="math notranslate">\(\mathcal{R}_{22}\)</span></td>
 </tr>
-<tr class="row-even"><td><span class="math notranslate">\(\mathbf{\beta}\)</span></td>
-<td><span class="math notranslate">\(\mu\)</span></td>
-<td><span class="math notranslate">\(\epsilon\)</span></td>
+<tr class="row-even"><td><span class="math notranslate">\(\boldsymbol{\beta}_{11}\)</span></td>
+<td><span class="math notranslate">\(\mu_{33}\)</span></td>
+<td><span class="math notranslate">\(\epsilon_{33}\)</span></td>
+<td><span class="math notranslate">\(\mathcal{R}_{11}\)</span></td>
 <td><span class="math notranslate">\(\rho\)</span></td>
-<td><span class="math notranslate">\(1/\mu\)</span></td>
+<td><span class="math notranslate">\(4 s_{1221}\)</span></td>
 </tr>
-<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{\gamma}_1\)</span></td>
+<tr class="row-odd"><td><span class="math notranslate">\(\boldsymbol{\beta}_{13}\)</span></td>
+<td><span class="math notranslate">\(-\mu_{31}\)</span></td>
+<td><span class="math notranslate">\(-\epsilon_{31}\)</span></td>
+<td><span class="math notranslate">\(\mathcal{R}_{13}\)</span></td>
+<td><span class="math notranslate">\(\frac{2\rho\Omega_2}{j\omega}\)</span></td>
+<td><span class="math notranslate">\(4 s_{1223}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\boldsymbol{\beta}_{31}\)</span></td>
+<td><span class="math notranslate">\(-\mu_{13}\)</span></td>
+<td><span class="math notranslate">\(-\epsilon_{13}\)</span></td>
+<td><span class="math notranslate">\(\mathcal{R}_{31}\)</span></td>
+<td><span class="math notranslate">\(-\frac{2\rho\Omega_2}{j\omega}\)</span></td>
+<td><span class="math notranslate">\(4 s_{3221}\)</span></td>
+</tr>
+<tr class="row-odd"><td><span class="math notranslate">\(\boldsymbol{\beta}_{33}\)</span></td>
+<td><span class="math notranslate">\(\mu_{11}\)</span></td>
+<td><span class="math notranslate">\(\epsilon_{11}\)</span></td>
+<td><span class="math notranslate">\(\mathcal{R}_{33}\)</span></td>
+<td><span class="math notranslate">\(\rho\)</span></td>
+<td><span class="math notranslate">\(4 s_{3223}\)</span></td>
+</tr>
+<tr class="row-even"><td><span class="math notranslate">\(\boldsymbol{\gamma}_{1}\)</span></td>
 <td><span class="math notranslate">\(\xi_{23}\)</span></td>
 <td><span class="math notranslate">\(-\zeta_{23}\)</span></td>
-<td><span class="math notranslate">\(d_1\)</span></td>
-<td><span class="math notranslate">\(e_1\)</span></td>
+<td><span class="math notranslate">\(\frac{\theta_{mm1}}{3K}\)</span></td>
+<td>&#160;</td>
+<td><span class="math notranslate">\(-2 \xi_{221}\)</span></td>
 </tr>
-<tr class="row-even"><td><span class="math notranslate">\(\mathbf{\gamma}_3\)</span></td>
+<tr class="row-odd"><td><span class="math notranslate">\(\boldsymbol{\gamma}_{3}\)</span></td>
 <td><span class="math notranslate">\(-\xi_{21}\)</span></td>
 <td><span class="math notranslate">\(\zeta_{21}\)</span></td>
-<td><span class="math notranslate">\(d_3\)</span></td>
-<td><span class="math notranslate">\(e_3\)</span></td>
+<td><span class="math notranslate">\(\frac{\theta_{mm3}}{3K}\)</span></td>
+<td>&#160;</td>
+<td><span class="math notranslate">\(-2 \xi_{223}\)</span></td>
 </tr>
-<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{\delta}_1\)</span></td>
+<tr class="row-even"><td><span class="math notranslate">\(\boldsymbol{\chi}_{1}\)</span></td>
 <td><span class="math notranslate">\(\zeta_{32}\)</span></td>
 <td><span class="math notranslate">\(-\xi_{32}\)</span></td>
-<td><span class="math notranslate">\(e_1\)</span></td>
-<td><span class="math notranslate">\(d_1\)</span></td>
+<td><span class="math notranslate">\(-\frac{\eta_{1ll}}{3K}\)</span></td>
+<td>&#160;</td>
+<td><span class="math notranslate">\(-2 \zeta_{122}\)</span></td>
 </tr>
-<tr class="row-even"><td><span class="math notranslate">\(\mathbf{\delta}_3\)</span></td>
+<tr class="row-odd"><td><span class="math notranslate">\(\boldsymbol{\chi}_{3}\)</span></td>
 <td><span class="math notranslate">\(-\zeta_{12}\)</span></td>
 <td><span class="math notranslate">\(\xi_{12}\)</span></td>
-<td><span class="math notranslate">\(e_3\)</span></td>
-<td><span class="math notranslate">\(d_3\)</span></td>
+<td><span class="math notranslate">\(-\frac{\eta_{3ll}}{3K}\)</span></td>
+<td>&#160;</td>
+<td><span class="math notranslate">\(-2 \zeta_{322}\)</span></td>
 </tr>
-<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{B}\)</span></td>
+<tr class="row-even"><td><strong>B</strong></td>
 <td><span class="math notranslate">\(-J_2^e\)</span></td>
 <td><span class="math notranslate">\(-J_2^m\)</span></td>
 <td><span class="math notranslate">\(q\)</span></td>
+<td><span class="math notranslate">\(q\)</span></td>
 <td><span class="math notranslate">\(f_2\)</span></td>
 </tr>
-<tr class="row-even"><td><span class="math notranslate">\(\mathbf{C}_1\)</span></td>
+<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{C}_1\)</span></td>
 <td><span class="math notranslate">\(-J_3^m\)</span></td>
 <td><span class="math notranslate">\(J_3^e\)</span></td>
 <td><span class="math notranslate">\(f_1\)</span></td>
-<td><span class="math notranslate">\(2h_{21}\)</span></td>
+<td><span class="math notranslate">\(f_1\)</span></td>
+<td><span class="math notranslate">\(2h_{12}\)</span></td>
 </tr>
-<tr class="row-odd"><td><span class="math notranslate">\(\mathbf{C}_3\)</span></td>
+<tr class="row-even"><td><span class="math notranslate">\(\mathbf{C}_3\)</span></td>
 <td><span class="math notranslate">\(J_1^m\)</span></td>
 <td><span class="math notranslate">\(-J_1^e\)</span></td>
 <td><span class="math notranslate">\(f_3\)</span></td>
-<td><span class="math notranslate">\(2h_{23}\)</span></td>
+<td><span class="math notranslate">\(f_3\)</span></td>
+<td><span class="math notranslate">\(2h_{32}\)</span></td>
 </tr>
 </tbody>
 </table>
@@ -531,6 +571,67 @@ applied to complex-valued arrays.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create fk mask with a cut-off frequency at 200 1/s</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Mask</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">FK1_mask2_k1_w</span><span class="p">(</span><span class="n">wmax</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Tapered_fk_mask</span> <span class="o">=</span> <span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FK_tap&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.Eigenvalues_k1_w">
+<code class="descname">Eigenvalues_k1_w</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.Eigenvalues_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.Eigenvalues_k1_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the eigenvalues <span class="math notranslate">\(\lambda^{\pm}\)</span> of the two-way 
+operator matrix <span class="math notranslate">\(\rm{\bf A}\)</span> in the wavenumber-frequency 
+domain.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote>
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>LP</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{+}\)</span>.</li>
+<li><strong>LM</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{-}\)</span>.</li>
+<li><strong>LPn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{+}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</li>
+<li><strong>LMn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{-}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</li>
+</ul>
+</div></blockquote>
+<p>All eigenvalue matrices are stored in a in a (nf,nr)-array. The 
+dimensions correspond to all combinations of frequencies 
+<span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+</div></blockquote>
+<div class="admonition-todo last admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p>(1) Check if the eigenvalues have to be modified for reciprocal 
+media.</p>
+<p class="last">(2) Check if <span class="math notranslate">\(\beta_{11} \beta_{33} - \beta_{13}^2 \geq 0\)</span> 
+holds in general.</p>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>The eigenvalues are associated with non-reciprocal media.</li>
+</ul>
+<p class="rubric">References</p>
+<p>Kees document as soon as it is published.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_k1_w</span> <span class="k">import</span> <span class="n">Layered_NRM_k1_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span>
+<span class="go">         avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="go">         b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="go">         g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="go">         ReciprocalMedium=False)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute the eigenvalue lambda_plus</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Lam</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lP</span> <span class="o">=</span> <span class="n">Lam</span><span class="p">[</span><span class="s2">&quot;LP&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lP</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Evaluate for k1=0 and \omega = \Delta \omega</span>
+<span class="go">0.0006226976760655292j</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -690,7 +791,7 @@ applied to complex-valued arrays.</p>
 </dl>
 <p>All scattering coefficients are stored as arrays with the shape (nf,nr).</p>
 </div></blockquote>
-<div class="admonition-todo last admonition" id="index-1">
+<div class="admonition-todo last admonition" id="index-2">
 <p class="first admonition-title">Todo</p>
 <p class="last">(1) For <span class="math notranslate">\(k_1,\omega=(0,0)\)</span> there is a zero division in the 
 computation of the scattering coefficients. I have fixed that, 
@@ -785,7 +886,7 @@ however, I believe that the fix is (mathmatically) wrong. Check that!</p>
 </dl>
 <p>All propagators are stored in an arrays of shape (nf,nr). The variables ‘wPa’ and ‘wMa’ are computed for the setting ‘AdjointMedium=True’.</p>
 </div></blockquote>
-<div class="admonition-todo last admonition" id="index-2">
+<div class="admonition-todo last admonition" id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">In a non-reciprocal medium, for a complex-valued frequency 
 <span class="math notranslate">\(\omega'=\omega+\mathrm{j}\epsilon\)</span> one of the propagators 
