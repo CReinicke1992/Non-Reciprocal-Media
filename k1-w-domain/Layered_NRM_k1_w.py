@@ -447,16 +447,16 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         Examples
         --------
         
-        >>> # Initialise wavefield
         >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
+        >>> import numpy as np
         >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),
-        >>>      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
-        >>>      g1vec=1j*np.array([0.8,2,1.3])*1e-4,
-        >>>      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,
-        >>>      ReciprocalMedium=True)
+                 avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,
+                 b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,
+                 g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,
+                 ReciprocalMedium=False)
         
         >>> # Create fk mask with a cut-off frequency at 200 1/s
-        >>> Mask=F.FK1_mask2_k1_w(wmax=200)
+        >>> Mask=F.FK1_mask_k1_w(wmax=200)
         >>> Tapered_fk_mask = Mask['FK_tap']
         
             
