@@ -752,44 +752,64 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         return {"LP":LP,"LM":LM,"LPn":LPn,"LMn":LMn}
     
-    def L_eigenvectors_k1_w(self,beta=None,g3=None,K3=None,K3n=None,normalisation='flux'):
-        """computes the eigenvector matrix 'L' and its inverse 'Linv', either in flux- or in pressure-normalisation for the vertical-wavenumber 'K3' inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid that contains all combinations of frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. If \'AdjointMedium=True\', **L_eigenvectors_k1_w** also computes the eigenvector matrix in the adjoint medium 'La' and its inverse 'Lainv'. 
+    def L_eigenvectors_k1_w(self,beta11=None,beta13=None,beta33=None,
+                            K3=None,K3n=None,normalisation='flux'):
+        """computes the eigenvector matrix 'L' and its inverse 'Linv', either 
+        in flux- or in pressure-normalisation for the vertical-wavenumber 'K3' 
+        inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid 
+        that contains all combinations of frequencies :math:`\omega` and 
+        horizontal-wavenumbers :math:`k_1`. If \'AdjointMedium=True\', 
+        **L_eigenvectors_k1_w** also computes the eigenvector matrix in the 
+        adjoint medium 'La' and its inverse 'Lainv'. 
         
         Parameters
         ----------
     
-        beta : int, float
-            Medium parameter :math:`\\beta`  (real-valued).
+        beta11 : int, float
+            Medium parameter :math:`\\beta_{11}`  (real-valued).
         
-        g3 : int, float
-            Medium parameter :math:`\gamma_3`.
+        beta13 : int, float
+            Medium parameter :math:`\\beta_{13}`  (real-valued).
+            
+        beta33 : int, float
+            Medium parameter :math:`\\beta_{33}`  (real-valued).
         
         K3 : numpy.ndarray
-            Vertical-wavenumber :math:`k_3(+k_1)` for all frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`.
+            Vertical-wavenumber :math:`k_3(+k_1)` for all frequencies 
+            :math:`\omega` and horizontal-wavenumbers :math:`k_1`.
         
         K3n : numpy.ndarray, optional (required if 'AdjointMedium=True')
-            Vertical-wavenumber :math:`k_3(-k_1)` for all frequencies :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1`.
+            Vertical-wavenumber :math:`k_3(-k_1)` for all frequencies 
+            :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1`.
             
         normalisation : str, optional
-            For pressure-normalisation set normalisation='pressure', for flux-normalisation set normalisation='flux'.
+            For pressure-normalisation set normalisation='pressure', for 
+            flux-normalisation set normalisation='flux'.
             
         Returns
         -------
     
         dict
             Dictionary that contains 
+            
                 - **L**: The eigenvector matrix.
                 - **Linv**: The inverse of the eigenvector matrix.
                 - **La**: The eigenvector matrix (adjoint medium).
                 - **Lainv**: The inverse of the eigenvector matrix (adjoint medium).
-            All eigenvector matrices are stored in a in a (nf,nr,2,2)-array. The first two dimensions correspond to all combinations of frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. The last two dimension are the actual eigenvector matrices for all :math:`\omega`-:math:`k_1` components.
+                
+            All eigenvector matrices are stored in a in a (nf,nr,2,2)-array. 
+            The first two dimensions correspond to all combinations of 
+            frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. 
+            The last two dimension are the actual eigenvector matrices for all 
+            :math:`\omega`-:math:`k_1` components.
         
         Notes
         -----
-            - The eigenvector matrix 'L' and its inverse 'Linv' are different for reciprocal and non-reciprocal media.
-            - For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium.
-            - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.
-            - At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \'L\' and their inverse \'Linv\' contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.
+            
+        - The eigenvector matrix 'L' and its inverse 'Linv' are different for reciprocal and non-reciprocal media (I assume that has not changed, but check it!).
+        - For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium (verify!).
+        - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.
+        - At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \'L\' and their inverse \'Linv\' contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.
         
         References
         ----------
@@ -803,14 +823,18 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         >>> # Initialise wavefield in a layered non-reciprocal medium
         >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),
-        >>>      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
-        >>>      g1vec=1j*np.array([0.8,2,1.3])*1e-4,
-        >>>      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,
-        >>>      ReciprocalMedium=True)
+        >>>      avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>      b13vec=np.array([0.4,2.4,1.2])*1e-4,
+        >>>      b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>      g1vec=np.array([0.8,2,1.3])*1e-4,
+        >>>      g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>      ReciprocalMedium=False,AdjointMedium=True)
         
         >>> # Compute eigenvectors in pressure-normalisation
-        >>> Leig=F.L_eigenvectors_k1_w(F.bvec[0],F.g3vec[0],
-        >>>                            F.K3[:,:,0],normalisation='pressure')
+        >>> Leig=F.L_eigenvectors_k1_w(beta11=F.b11vec[0],beta13=F.b13vec[0],
+        >>>                            beta33=F.b33vec[0],K3=F.K3[:,:,0],
+        >>>                            K3n=F.K3n[:,:,0],
+        >>>                            normalisation='pressure')
         >>> L=Leig['L']
         
         >>> # For pressure normalisation, the top-left element of L equals
@@ -821,20 +845,30 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         >>> # For pressure normalisation, the bottom-left element of L does not
         >>> # equal 1 for all frequencies and all horizontal-wavenumbers
         >>> L[101,200,1,0]
-        12.370632073930679j
+        10.85892500293106j
         
         """
         # Check if required input variables are given
-        if (beta is None) or (g3 is None) or (K3 is None):
-            sys.exit('L_eigenvectors_k1_w: The input variables \'beta\', \'g3\' and  \'K3\' must be set.')
+        if ( (beta11 is None) or (beta13 is None) or (beta33 is None) 
+             or (K3 is None) ):
+            sys.exit('L_eigenvectors_k1_w: The input variables \'beta11\', '
+                     +'\'beta13\', \'beta33\' and  \'K3\' must be set.')
          
         # Check if normalisation is set correctly
         if (normalisation is not 'flux') and (normalisation is not 'pressure'):
-            sys.exit('L_eigenvectors_k1_w: The input variable \'normalisation\' must be set, either to \'flux\', or to \'pressure\'.')
+            sys.exit('L_eigenvectors_k1_w: The input variable '
+                     +'\'normalisation\' must be set, either to \'flux\', or '
+                     +'to \'pressure\'.')
             
-        # Check if the vertical-wavenumber for a negative horizontal-wavenumber is given
-        if  (self.AdjointMedium is True) and (K3n is None) and (normalisation is 'flux') and (self.ReciprocalMedium is False):
-            sys.exit('L_eigenvectors_k1_w: The input variable \'K3n\' (vertical-wavenumber K3 for a negative horizontal-wavenumber k1) must be given to compute the eigenvector matrix of the adjoint medium \'La\' and its inverse\'Lainv\'.')
+        # Check if the vertical-wavenumber for a negative horizontal-wavenumber 
+        # is given
+        if ( (self.AdjointMedium is True) and (K3n is None) 
+          and (normalisation is 'flux') and (self.ReciprocalMedium is False) ):
+            sys.exit('L_eigenvectors_k1_w: The input variable \'K3n\' '
+                     +'(vertical-wavenumber K3 for a negative horizontal-'
+                     +'wavenumber k1) must be given to compute the eigenvector'
+                     +' matrix of the adjoint medium \'La\' and its inverse '
+                     +'\'Lainv\'.')
             
         # Initialise L and Linv
         L = np.zeros((self.nf,self.nr,2,2),dtype=complex)
@@ -856,63 +890,76 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         P3inv = P3.copy()
         P3inv[1:,:] = Om[1:,:]/K3[1:,:]
         
+        hinv = np.sqrt( beta11*beta33-beta13*beta13 )
+        
         if self.verbose is True:
             print('\nL_eigenvectors_k1_w ')
-            print('-------------------------------------------------------------------------------')
-            print('The eigenvectors L and their inverse Linv have a pole at zero frequency. Here, ')
-            print('we set the zero frequency component of L and Linv to zero (which is wrong but ')
-            print('convenient for the computation).\n')
+            print(72*'-')
+            print('The eigenvectors L and their inverse Linv have a pole at '
+                  +'zero frequency. Here, we set the zero frequency component '
+                  +'of L and Linv to zero (which is wrong but convenient for '
+                  +'the computation).\n')
 
             
         if (self.ReciprocalMedium is True) and (normalisation is 'flux'):
-            # L matrix
-            fac = (beta*P3inv/2)**0.5
-            L[:,:,0,0] = 1*fac
-            L[:,:,0,1] = 1*fac
-            L[:,:,1,0] = (P3+g3)/beta*fac
-            L[:,:,1,1] = -(P3-g3)/beta*fac
             
-            # Inverse L matrix
-            Linv[:,:,0,0] = -L[:,:,1,1]
-            Linv[:,:,0,1] =  L[:,:,0,0]
-            Linv[:,:,1,0] =  L[:,:,1,0]
-            Linv[:,:,1,1] = -L[:,:,0,0]
+            #####################
+            # NOT YET IMPLEMENTED
+            #####################
+            if self.verbose is True:
+                print('\nL_eigenvectors_k1_w (ReciprocalMedium is True)')
+                print('-----------------------------------------------')
+                print('For reciprocal media, the eigenvectors are not yet '
+                      +'implemented.')
             
-            if self.AdjointMedium is True:
-                if self.verbose is True:
-                    print('\nL_eigenvectors_k1_w (AdjointMedium is True) and (ReciprocalMedium is True)')
-                    print('-------------------------------------------------------------------------------')
-                    print('For reciprocal media, the eigenvector matrix of a medium and its adjoint medium ')
-                    print('are identical.\n')
-               
-                La = L.copy()
-                Lainv = Linv.copy()
-            
-        elif (self.ReciprocalMedium is True) and (normalisation is 'pressure'):            
-            # L matrix
-            L[:,:,0,0] = 1
-            L[:,:,0,1] = 1
-            L[:,:,1,0] = (P3+g3)/beta
-            L[:,:,1,1] = -(P3-g3)/beta
-            
-            # Inverse L matrix
-            fac = beta*P3inv/2
-            Linv[:,:,0,0] = -L[:,:,1,1]*fac
-            Linv[:,:,0,1] = 1*fac
-            Linv[:,:,1,0] = L[:,:,1,0]*fac
-            Linv[:,:,1,1] = -1*fac
-            
-            if self.verbose is True and self.AdjointMedium is True:
-                print('\nL_eigenvectors_k1_w (AdjointMedium is True) and (normalisation=\'pressure\')')
-                print('-------------------------------------------------------------------------------')
-                print('We have defined the eigenvector matrix of the adjoint medium \'La\' and its ')
-                print('inverse \'Lainv\' only for flux-normalisation.\n')
+#            # L matrix
+#            fac = (beta*P3inv/2)**0.5
+#            L[:,:,0,0] = 1*fac
+#            L[:,:,0,1] = 1*fac
+#            L[:,:,1,0] = (P3+g3)/beta*fac
+#            L[:,:,1,1] = -(P3-g3)/beta*fac
+#            
+#            # Inverse L matrix
+#            Linv[:,:,0,0] = -L[:,:,1,1]
+#            Linv[:,:,0,1] =  L[:,:,0,0]
+#            Linv[:,:,1,0] =  L[:,:,1,0]
+#            Linv[:,:,1,1] = -L[:,:,0,0]
+#            
+#            if self.AdjointMedium is True:
+#                if self.verbose is True:
+#                    print('\nL_eigenvectors_k1_w (AdjointMedium is True) and (ReciprocalMedium is True)')
+#                    print('-------------------------------------------------------------------------------')
+#                    print('For reciprocal media, the eigenvector matrix of a medium and its adjoint medium ')
+#                    print('are identical.\n')
+#               
+#                La = L.copy()
+#                Lainv = Linv.copy()
+#            
+#        elif (self.ReciprocalMedium is True) and (normalisation is 'pressure'):            
+#            # L matrix
+#            L[:,:,0,0] = 1
+#            L[:,:,0,1] = 1
+#            L[:,:,1,0] = (P3+g3)/beta
+#            L[:,:,1,1] = -(P3-g3)/beta
+#            
+#            # Inverse L matrix
+#            fac = beta*P3inv/2
+#            Linv[:,:,0,0] = -L[:,:,1,1]*fac
+#            Linv[:,:,0,1] = 1*fac
+#            Linv[:,:,1,0] = L[:,:,1,0]*fac
+#            Linv[:,:,1,1] = -1*fac
+#            
+#            if self.verbose is True and self.AdjointMedium is True:
+#                print('\nL_eigenvectors_k1_w (AdjointMedium is True) and (normalisation=\'pressure\')')
+#                print('-------------------------------------------------------------------------------')
+#                print('We have defined the eigenvector matrix of the adjoint medium \'La\' and its ')
+#                print('inverse \'Lainv\' only for flux-normalisation.\n')
             
         elif (self.ReciprocalMedium is False) and (normalisation is 'flux'):
             # L matrix
-            L[:,:,0,0] = (beta*P3inv)**0.5
+            L[:,:,0,0] = (hinv*P3inv)**0.5
             L[:,:,0,1] = L[:,:,0,0]
-            L[:,:,1,0] = (P3/beta)**0.5
+            L[:,:,1,0] = (P3/hinv)**0.5
             L[:,:,1,1] = -L[:,:,1,0]
             L = L/2**0.5
             
@@ -947,32 +994,31 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 
                 # L matrix (adjoint medium) = N Transpose( Inverse( L(-k1) )) N
                 La = np.zeros((self.nf,self.nr,2,2),dtype=complex)
-                La[:,:,0,0] = (beta*P3ninv)**0.5
+                La[:,:,0,0] = (hinv*P3ninv)**0.5
                 La[:,:,0,1] = La[:,:,0,0]
-                La[:,:,1,0] = (P3n/beta)**0.5
+                La[:,:,1,0] = (P3n/hinv)**0.5
                 La[:,:,1,1] = -La[:,:,1,0]
                 La = La/2**0.5
                 
                 #  Inverse L matrix (adjoint medium) = N Transpose( L(-k1)) N
                 Lainv = np.zeros((self.nf,self.nr,2,2),dtype=complex)
-                Lainv[:,:,0,0] = (P3n/beta)**0.5
-                Lainv[:,:,0,1] = (beta*P3ninv)**0.5
-                Lainv[:,:,1,0] = Lainv[:,:,0,0]
-                Lainv[:,:,1,1] = -Lainv[:,:,0,1]
-                Lainv = Lainv/2**0.5
+                Lainv[:,:,0,0] = La[:,:,1,0]
+                Lainv[:,:,0,1] = La[:,:,0,0]
+                Lainv[:,:,1,0] = La[:,:,1,0]
+                Lainv[:,:,1,1] = - La[:,:,0,0]
             
         elif (self.ReciprocalMedium is False) and (normalisation is 'pressure'):
             # L matrix
             L[:,:,0,0] = 1
             L[:,:,0,1] = 1
-            L[:,:,1,0] = P3/beta
-            L[:,:,1,1] = -P3/beta
+            L[:,:,1,0] = P3/hinv
+            L[:,:,1,1] = -L[:,:,1,0]
             
             # Inverse L matrix
             Linv[:,:,0,0] = 1
-            Linv[:,:,0,1] = beta*P3inv
+            Linv[:,:,0,1] = hinv*P3inv
             Linv[:,:,1,0] = 1
-            Linv[:,:,1,1] = -beta*P3inv
+            Linv[:,:,1,1] = -hinv*P3inv
             Linv = 0.5*Linv
             
             if self.verbose is True and self.AdjointMedium is True:
@@ -984,74 +1030,104 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         out = {'L':L,'Linv':Linv,'La':La,'Lainv':Lainv}
         return out
           
-    def RT_k1_w(self,beta_u=None,g3_u=None,K3_u=None,K3n_u=None,
-                     beta_l=None,g3_l=None,K3_l=None,K3n_l=None,
+    def RT_k1_w(self,beta11_u=None,beta13_u=None,beta33_u=None,K3_u=None,K3n_u=None,
+                     beta11_l=None,beta13_l=None,beta33_l=None,K3_l=None,K3n_l=None,
                      normalisation='flux'):
         """computes the scattering coefficients at an horizontal interface.
         
-        The scattering coefficients can be computed either in flux- or in pressure-normalisation. The variables with subscript 'u' refer to the medium parameters in the upper half-space, the variables with subscript 'l' refer to the medium parameters in the lower half-space. The vertical-wavenumbers \'K3\':math:`=k_3(k_1,\omega)` and \'K3n\':math:`=k_3(-k_1,\omega)` are stored as :math:`k_1`-:math:`\omega` meshgirds to compute the scattering coefficients for all sampled frequencies and horizontal-wavenumbers in a vectorsied manner. Set \'AdjointMedium=True\' to compute the scattering coefficients also in the adjoint medium.
+        The scattering coefficients can be computed either in flux- or in 
+        pressure-normalisation. The variables with subscript 'u' refer to the 
+        medium parameters in the upper half-space, the variables with subscript 
+        'l' refer to the medium parameters in the lower half-space. The 
+        vertical-wavenumbers \'K3\':math:`=k_3(k_1,\omega)` and 
+        \'K3n\':math:`=k_3(-k_1,\omega)` are stored as :math:`k_1`-
+        :math:`\omega` meshgirds to compute the scattering coefficients for all 
+        sampled frequencies and horizontal-wavenumbers in a vectorsied manner. 
+        Set \'AdjointMedium=True\' to compute the scattering coefficients also 
+        in the adjoint medium.
         
         Parameters
         ----------
     
-        beta_u : int, float
-            Medium parameter :math:`\\beta` (real-valued) (upper half-space).
+        beta11_u : int, float
+            Medium parameter :math:`\\beta_{11}` (real-valued) (upper half-space).
         
-        g3_u : int, float
-            Medium parameter :math:`\gamma_3` (upper half-space).
+        beta13_u : int, float
+            Medium parameter :math:`\\beta_{13}` (real-valued) (upper half-space).
+            
+        beta33_u : int, float
+            Medium parameter :math:`\\beta_{33}` (real-valued) (upper half-space).
         
         K3_u : numpy.ndarray
-            Vertical-wavenumber :math:`k_{3,u}(+k_1)` for all frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1` (upper half-space).
+            Vertical-wavenumber :math:`k_{3,u}(+k_1)` for all frequencies 
+            :math:`\omega` and horizontal-wavenumbers :math:`k_1` (upper half-
+            space).
         
         K3n_u : numpy.ndarray, optional (required if 'AdjointMedium=True')
-            Vertical-wavenumber :math:`k_{3,u}(-k_1)` for all frequencies :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` (upper half-space).
+            Vertical-wavenumber :math:`k_{3,u}(-k_1)` for all frequencies 
+            :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` 
+            (upper half-space).
             
-        beta_l : int, float
-            Medium parameter :math:`\\beta` (real-valued) (lower half-space).
+        beta11_l : int, float
+            Medium parameter :math:`\\beta_{11}` (real-valued) (lower half-space).
         
-        g3_l : int, float
-            Medium parameter :math:`\gamma_3` (lower half-space).
+        beta13_l : int, float
+            Medium parameter :math:`\\beta_{13}` (real-valued) (lower half-space).
+            
+        beta33_l : int, float
+            Medium parameter :math:`\\beta_{33}` (real-valued) (lower half-space).
         
         K3_l : numpy.ndarray
-            Vertical-wavenumber :math:`k_{3,l}(+k_1)` for all frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1` (lower half-space).
+            Vertical-wavenumber :math:`k_{3,l}(+k_1)` for all frequencies 
+            :math:`\omega` and horizontal-wavenumbers :math:`k_1` (lower half-
+            space).
         
         K3n_l : numpy.ndarray, optional (required if 'AdjointMedium=True')
-            Vertical-wavenumber :math:`k_{3,l}(-k_1)` for all frequencies :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` (lower half-space).
+            Vertical-wavenumber :math:`k_{3,l}(-k_1)` for all frequencies 
+            :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` 
+            (lower half-space).
             
         normalisation : str, optional
-            For pressure-normalisation set normalisation='pressure', for flux-normalisation set normalisation='flux'.
+            For pressure-normalisation set normalisation='pressure', for flux-
+            normalisation set normalisation='flux'.
             
         Returns
         -------
     
         dict
             Dictionary that contains 
+            
                 - **rP**: Reflection coefficient from above.
-                - **tP**: Transmission coefficient from above 'tP'.
+                - **tP**: Transmission coefficient from above.
                 - **rM**: Reflection coefficient from below.
                 - **tM**: Transmission coefficient from below.
                 - **rPa**: Reflection coefficient from above (adjoint medium).
                 - **tPa**: Transmission coefficient from above (adjoint medium).
                 - **rMa**: Reflection coefficient from below (adjoint medium).
                 - **tMa**: Transmission coefficient from below (adjoint medium).
-            All scattering coefficients are stored as arrays with the shape (nf,nr).
+                
+            All scattering coefficients are stored as arrays with the shape 
+            (nf,nr).
             
-        .. todo:: 
         
-            (1) For :math:`k_1,\omega=(0,0)` there is a zero division in the 
-            computation of the scattering coefficients. I have fixed that, 
-            however, I believe that the fix is (mathmatically) wrong. Check that!
+        .. todo::
+            
+            (1) For :math:`(k_1 , \omega) = (0,0)` there is a zero division in the 
+            computation of the scattering coefficients. I have fixed that, however, I believe that the fix is (mathmatically) wrong. Check that!
+        
         
         Notes
         -----
     
-        - For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium.
+        - For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium. (To be checked)
         - We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.
         
             
         References
         ----------
+        
         Kees document as soon as it is published.
+        
         
         Examples
         --------
@@ -1061,17 +1137,17 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         >>> # Initialise wavefield F in a reciprocal medium 
         >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),
-        >>>      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
-        >>>      g1vec=1j*np.array([0.8,2,1.3])*1e-4,
-        >>>      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,
-        >>>      ReciprocalMedium=True)
+        >>>      avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>      b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>      g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>      ReciprocalMedium=False,AdjointMedium=True)
         
         >>> # Compute scattering coefficients at the first interface in flux
         >>> # normalisation
-        >>> Scat=F.RT_k1_w(beta_u=F.bvec[0],g3_u=F.g3vec[0],K3_u=F.K3[:,:,0],
-        >>>                K3n_u=F.K3n[:,:,0],
-        >>>                beta_l=F.bvec[1],g3_l=F.g3vec[1],K3_l=F.K3[:,:,1],
-        >>>                K3n_l=F.K3n[:,:,1],normalisation='flux')
+        >>> Scat = F.RT_k1_w(beta11_u=F.b11vec[0],beta13_u=F.b13vec[0],beta33_u=F.b33vec[0],
+        >>>                  K3_u=F.K3[:,:,0],K3n_u=F.K3n[:,:,0],
+        >>>                  beta11_l=F.b11vec[1],beta13_l=F.b13vec[1],beta33_l=F.b33vec[1],
+        >>>                  K3_l=F.K3[:,:,1],K3n_l=F.K3n[:,:,1],normalisation='flux')
         
         >>> # Read the scattering coeffcients, and 
         >>> tP = Scat['tP']
@@ -1085,14 +1161,20 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         >>> np.linalg.norm(tP-tM)
         0.0
         
+        >>> # Transmission coefficient for k1,omega = (0,Delta omega)
+        >>> tP[1,0]
+        (0.9865896281519458+0j)
+        
         
         """
         
         # Check if required input variables are given
-        if ((beta_u is None) or (g3_u is None) or (K3_u is None) 
-         or (beta_l is None) or (g3_l is None) or (K3_l is None)):
-            sys.exit('RT_k1_w: The input variables \'beta_u\', \'g3_u\',  '+
-                     '\'K3_u\', \'beta_l\', \'g3_l\',  \'K3_l\' must be set.')
+        if (   (beta11_u is None) or (beta13_u is None) or (beta33_u is None) 
+            or (beta11_l is None) or (beta13_l is None) or (beta33_l is None) 
+            or (K3_u is None) or (K3_l is None)):
+            sys.exit('RT_k1_w: The input variables \'beta11_u\', \'beta13_u\','
+                     +' \'beta33_u\', \'K3_u\', \'beta11_l\', \'beta13_l\', '
+                     +'\'beta33_l\',  \'K3_l\' must be set.')
             
         # Check if normalisation is set correctly
         if (normalisation is not 'flux') and (normalisation is not 'pressure'):
@@ -1116,9 +1198,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         tPa = None
         rMa = None
         tMa = None
-            
-        # Frequency meshgrid
-        Om = self.W_K1_grid()['Wgrid']
         
         # For zero frequency and zero horizontal-wavenumber we will encounter
         # divisions by zero. 
@@ -1131,85 +1210,98 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         K3n_u[0,0] = K3n_u[1,0]/self.Dw()
         K3n_l[0,0] = K3n_l[1,0]/self.Dw()
         
+        hu = 1/np.sqrt( beta11_u*beta33_u-beta13_u*beta13_u )
+        hl = 1/np.sqrt( beta11_l*beta33_l-beta13_l*beta13_l )
+        
         if (self.ReciprocalMedium is True) and (normalisation is 'flux'):
             
-            # True medium
-            denom = 1/( (K3_u-Om*g3_u)*beta_l + (K3_l+Om*g3_l)*beta_u )
-            rP =  ( (K3_u+Om*g3_u)*beta_l - (K3_l+Om*g3_l)*beta_u ) * denom 
-            rM = -( (K3_u-Om*g3_u)*beta_l - (K3_l-Om*g3_l)*beta_u ) * denom
-            tP = 2*(K3_u*beta_l*K3_l*beta_u)**0.5 * denom
-            tM = tP
+            #####################
+            # NOT YET IMPLEMENTED
+            #####################
+            if self.verbose is True:
+                print('\nRT_k1_w (ReciprocalMedium is True)')
+                print('-----------------------------------------------')
+                print('For reciprocal media, the scattering coefficients are '
+                      +'not yet implemented.')
             
-            # Correct the zero frequency, zero horizontal-wavenumber component
-            denom = 1/( (K3_u[0,0]-g3_u)*beta_l + (K3_l[0,0]+g3_l)*beta_u )
-            rP[0,0] =  ( (K3_u[0,0]+g3_u)*beta_l - (K3_l[0,0]+g3_l)*beta_u ) * denom 
-            rM[0,0] = -( (K3_u[0,0]-g3_u)*beta_l - (K3_l[0,0]-g3_l)*beta_u ) * denom
-            tP[0,0] = 2*(K3_u[0,0]*beta_l*K3_l[0,0]*beta_u)**0.5 * denom
-            tM[0,0] = tP[0,0]
-            
-            if self.AdjointMedium is True:
-                # Adjoint medium
-                rPa = rP 
-                tPa = tP 
-                rMa = rM 
-                tMa = tM 
-    
-                if self.verbose is True:
-                    print('\nRT_k1_w: (AdjointMedium is True) and (ReciprocalMedium is True)')
-                    print(72*'-')
-                    print('For reciprocal media, the scattering coefficients in a medium and its adjoint medium are identical.\n')
-        
-        elif (self.ReciprocalMedium is True) and (normalisation is 'pressure'):
-            
-            # True medium
-            denom = 1/( (K3_u-Om*g3_u)*beta_l + (K3_l+Om*g3_l)*beta_u )
-            rP =  ( (K3_u+Om*g3_u)*beta_l - (K3_l+Om*g3_l)*beta_u ) * denom
-            rM = -( (K3_u-Om*g3_u)*beta_l - (K3_l-Om*g3_l)*beta_u ) * denom
-            tP = 2*K3_u*beta_l * denom
-            tM = 2*K3_l*beta_u * denom
-            
-            # Correct the zero frequency, zero horizontal-wavenumber component
-            denom = 1/( (K3_u[0,0]-g3_u)*beta_l + (K3_l[0,0]+g3_l)*beta_u )
-            rP[0,0] =  ( (K3_u[0,0]+g3_u)*beta_l - (K3_l[0,0]+g3_l)*beta_u ) * denom 
-            rM[0,0] = -( (K3_u[0,0]-g3_u)*beta_l - (K3_l[0,0]-g3_l)*beta_u ) * denom
-            tP[0,0] = 2*K3_u[0,0]*beta_l * denom
-            tM[0,0] = 2*K3_l[0,0]*beta_u * denom
-            
-            if self.verbose is True and self.AdjointMedium is True:
-                print('\nRT_k1_w: (AdjointMedium is True) and (normalisation=\'pressure\')')
-                print(72*'-')
-                print('We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.\n')
+#            # True medium
+#            denom = 1/( (K3_u-Om*g3_u)*beta_l + (K3_l+Om*g3_l)*beta_u )
+#            rP =  ( (K3_u+Om*g3_u)*beta_l - (K3_l+Om*g3_l)*beta_u ) * denom 
+#            rM = -( (K3_u-Om*g3_u)*beta_l - (K3_l-Om*g3_l)*beta_u ) * denom
+#            tP = 2*(K3_u*beta_l*K3_l*beta_u)**0.5 * denom
+#            tM = tP
+#            
+#            # Correct the zero frequency, zero horizontal-wavenumber component
+#            denom = 1/( (K3_u[0,0]-g3_u)*beta_l + (K3_l[0,0]+g3_l)*beta_u )
+#            rP[0,0] =  ( (K3_u[0,0]+g3_u)*beta_l - (K3_l[0,0]+g3_l)*beta_u ) * denom 
+#            rM[0,0] = -( (K3_u[0,0]-g3_u)*beta_l - (K3_l[0,0]-g3_l)*beta_u ) * denom
+#            tP[0,0] = 2*(K3_u[0,0]*beta_l*K3_l[0,0]*beta_u)**0.5 * denom
+#            tM[0,0] = tP[0,0]
+#            
+#            if self.AdjointMedium is True:
+#                # Adjoint medium
+#                rPa = rP 
+#                tPa = tP 
+#                rMa = rM 
+#                tMa = tM 
+#    
+#                if self.verbose is True:
+#                    print('\nRT_k1_w: (AdjointMedium is True) and (ReciprocalMedium is True)')
+#                    print(72*'-')
+#                    print('For reciprocal media, the scattering coefficients in a medium and its adjoint medium are identical.\n')
+#        
+#        elif (self.ReciprocalMedium is True) and (normalisation is 'pressure'):
+#            
+#            # True medium
+#            denom = 1/( (K3_u-Om*g3_u)*beta_l + (K3_l+Om*g3_l)*beta_u )
+#            rP =  ( (K3_u+Om*g3_u)*beta_l - (K3_l+Om*g3_l)*beta_u ) * denom
+#            rM = -( (K3_u-Om*g3_u)*beta_l - (K3_l-Om*g3_l)*beta_u ) * denom
+#            tP = 2*K3_u*beta_l * denom
+#            tM = 2*K3_l*beta_u * denom
+#            
+#            # Correct the zero frequency, zero horizontal-wavenumber component
+#            denom = 1/( (K3_u[0,0]-g3_u)*beta_l + (K3_l[0,0]+g3_l)*beta_u )
+#            rP[0,0] =  ( (K3_u[0,0]+g3_u)*beta_l - (K3_l[0,0]+g3_l)*beta_u ) * denom 
+#            rM[0,0] = -( (K3_u[0,0]-g3_u)*beta_l - (K3_l[0,0]-g3_l)*beta_u ) * denom
+#            tP[0,0] = 2*K3_u[0,0]*beta_l * denom
+#            tM[0,0] = 2*K3_l[0,0]*beta_u * denom
+#            
+#            if self.verbose is True and self.AdjointMedium is True:
+#                print('\nRT_k1_w: (AdjointMedium is True) and (normalisation=\'pressure\')')
+#                print(72*'-')
+#                print('We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.\n')
             
         elif (self.ReciprocalMedium is False) and (normalisation is 'flux'):
             
             # True medium (no need to coorect (w,k1)=(0,0) element)
-            denom = 1/(K3_u*beta_l + K3_l*beta_u)
-            rP = (K3_u*beta_l - K3_l*beta_u) *denom
-            tP = 2*(K3_u*beta_l*K3_l*beta_u)**0.5 * denom
+            denom = 1/(K3_u*hu + K3_l*hl)
+            rP = (K3_u*hu - K3_l*hl) *denom
+            tP = 2*(K3_u*hu*K3_l*hl)**0.5 * denom
             rM = -rP
             tM = tP
             
             if self.AdjointMedium is True:
                 # Adjoint medium (no need to coorect (w,k1)=(0,0) element)
-                denom = 1/(K3n_u*beta_l + K3n_l*beta_u)
-                rPa = (K3n_u*beta_l - K3n_l*beta_u) * denom
-                tPa = 2*(K3n_u*beta_l*K3n_l*beta_u)**0.5 * denom
+                denom = 1/(K3n_u*hu + K3n_l*hl)
+                rPa = (K3n_u*hu - K3n_l*hl) * denom
+                tPa = 2*(K3n_u*hu*K3n_l*hl)**0.5 * denom
                 rMa = -rPa
                 tMa = tPa 
             
         elif (self.ReciprocalMedium is False) and (normalisation is 'pressure'):
             
             # True medium  (no need to coorect (w,k1)=(0,0) element)
-            denom = 1/(K3_u*beta_l + K3_l*beta_u)
-            rP = (K3_u*beta_l - K3_l*beta_u) * denom
-            tP = 2*K3_u*beta_l * denom
+            denom = 1/(K3_u*hu + K3_l*hl)
+            rP = (K3_u*hu - K3_l*hl) * denom
+            tP = 2*K3_u*hu*denom
             rM = -rP
-            tM = 2*K3_l*beta_u * denom
+            tM = 1 - rP
             
             if self.verbose is True and self.AdjointMedium is True:
                 print('\nRT_k1_w: (AdjointMedium is True) and (normalisation=\'pressure\')')
                 print(72*'-')
-                print('We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.\n')
+                print('We have defined the scattering coefficients of the '
+                      +'adjoint medium only for flux-normalisation.\n')
             
         out = {'rP':rP,'tP':tP,'rM':rM,'tM':tM,'rPa':rPa,'tPa':tPa,'rMa':rMa,'tMa':tMa}
         return out

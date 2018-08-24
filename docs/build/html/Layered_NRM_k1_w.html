@@ -559,17 +559,17 @@ applied to complex-valued arrays.</p>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_k1_w</span> <span class="k">import</span> <span class="n">Layered_NRM_k1_w</span> <span class="k">as</span> <span class="n">LM</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_k1_w</span> <span class="k">import</span> <span class="n">Layered_NRM_k1_w</span> <span class="k">as</span> <span class="n">LM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">         avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="go">         b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="go">         g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="go">         ReciprocalMedium=False)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create fk mask with a cut-off frequency at 200 1/s</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Mask</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">FK1_mask2_k1_w</span><span class="p">(</span><span class="n">wmax</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mask</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">FK1_mask_k1_w</span><span class="p">(</span><span class="n">wmax</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">Tapered_fk_mask</span> <span class="o">=</span> <span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FK_tap&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -638,47 +638,63 @@ holds in general.</p>
 
 <dl class="method">
 <dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w">
-<code class="descname">L_eigenvectors_k1_w</code><span class="sig-paren">(</span><em>beta=None</em>, <em>g3=None</em>, <em>K3=None</em>, <em>K3n=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.L_eigenvectors_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>computes the eigenvector matrix ‘L’ and its inverse ‘Linv’, either in flux- or in pressure-normalisation for the vertical-wavenumber ‘K3’ inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid that contains all combinations of frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>. If ‘AdjointMedium=True’, <strong>L_eigenvectors_k1_w</strong> also computes the eigenvector matrix in the adjoint medium ‘La’ and its inverse ‘Lainv’.</p>
+<code class="descname">L_eigenvectors_k1_w</code><span class="sig-paren">(</span><em>beta11=None</em>, <em>beta13=None</em>, <em>beta33=None</em>, <em>K3=None</em>, <em>K3n=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.L_eigenvectors_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the eigenvector matrix ‘L’ and its inverse ‘Linv’, either 
+in flux- or in pressure-normalisation for the vertical-wavenumber ‘K3’ 
+inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid 
+that contains all combinations of frequencies <span class="math notranslate">\(\omega\)</span> and 
+horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>. If ‘AdjointMedium=True’, 
+<strong>L_eigenvectors_k1_w</strong> also computes the eigenvector matrix in the 
+adjoint medium ‘La’ and its inverse ‘Lainv’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>beta</strong> : int, float</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>beta11</strong> : int, float</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span>  (real-valued).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{11}\)</span>  (real-valued).</p>
 </div></blockquote>
-<p><strong>g3</strong> : int, float</p>
+<p><strong>beta13</strong> : int, float</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span>.</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{13}\)</span>  (real-valued).</p>
+</div></blockquote>
+<p><strong>beta33</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{33}\)</span>  (real-valued).</p>
 </div></blockquote>
 <p><strong>K3</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Vertical-wavenumber <span class="math notranslate">\(k_3(+k_1)\)</span> for all frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+<div><p>Vertical-wavenumber <span class="math notranslate">\(k_3(+k_1)\)</span> for all frequencies 
+<span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
 </div></blockquote>
 <p><strong>K3n</strong> : numpy.ndarray, optional (required if ‘AdjointMedium=True’)</p>
 <blockquote>
-<div><p>Vertical-wavenumber <span class="math notranslate">\(k_3(-k_1)\)</span> for all frequencies <span class="math notranslate">\(\omega\)</span> and sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+<div><p>Vertical-wavenumber <span class="math notranslate">\(k_3(-k_1)\)</span> for all frequencies 
+<span class="math notranslate">\(\omega\)</span> and sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
 </div></blockquote>
 <p><strong>normalisation</strong> : str, optional</p>
 <blockquote>
-<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’.</p>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for 
+flux-normalisation set normalisation=’flux’.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
 <blockquote class="last">
-<div><dl class="docutils">
-<dt>Dictionary that contains </dt>
-<dd><ul class="first last simple">
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
 <li><strong>L</strong>: The eigenvector matrix.</li>
 <li><strong>Linv</strong>: The inverse of the eigenvector matrix.</li>
 <li><strong>La</strong>: The eigenvector matrix (adjoint medium).</li>
 <li><strong>Lainv</strong>: The inverse of the eigenvector matrix (adjoint medium).</li>
 </ul>
-</dd>
-</dl>
-<p>All eigenvector matrices are stored in a in a (nf,nr,2,2)-array. The first two dimensions correspond to all combinations of frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>. The last two dimension are the actual eigenvector matrices for all <span class="math notranslate">\(\omega\)</span>-<span class="math notranslate">\(k_1\)</span> components.</p>
+</div></blockquote>
+<p>All eigenvector matrices are stored in a in a (nf,nr,2,2)-array. 
+The first two dimensions correspond to all combinations of 
+frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>. 
+The last two dimension are the actual eigenvector matrices for all 
+<span class="math notranslate">\(\omega\)</span>-<span class="math notranslate">\(k_1\)</span> components.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -686,8 +702,8 @@ holds in general.</p>
 </table>
 <p class="rubric">Notes</p>
 <ul class="simple">
-<li>The eigenvector matrix ‘L’ and its inverse ‘Linv’ are different for reciprocal and non-reciprocal media.</li>
-<li>For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium.</li>
+<li>The eigenvector matrix ‘L’ and its inverse ‘Linv’ are different for reciprocal and non-reciprocal media (I assume that has not changed, but check it!).</li>
+<li>For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium (verify!).</li>
 <li>We have defined the eigenvectors of the adjoint medium only for flux-normalisation.</li>
 <li>At zero frequency (<span class="math notranslate">\(\omega=0 \;\mathrm{s}^{-1}\)</span>), the eigenvector matrices ‘L’ and their inverse ‘Linv’ contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.</li>
 </ul>
@@ -700,15 +716,19 @@ holds in general.</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield in a layered non-reciprocal medium</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span><span class="n">b11vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">b13vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">2.4</span><span class="p">,</span><span class="mf">1.2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">b33vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute eigenvectors in pressure-normalisation</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Leig</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">L_eigenvectors_k1_w</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">F</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>                           <span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;pressure&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Leig</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">L_eigenvectors_k1_w</span><span class="p">(</span><span class="n">beta11</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">beta13</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                           <span class="n">beta33</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b33vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K3</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                           <span class="n">K3n</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                           <span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;pressure&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="o">=</span><span class="n">Leig</span><span class="p">[</span><span class="s1">&#39;L&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
@@ -721,65 +741,91 @@ holds in general.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># For pressure normalisation, the bottom-left element of L does not</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># equal 1 for all frequencies and all horizontal-wavenumbers</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">L</span><span class="p">[</span><span class="mi">101</span><span class="p">,</span><span class="mi">200</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-<span class="go">12.370632073930679j</span>
+<span class="go">10.85892500293106j</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.RT_k1_w">
-<code class="descname">RT_k1_w</code><span class="sig-paren">(</span><em>beta_u=None</em>, <em>g3_u=None</em>, <em>K3_u=None</em>, <em>K3n_u=None</em>, <em>beta_l=None</em>, <em>g3_l=None</em>, <em>K3_l=None</em>, <em>K3n_l=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.RT_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.RT_k1_w" title="Permalink to this definition">¶</a></dt>
+<code class="descname">RT_k1_w</code><span class="sig-paren">(</span><em>beta11_u=None</em>, <em>beta13_u=None</em>, <em>beta33_u=None</em>, <em>K3_u=None</em>, <em>K3n_u=None</em>, <em>beta11_l=None</em>, <em>beta13_l=None</em>, <em>beta33_l=None</em>, <em>K3_l=None</em>, <em>K3n_l=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.RT_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.RT_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the scattering coefficients at an horizontal interface.</p>
-<p>The scattering coefficients can be computed either in flux- or in pressure-normalisation. The variables with subscript ‘u’ refer to the medium parameters in the upper half-space, the variables with subscript ‘l’ refer to the medium parameters in the lower half-space. The vertical-wavenumbers ‘K3’<span class="math notranslate">\(=k_3(k_1,\omega)\)</span> and ‘K3n’<span class="math notranslate">\(=k_3(-k_1,\omega)\)</span> are stored as <span class="math notranslate">\(k_1\)</span>-<span class="math notranslate">\(\omega\)</span> meshgirds to compute the scattering coefficients for all sampled frequencies and horizontal-wavenumbers in a vectorsied manner. Set ‘AdjointMedium=True’ to compute the scattering coefficients also in the adjoint medium.</p>
+<p>The scattering coefficients can be computed either in flux- or in 
+pressure-normalisation. The variables with subscript ‘u’ refer to the 
+medium parameters in the upper half-space, the variables with subscript 
+‘l’ refer to the medium parameters in the lower half-space. The 
+vertical-wavenumbers ‘K3’<span class="math notranslate">\(=k_3(k_1,\omega)\)</span> and 
+‘K3n’<span class="math notranslate">\(=k_3(-k_1,\omega)\)</span> are stored as <span class="math notranslate">\(k_1\)</span>-
+<span class="math notranslate">\(\omega\)</span> meshgirds to compute the scattering coefficients for all 
+sampled frequencies and horizontal-wavenumbers in a vectorsied manner. 
+Set ‘AdjointMedium=True’ to compute the scattering coefficients also 
+in the adjoint medium.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>beta_u</strong> : int, float</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>beta11_u</strong> : int, float</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued) (upper half-space).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{11}\)</span> (real-valued) (upper half-space).</p>
 </div></blockquote>
-<p><strong>g3_u</strong> : int, float</p>
+<p><strong>beta13_u</strong> : int, float</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (upper half-space).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{13}\)</span> (real-valued) (upper half-space).</p>
+</div></blockquote>
+<p><strong>beta33_u</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{33}\)</span> (real-valued) (upper half-space).</p>
 </div></blockquote>
 <p><strong>K3_u</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,u}(+k_1)\)</span> for all frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (upper half-space).</p>
+<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,u}(+k_1)\)</span> for all frequencies 
+<span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (upper half-
+space).</p>
 </div></blockquote>
 <p><strong>K3n_u</strong> : numpy.ndarray, optional (required if ‘AdjointMedium=True’)</p>
 <blockquote>
-<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,u}(-k_1)\)</span> for all frequencies <span class="math notranslate">\(\omega\)</span> and sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (upper half-space).</p>
+<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,u}(-k_1)\)</span> for all frequencies 
+<span class="math notranslate">\(\omega\)</span> and sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> 
+(upper half-space).</p>
 </div></blockquote>
-<p><strong>beta_l</strong> : int, float</p>
+<p><strong>beta11_l</strong> : int, float</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\beta\)</span> (real-valued) (lower half-space).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{11}\)</span> (real-valued) (lower half-space).</p>
 </div></blockquote>
-<p><strong>g3_l</strong> : int, float</p>
+<p><strong>beta13_l</strong> : int, float</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span> (lower half-space).</p>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{13}\)</span> (real-valued) (lower half-space).</p>
+</div></blockquote>
+<p><strong>beta33_l</strong> : int, float</p>
+<blockquote>
+<div><p>Medium parameter <span class="math notranslate">\(\beta_{33}\)</span> (real-valued) (lower half-space).</p>
 </div></blockquote>
 <p><strong>K3_l</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,l}(+k_1)\)</span> for all frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (lower half-space).</p>
+<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,l}(+k_1)\)</span> for all frequencies 
+<span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (lower half-
+space).</p>
 </div></blockquote>
 <p><strong>K3n_l</strong> : numpy.ndarray, optional (required if ‘AdjointMedium=True’)</p>
 <blockquote>
-<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,l}(-k_1)\)</span> for all frequencies <span class="math notranslate">\(\omega\)</span> and sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (lower half-space).</p>
+<div><p>Vertical-wavenumber <span class="math notranslate">\(k_{3,l}(-k_1)\)</span> for all frequencies 
+<span class="math notranslate">\(\omega\)</span> and sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> 
+(lower half-space).</p>
 </div></blockquote>
 <p><strong>normalisation</strong> : str, optional</p>
 <blockquote>
-<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’.</p>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-
+normalisation set normalisation=’flux’.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>Dictionary that contains </dt>
-<dd><ul class="first last simple">
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
 <li><strong>rP</strong>: Reflection coefficient from above.</li>
-<li><strong>tP</strong>: Transmission coefficient from above ‘tP’.</li>
+<li><strong>tP</strong>: Transmission coefficient from above.</li>
 <li><strong>rM</strong>: Reflection coefficient from below.</li>
 <li><strong>tM</strong>: Transmission coefficient from below.</li>
 <li><strong>rPa</strong>: Reflection coefficient from above (adjoint medium).</li>
@@ -787,15 +833,14 @@ holds in general.</p>
 <li><strong>rMa</strong>: Reflection coefficient from below (adjoint medium).</li>
 <li><strong>tMa</strong>: Transmission coefficient from below (adjoint medium).</li>
 </ul>
-</dd>
-</dl>
-<p>All scattering coefficients are stored as arrays with the shape (nf,nr).</p>
+</div></blockquote>
+<p>All scattering coefficients are stored as arrays with the shape 
+(nf,nr).</p>
 </div></blockquote>
 <div class="admonition-todo last admonition" id="index-2">
 <p class="first admonition-title">Todo</p>
-<p class="last">(1) For <span class="math notranslate">\(k_1,\omega=(0,0)\)</span> there is a zero division in the 
-computation of the scattering coefficients. I have fixed that, 
-however, I believe that the fix is (mathmatically) wrong. Check that!</p>
+<p class="last">(1) For <span class="math notranslate">\((k_1 , \omega) = (0,0)\)</span> there is a zero division in the 
+computation of the scattering coefficients. I have fixed that, however, I believe that the fix is (mathmatically) wrong. Check that!</p>
 </div>
 </td>
 </tr>
@@ -803,7 +848,7 @@ however, I believe that the fix is (mathmatically) wrong. Check that!</p>
 </table>
 <p class="rubric">Notes</p>
 <ul class="simple">
-<li>For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium.</li>
+<li>For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium. (To be checked)</li>
 <li>We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</li>
 </ul>
 <p class="rubric">References</p>
@@ -815,18 +860,18 @@ however, I believe that the fix is (mathmatically) wrong. Check that!</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield F in a reciprocal medium </span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">]),</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g3vec</span><span class="o">=</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
-<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span><span class="n">b11vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">b13vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">2.4</span><span class="p">,</span><span class="mf">1.2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span><span class="n">b33vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>     <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute scattering coefficients at the first interface in flux</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># normalisation</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Scat</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">RT_k1_w</span><span class="p">(</span><span class="n">beta_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">g3_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">K3_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>               <span class="n">K3n_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>               <span class="n">beta_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">bvec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">g3_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">g3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">K3_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">],</span>
-<span class="gp">&gt;&gt;&gt; </span>               <span class="n">K3n_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">],</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Scat</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">RT_k1_w</span><span class="p">(</span><span class="n">beta11_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">beta13_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">beta33_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b33vec</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                 <span class="n">K3_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span><span class="n">K3n_u</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                 <span class="n">beta11_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">beta13_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b13vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">beta33_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">b33vec</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>                 <span class="n">K3_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">],</span><span class="n">K3n_l</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">],</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Read the scattering coeffcients, and </span>
@@ -842,6 +887,11 @@ however, I believe that the fix is (mathmatically) wrong. Check that!</p>
 </div>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">tP</span><span class="o">-</span><span class="n">tM</span><span class="p">)</span>
 <span class="go">0.0</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Transmission coefficient for k1,omega = (0,Delta omega)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">tP</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">(0.9865896281519458+0j)</span>
 </pre></div>
 </div>
 </dd></dl>

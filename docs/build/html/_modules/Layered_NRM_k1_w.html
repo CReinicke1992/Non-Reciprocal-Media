@@ -502,16 +502,16 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        </span>
-<span class="sd">        &gt;&gt;&gt; # Initialise wavefield</span>
 <span class="sd">        &gt;&gt;&gt; from Layered_NRM_k1_w import Layered_NRM_k1_w as LM</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        &gt;&gt;&gt; F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),</span>
-<span class="sd">        &gt;&gt;&gt;      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      g1vec=1j*np.array([0.8,2,1.3])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      ReciprocalMedium=True)</span>
+<span class="sd">                 avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">                 b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">                 g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">                 ReciprocalMedium=False)</span>
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # Create fk mask with a cut-off frequency at 200 1/s</span>
-<span class="sd">        &gt;&gt;&gt; Mask=F.FK1_mask2_k1_w(wmax=200)</span>
+<span class="sd">        &gt;&gt;&gt; Mask=F.FK1_mask_k1_w(wmax=200)</span>
 <span class="sd">        &gt;&gt;&gt; Tapered_fk_mask = Mask[&#39;FK_tap&#39;]</span>
 <span class="sd">        </span>
 <span class="sd">            </span>
@@ -807,44 +807,64 @@
         
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;LP&quot;</span><span class="p">:</span><span class="n">LP</span><span class="p">,</span><span class="s2">&quot;LM&quot;</span><span class="p">:</span><span class="n">LM</span><span class="p">,</span><span class="s2">&quot;LPn&quot;</span><span class="p">:</span><span class="n">LPn</span><span class="p">,</span><span class="s2">&quot;LMn&quot;</span><span class="p">:</span><span class="n">LMn</span><span class="p">}</span></div>
     
-<div class="viewcode-block" id="Layered_NRM_k1_w.L_eigenvectors_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">L_eigenvectors_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">beta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">g3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;computes the eigenvector matrix &#39;L&#39; and its inverse &#39;Linv&#39;, either in flux- or in pressure-normalisation for the vertical-wavenumber &#39;K3&#39; inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid that contains all combinations of frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. If \&#39;AdjointMedium=True\&#39;, **L_eigenvectors_k1_w** also computes the eigenvector matrix in the adjoint medium &#39;La&#39; and its inverse &#39;Lainv&#39;. </span>
+<div class="viewcode-block" id="Layered_NRM_k1_w.L_eigenvectors_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">L_eigenvectors_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">beta11</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta13</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta33</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">K3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the eigenvector matrix &#39;L&#39; and its inverse &#39;Linv&#39;, either </span>
+<span class="sd">        in flux- or in pressure-normalisation for the vertical-wavenumber &#39;K3&#39; </span>
+<span class="sd">        inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid </span>
+<span class="sd">        that contains all combinations of frequencies :math:`\omega` and </span>
+<span class="sd">        horizontal-wavenumbers :math:`k_1`. If \&#39;AdjointMedium=True\&#39;, </span>
+<span class="sd">        **L_eigenvectors_k1_w** also computes the eigenvector matrix in the </span>
+<span class="sd">        adjoint medium &#39;La&#39; and its inverse &#39;Lainv&#39;. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">    </span>
-<span class="sd">        beta : int, float</span>
-<span class="sd">            Medium parameter :math:`\\beta`  (real-valued).</span>
+<span class="sd">        beta11 : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{11}`  (real-valued).</span>
 <span class="sd">        </span>
-<span class="sd">        g3 : int, float</span>
-<span class="sd">            Medium parameter :math:`\gamma_3`.</span>
+<span class="sd">        beta13 : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{13}`  (real-valued).</span>
+<span class="sd">            </span>
+<span class="sd">        beta33 : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{33}`  (real-valued).</span>
 <span class="sd">        </span>
 <span class="sd">        K3 : numpy.ndarray</span>
-<span class="sd">            Vertical-wavenumber :math:`k_3(+k_1)` for all frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">            Vertical-wavenumber :math:`k_3(+k_1)` for all frequencies </span>
+<span class="sd">            :math:`\omega` and horizontal-wavenumbers :math:`k_1`.</span>
 <span class="sd">        </span>
 <span class="sd">        K3n : numpy.ndarray, optional (required if &#39;AdjointMedium=True&#39;)</span>
-<span class="sd">            Vertical-wavenumber :math:`k_3(-k_1)` for all frequencies :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">            Vertical-wavenumber :math:`k_3(-k_1)` for all frequencies </span>
+<span class="sd">            :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1`.</span>
 <span class="sd">            </span>
 <span class="sd">        normalisation : str, optional</span>
-<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for flux-normalisation set normalisation=&#39;flux&#39;.</span>
+<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for </span>
+<span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;.</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
 <span class="sd">        dict</span>
 <span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
 <span class="sd">                - **L**: The eigenvector matrix.</span>
 <span class="sd">                - **Linv**: The inverse of the eigenvector matrix.</span>
 <span class="sd">                - **La**: The eigenvector matrix (adjoint medium).</span>
 <span class="sd">                - **Lainv**: The inverse of the eigenvector matrix (adjoint medium).</span>
-<span class="sd">            All eigenvector matrices are stored in a in a (nf,nr,2,2)-array. The first two dimensions correspond to all combinations of frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. The last two dimension are the actual eigenvector matrices for all :math:`\omega`-:math:`k_1` components.</span>
+<span class="sd">                </span>
+<span class="sd">            All eigenvector matrices are stored in a in a (nf,nr,2,2)-array. </span>
+<span class="sd">            The first two dimensions correspond to all combinations of </span>
+<span class="sd">            frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1`. </span>
+<span class="sd">            The last two dimension are the actual eigenvector matrices for all </span>
+<span class="sd">            :math:`\omega`-:math:`k_1` components.</span>
 <span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">            - The eigenvector matrix &#39;L&#39; and its inverse &#39;Linv&#39; are different for reciprocal and non-reciprocal media.</span>
-<span class="sd">            - For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium.</span>
-<span class="sd">            - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.</span>
-<span class="sd">            - At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \&#39;L\&#39; and their inverse \&#39;Linv\&#39; contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.</span>
+<span class="sd">            </span>
+<span class="sd">        - The eigenvector matrix &#39;L&#39; and its inverse &#39;Linv&#39; are different for reciprocal and non-reciprocal media (I assume that has not changed, but check it!).</span>
+<span class="sd">        - For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium (verify!).</span>
+<span class="sd">        - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.</span>
+<span class="sd">        - At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \&#39;L\&#39; and their inverse \&#39;Linv\&#39; contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.</span>
 <span class="sd">        </span>
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
@@ -858,14 +878,18 @@
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # Initialise wavefield in a layered non-reciprocal medium</span>
 <span class="sd">        &gt;&gt;&gt; F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),</span>
-<span class="sd">        &gt;&gt;&gt;      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      g1vec=1j*np.array([0.8,2,1.3])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      ReciprocalMedium=True)</span>
+<span class="sd">        &gt;&gt;&gt;      avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      ReciprocalMedium=False,AdjointMedium=True)</span>
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # Compute eigenvectors in pressure-normalisation</span>
-<span class="sd">        &gt;&gt;&gt; Leig=F.L_eigenvectors_k1_w(F.bvec[0],F.g3vec[0],</span>
-<span class="sd">        &gt;&gt;&gt;                            F.K3[:,:,0],normalisation=&#39;pressure&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; Leig=F.L_eigenvectors_k1_w(beta11=F.b11vec[0],beta13=F.b13vec[0],</span>
+<span class="sd">        &gt;&gt;&gt;                            beta33=F.b33vec[0],K3=F.K3[:,:,0],</span>
+<span class="sd">        &gt;&gt;&gt;                            K3n=F.K3n[:,:,0],</span>
+<span class="sd">        &gt;&gt;&gt;                            normalisation=&#39;pressure&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; L=Leig[&#39;L&#39;]</span>
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # For pressure normalisation, the top-left element of L equals</span>
@@ -876,20 +900,30 @@
 <span class="sd">        &gt;&gt;&gt; # For pressure normalisation, the bottom-left element of L does not</span>
 <span class="sd">        &gt;&gt;&gt; # equal 1 for all frequencies and all horizontal-wavenumbers</span>
 <span class="sd">        &gt;&gt;&gt; L[101,200,1,0]</span>
-<span class="sd">        12.370632073930679j</span>
+<span class="sd">        10.85892500293106j</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if required input variables are given</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">beta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">g3</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">K3</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;L_eigenvectors_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">beta</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">g3</span><span class="se">\&#39;</span><span class="s1"> and  </span><span class="se">\&#39;</span><span class="s1">K3</span><span class="se">\&#39;</span><span class="s1"> must be set.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="n">beta11</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">beta13</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">beta33</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+             <span class="ow">or</span> <span class="p">(</span><span class="n">K3</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;L_eigenvectors_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">beta11</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">beta13</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">beta33</span><span class="se">\&#39;</span><span class="s1"> and  </span><span class="se">\&#39;</span><span class="s1">K3</span><span class="se">\&#39;</span><span class="s1"> must be set.&#39;</span><span class="p">)</span>
          
         <span class="c1"># Check if normalisation is set correctly</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;flux&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;L_eigenvectors_k1_w: The input variable </span><span class="se">\&#39;</span><span class="s1">normalisation</span><span class="se">\&#39;</span><span class="s1"> must be set, either to </span><span class="se">\&#39;</span><span class="s1">flux</span><span class="se">\&#39;</span><span class="s1">, or to </span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;L_eigenvectors_k1_w: The input variable &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">normalisation</span><span class="se">\&#39;</span><span class="s1"> must be set, either to </span><span class="se">\&#39;</span><span class="s1">flux</span><span class="se">\&#39;</span><span class="s1">, or &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;to </span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
             
-        <span class="c1"># Check if the vertical-wavenumber for a negative horizontal-wavenumber is given</span>
-        <span class="k">if</span>  <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">K3n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;L_eigenvectors_k1_w: The input variable </span><span class="se">\&#39;</span><span class="s1">K3n</span><span class="se">\&#39;</span><span class="s1"> (vertical-wavenumber K3 for a negative horizontal-wavenumber k1) must be given to compute the eigenvector matrix of the adjoint medium </span><span class="se">\&#39;</span><span class="s1">La</span><span class="se">\&#39;</span><span class="s1"> and its inverse</span><span class="se">\&#39;</span><span class="s1">Lainv</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
+        <span class="c1"># Check if the vertical-wavenumber for a negative horizontal-wavenumber </span>
+        <span class="c1"># is given</span>
+        <span class="k">if</span> <span class="p">(</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">K3n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+          <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;L_eigenvectors_k1_w: The input variable </span><span class="se">\&#39;</span><span class="s1">K3n</span><span class="se">\&#39;</span><span class="s1"> &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;(vertical-wavenumber K3 for a negative horizontal-&#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;wavenumber k1) must be given to compute the eigenvector&#39;</span>
+                     <span class="o">+</span><span class="s1">&#39; matrix of the adjoint medium </span><span class="se">\&#39;</span><span class="s1">La</span><span class="se">\&#39;</span><span class="s1"> and its inverse &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">Lainv</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
             
         <span class="c1"># Initialise L and Linv</span>
         <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -911,63 +945,76 @@
         <span class="n">P3inv</span> <span class="o">=</span> <span class="n">P3</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">P3inv</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span> <span class="o">=</span> <span class="n">Om</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span><span class="o">/</span><span class="n">K3</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span>
         
+        <span class="n">hinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">beta11</span><span class="o">*</span><span class="n">beta33</span><span class="o">-</span><span class="n">beta13</span><span class="o">*</span><span class="n">beta13</span> <span class="p">)</span>
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">L_eigenvectors_k1_w &#39;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------------------------------------------------&#39;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The eigenvectors L and their inverse Linv have a pole at zero frequency. Here, &#39;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;we set the zero frequency component of L and Linv to zero (which is wrong but &#39;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;convenient for the computation).</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="mi">72</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The eigenvectors L and their inverse Linv have a pole at &#39;</span>
+                  <span class="o">+</span><span class="s1">&#39;zero frequency. Here, we set the zero frequency component &#39;</span>
+                  <span class="o">+</span><span class="s1">&#39;of L and Linv to zero (which is wrong but convenient for &#39;</span>
+                  <span class="o">+</span><span class="s1">&#39;the computation).</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
             
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">):</span>
-            <span class="c1"># L matrix</span>
-            <span class="n">fac</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="n">P3inv</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">fac</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">fac</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3</span><span class="o">+</span><span class="n">g3</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span><span class="o">*</span><span class="n">fac</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">P3</span><span class="o">-</span><span class="n">g3</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span><span class="o">*</span><span class="n">fac</span>
             
-            <span class="c1"># Inverse L matrix</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span>  <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span>  <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1">#####################</span>
+            <span class="c1"># NOT YET IMPLEMENTED</span>
+            <span class="c1">#####################</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">L_eigenvectors_k1_w (ReciprocalMedium is True)&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------------------------------------&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the eigenvectors are not yet &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;implemented.&#39;</span><span class="p">)</span>
             
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">L_eigenvectors_k1_w (AdjointMedium is True) and (ReciprocalMedium is True)&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------------------------------------------------&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the eigenvector matrix of a medium and its adjoint medium &#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;are identical.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-               
-                <span class="n">La</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="n">Lainv</span> <span class="o">=</span> <span class="n">Linv</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>            
-            <span class="c1"># L matrix</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3</span><span class="o">+</span><span class="n">g3</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="n">P3</span><span class="o">-</span><span class="n">g3</span><span class="p">)</span><span class="o">/</span><span class="n">beta</span>
-            
-            <span class="c1"># Inverse L matrix</span>
-            <span class="n">fac</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="n">P3inv</span><span class="o">/</span><span class="mi">2</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">fac</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">fac</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">fac</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">*</span><span class="n">fac</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">L_eigenvectors_k1_w (AdjointMedium is True) and (normalisation=</span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-------------------------------------------------------------------------------&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have defined the eigenvector matrix of the adjoint medium </span><span class="se">\&#39;</span><span class="s1">La</span><span class="se">\&#39;</span><span class="s1"> and its &#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;inverse </span><span class="se">\&#39;</span><span class="s1">Lainv</span><span class="se">\&#39;</span><span class="s1"> only for flux-normalisation.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="c1">#            # L matrix</span>
+<span class="c1">#            fac = (beta*P3inv/2)**0.5</span>
+<span class="c1">#            L[:,:,0,0] = 1*fac</span>
+<span class="c1">#            L[:,:,0,1] = 1*fac</span>
+<span class="c1">#            L[:,:,1,0] = (P3+g3)/beta*fac</span>
+<span class="c1">#            L[:,:,1,1] = -(P3-g3)/beta*fac</span>
+<span class="c1">#            </span>
+<span class="c1">#            # Inverse L matrix</span>
+<span class="c1">#            Linv[:,:,0,0] = -L[:,:,1,1]</span>
+<span class="c1">#            Linv[:,:,0,1] =  L[:,:,0,0]</span>
+<span class="c1">#            Linv[:,:,1,0] =  L[:,:,1,0]</span>
+<span class="c1">#            Linv[:,:,1,1] = -L[:,:,0,0]</span>
+<span class="c1">#            </span>
+<span class="c1">#            if self.AdjointMedium is True:</span>
+<span class="c1">#                if self.verbose is True:</span>
+<span class="c1">#                    print(&#39;\nL_eigenvectors_k1_w (AdjointMedium is True) and (ReciprocalMedium is True)&#39;)</span>
+<span class="c1">#                    print(&#39;-------------------------------------------------------------------------------&#39;)</span>
+<span class="c1">#                    print(&#39;For reciprocal media, the eigenvector matrix of a medium and its adjoint medium &#39;)</span>
+<span class="c1">#                    print(&#39;are identical.\n&#39;)</span>
+<span class="c1">#               </span>
+<span class="c1">#                La = L.copy()</span>
+<span class="c1">#                Lainv = Linv.copy()</span>
+<span class="c1">#            </span>
+<span class="c1">#        elif (self.ReciprocalMedium is True) and (normalisation is &#39;pressure&#39;):            </span>
+<span class="c1">#            # L matrix</span>
+<span class="c1">#            L[:,:,0,0] = 1</span>
+<span class="c1">#            L[:,:,0,1] = 1</span>
+<span class="c1">#            L[:,:,1,0] = (P3+g3)/beta</span>
+<span class="c1">#            L[:,:,1,1] = -(P3-g3)/beta</span>
+<span class="c1">#            </span>
+<span class="c1">#            # Inverse L matrix</span>
+<span class="c1">#            fac = beta*P3inv/2</span>
+<span class="c1">#            Linv[:,:,0,0] = -L[:,:,1,1]*fac</span>
+<span class="c1">#            Linv[:,:,0,1] = 1*fac</span>
+<span class="c1">#            Linv[:,:,1,0] = L[:,:,1,0]*fac</span>
+<span class="c1">#            Linv[:,:,1,1] = -1*fac</span>
+<span class="c1">#            </span>
+<span class="c1">#            if self.verbose is True and self.AdjointMedium is True:</span>
+<span class="c1">#                print(&#39;\nL_eigenvectors_k1_w (AdjointMedium is True) and (normalisation=\&#39;pressure\&#39;)&#39;)</span>
+<span class="c1">#                print(&#39;-------------------------------------------------------------------------------&#39;)</span>
+<span class="c1">#                print(&#39;We have defined the eigenvector matrix of the adjoint medium \&#39;La\&#39; and its &#39;)</span>
+<span class="c1">#                print(&#39;inverse \&#39;Lainv\&#39; only for flux-normalisation.\n&#39;)</span>
             
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">):</span>
             <span class="c1"># L matrix</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="n">P3inv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">hinv</span><span class="o">*</span><span class="n">P3inv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
             <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3</span><span class="o">/</span><span class="n">hinv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
             <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">L</span> <span class="o">=</span> <span class="n">L</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span>
             
@@ -1002,32 +1049,31 @@
                 
                 <span class="c1"># L matrix (adjoint medium) = N Transpose( Inverse( L(-k1) )) N</span>
                 <span class="n">La</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-                <span class="n">La</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="n">P3ninv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+                <span class="n">La</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">hinv</span><span class="o">*</span><span class="n">P3ninv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
                 <span class="n">La</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">La</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">La</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3n</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+                <span class="n">La</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3n</span><span class="o">/</span><span class="n">hinv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
                 <span class="n">La</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">La</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
                 <span class="n">La</span> <span class="o">=</span> <span class="n">La</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span>
                 
                 <span class="c1">#  Inverse L matrix (adjoint medium) = N Transpose( L(-k1)) N</span>
                 <span class="n">Lainv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">P3n</span><span class="o">/</span><span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">beta</span><span class="o">*</span><span class="n">P3ninv</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
-                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">Lainv</span> <span class="o">=</span> <span class="n">Lainv</span><span class="o">/</span><span class="mi">2</span><span class="o">**</span><span class="mf">0.5</span>
+                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">La</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">La</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">La</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">Lainv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">La</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
             
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
             <span class="c1"># L matrix</span>
             <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">L</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">P3</span><span class="o">/</span><span class="n">beta</span>
-            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">P3</span><span class="o">/</span><span class="n">beta</span>
+            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">P3</span><span class="o">/</span><span class="n">hinv</span>
+            <span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">L</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
             
             <span class="c1"># Inverse L matrix</span>
             <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">beta</span><span class="o">*</span><span class="n">P3inv</span>
+            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">hinv</span><span class="o">*</span><span class="n">P3inv</span>
             <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">beta</span><span class="o">*</span><span class="n">P3inv</span>
+            <span class="n">Linv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">hinv</span><span class="o">*</span><span class="n">P3inv</span>
             <span class="n">Linv</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">Linv</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -1039,74 +1085,104 @@
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;L&#39;</span><span class="p">:</span><span class="n">L</span><span class="p">,</span><span class="s1">&#39;Linv&#39;</span><span class="p">:</span><span class="n">Linv</span><span class="p">,</span><span class="s1">&#39;La&#39;</span><span class="p">:</span><span class="n">La</span><span class="p">,</span><span class="s1">&#39;Lainv&#39;</span><span class="p">:</span><span class="n">Lainv</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
           
-<div class="viewcode-block" id="Layered_NRM_k1_w.RT_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.RT_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">RT_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">beta_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">g3_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                     <span class="n">beta_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">g3_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="Layered_NRM_k1_w.RT_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.RT_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">RT_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">beta11_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta13_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta33_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n_u</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">beta11_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta13_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta33_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n_l</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the scattering coefficients at an horizontal interface.</span>
 <span class="sd">        </span>
-<span class="sd">        The scattering coefficients can be computed either in flux- or in pressure-normalisation. The variables with subscript &#39;u&#39; refer to the medium parameters in the upper half-space, the variables with subscript &#39;l&#39; refer to the medium parameters in the lower half-space. The vertical-wavenumbers \&#39;K3\&#39;:math:`=k_3(k_1,\omega)` and \&#39;K3n\&#39;:math:`=k_3(-k_1,\omega)` are stored as :math:`k_1`-:math:`\omega` meshgirds to compute the scattering coefficients for all sampled frequencies and horizontal-wavenumbers in a vectorsied manner. Set \&#39;AdjointMedium=True\&#39; to compute the scattering coefficients also in the adjoint medium.</span>
+<span class="sd">        The scattering coefficients can be computed either in flux- or in </span>
+<span class="sd">        pressure-normalisation. The variables with subscript &#39;u&#39; refer to the </span>
+<span class="sd">        medium parameters in the upper half-space, the variables with subscript </span>
+<span class="sd">        &#39;l&#39; refer to the medium parameters in the lower half-space. The </span>
+<span class="sd">        vertical-wavenumbers \&#39;K3\&#39;:math:`=k_3(k_1,\omega)` and </span>
+<span class="sd">        \&#39;K3n\&#39;:math:`=k_3(-k_1,\omega)` are stored as :math:`k_1`-</span>
+<span class="sd">        :math:`\omega` meshgirds to compute the scattering coefficients for all </span>
+<span class="sd">        sampled frequencies and horizontal-wavenumbers in a vectorsied manner. </span>
+<span class="sd">        Set \&#39;AdjointMedium=True\&#39; to compute the scattering coefficients also </span>
+<span class="sd">        in the adjoint medium.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">    </span>
-<span class="sd">        beta_u : int, float</span>
-<span class="sd">            Medium parameter :math:`\\beta` (real-valued) (upper half-space).</span>
+<span class="sd">        beta11_u : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{11}` (real-valued) (upper half-space).</span>
 <span class="sd">        </span>
-<span class="sd">        g3_u : int, float</span>
-<span class="sd">            Medium parameter :math:`\gamma_3` (upper half-space).</span>
+<span class="sd">        beta13_u : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{13}` (real-valued) (upper half-space).</span>
+<span class="sd">            </span>
+<span class="sd">        beta33_u : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{33}` (real-valued) (upper half-space).</span>
 <span class="sd">        </span>
 <span class="sd">        K3_u : numpy.ndarray</span>
-<span class="sd">            Vertical-wavenumber :math:`k_{3,u}(+k_1)` for all frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1` (upper half-space).</span>
+<span class="sd">            Vertical-wavenumber :math:`k_{3,u}(+k_1)` for all frequencies </span>
+<span class="sd">            :math:`\omega` and horizontal-wavenumbers :math:`k_1` (upper half-</span>
+<span class="sd">            space).</span>
 <span class="sd">        </span>
 <span class="sd">        K3n_u : numpy.ndarray, optional (required if &#39;AdjointMedium=True&#39;)</span>
-<span class="sd">            Vertical-wavenumber :math:`k_{3,u}(-k_1)` for all frequencies :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` (upper half-space).</span>
+<span class="sd">            Vertical-wavenumber :math:`k_{3,u}(-k_1)` for all frequencies </span>
+<span class="sd">            :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` </span>
+<span class="sd">            (upper half-space).</span>
 <span class="sd">            </span>
-<span class="sd">        beta_l : int, float</span>
-<span class="sd">            Medium parameter :math:`\\beta` (real-valued) (lower half-space).</span>
+<span class="sd">        beta11_l : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{11}` (real-valued) (lower half-space).</span>
 <span class="sd">        </span>
-<span class="sd">        g3_l : int, float</span>
-<span class="sd">            Medium parameter :math:`\gamma_3` (lower half-space).</span>
+<span class="sd">        beta13_l : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{13}` (real-valued) (lower half-space).</span>
+<span class="sd">            </span>
+<span class="sd">        beta33_l : int, float</span>
+<span class="sd">            Medium parameter :math:`\\beta_{33}` (real-valued) (lower half-space).</span>
 <span class="sd">        </span>
 <span class="sd">        K3_l : numpy.ndarray</span>
-<span class="sd">            Vertical-wavenumber :math:`k_{3,l}(+k_1)` for all frequencies :math:`\omega` and horizontal-wavenumbers :math:`k_1` (lower half-space).</span>
+<span class="sd">            Vertical-wavenumber :math:`k_{3,l}(+k_1)` for all frequencies </span>
+<span class="sd">            :math:`\omega` and horizontal-wavenumbers :math:`k_1` (lower half-</span>
+<span class="sd">            space).</span>
 <span class="sd">        </span>
 <span class="sd">        K3n_l : numpy.ndarray, optional (required if &#39;AdjointMedium=True&#39;)</span>
-<span class="sd">            Vertical-wavenumber :math:`k_{3,l}(-k_1)` for all frequencies :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` (lower half-space).</span>
+<span class="sd">            Vertical-wavenumber :math:`k_{3,l}(-k_1)` for all frequencies </span>
+<span class="sd">            :math:`\omega` and sign-inverted horizontal-wavenumbers :math:`k_1` </span>
+<span class="sd">            (lower half-space).</span>
 <span class="sd">            </span>
 <span class="sd">        normalisation : str, optional</span>
-<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for flux-normalisation set normalisation=&#39;flux&#39;.</span>
+<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for flux-</span>
+<span class="sd">            normalisation set normalisation=&#39;flux&#39;.</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
 <span class="sd">        dict</span>
 <span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
 <span class="sd">                - **rP**: Reflection coefficient from above.</span>
-<span class="sd">                - **tP**: Transmission coefficient from above &#39;tP&#39;.</span>
+<span class="sd">                - **tP**: Transmission coefficient from above.</span>
 <span class="sd">                - **rM**: Reflection coefficient from below.</span>
 <span class="sd">                - **tM**: Transmission coefficient from below.</span>
 <span class="sd">                - **rPa**: Reflection coefficient from above (adjoint medium).</span>
 <span class="sd">                - **tPa**: Transmission coefficient from above (adjoint medium).</span>
 <span class="sd">                - **rMa**: Reflection coefficient from below (adjoint medium).</span>
 <span class="sd">                - **tMa**: Transmission coefficient from below (adjoint medium).</span>
-<span class="sd">            All scattering coefficients are stored as arrays with the shape (nf,nr).</span>
+<span class="sd">                </span>
+<span class="sd">            All scattering coefficients are stored as arrays with the shape </span>
+<span class="sd">            (nf,nr).</span>
 <span class="sd">            </span>
-<span class="sd">        .. todo:: </span>
 <span class="sd">        </span>
-<span class="sd">            (1) For :math:`k_1,\omega=(0,0)` there is a zero division in the </span>
-<span class="sd">            computation of the scattering coefficients. I have fixed that, </span>
-<span class="sd">            however, I believe that the fix is (mathmatically) wrong. Check that!</span>
+<span class="sd">        .. todo::</span>
+<span class="sd">            </span>
+<span class="sd">            (1) For :math:`(k_1 , \omega) = (0,0)` there is a zero division in the </span>
+<span class="sd">            computation of the scattering coefficients. I have fixed that, however, I believe that the fix is (mathmatically) wrong. Check that!</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">    </span>
-<span class="sd">        - For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium.</span>
+<span class="sd">        - For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium. (To be checked)</span>
 <span class="sd">        - We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</span>
 <span class="sd">        </span>
 <span class="sd">            </span>
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
+<span class="sd">        </span>
 <span class="sd">        Kees document as soon as it is published.</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1116,17 +1192,17 @@
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # Initialise wavefield F in a reciprocal medium </span>
 <span class="sd">        &gt;&gt;&gt; F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),</span>
-<span class="sd">        &gt;&gt;&gt;      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      g1vec=1j*np.array([0.8,2,1.3])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,</span>
-<span class="sd">        &gt;&gt;&gt;      ReciprocalMedium=True)</span>
+<span class="sd">        &gt;&gt;&gt;      avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;      ReciprocalMedium=False,AdjointMedium=True)</span>
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # Compute scattering coefficients at the first interface in flux</span>
 <span class="sd">        &gt;&gt;&gt; # normalisation</span>
-<span class="sd">        &gt;&gt;&gt; Scat=F.RT_k1_w(beta_u=F.bvec[0],g3_u=F.g3vec[0],K3_u=F.K3[:,:,0],</span>
-<span class="sd">        &gt;&gt;&gt;                K3n_u=F.K3n[:,:,0],</span>
-<span class="sd">        &gt;&gt;&gt;                beta_l=F.bvec[1],g3_l=F.g3vec[1],K3_l=F.K3[:,:,1],</span>
-<span class="sd">        &gt;&gt;&gt;                K3n_l=F.K3n[:,:,1],normalisation=&#39;flux&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; Scat = F.RT_k1_w(beta11_u=F.b11vec[0],beta13_u=F.b13vec[0],beta33_u=F.b33vec[0],</span>
+<span class="sd">        &gt;&gt;&gt;                  K3_u=F.K3[:,:,0],K3n_u=F.K3n[:,:,0],</span>
+<span class="sd">        &gt;&gt;&gt;                  beta11_l=F.b11vec[1],beta13_l=F.b13vec[1],beta33_l=F.b33vec[1],</span>
+<span class="sd">        &gt;&gt;&gt;                  K3_l=F.K3[:,:,1],K3n_l=F.K3n[:,:,1],normalisation=&#39;flux&#39;)</span>
 <span class="sd">        </span>
 <span class="sd">        &gt;&gt;&gt; # Read the scattering coeffcients, and </span>
 <span class="sd">        &gt;&gt;&gt; tP = Scat[&#39;tP&#39;]</span>
@@ -1140,14 +1216,20 @@
 <span class="sd">        &gt;&gt;&gt; np.linalg.norm(tP-tM)</span>
 <span class="sd">        0.0</span>
 <span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Transmission coefficient for k1,omega = (0,Delta omega)</span>
+<span class="sd">        &gt;&gt;&gt; tP[1,0]</span>
+<span class="sd">        (0.9865896281519458+0j)</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="c1"># Check if required input variables are given</span>
-        <span class="k">if</span> <span class="p">((</span><span class="n">beta_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">g3_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">K3_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
-         <span class="ow">or</span> <span class="p">(</span><span class="n">beta_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">g3_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">K3_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;RT_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">beta_u</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">g3_u</span><span class="se">\&#39;</span><span class="s1">,  &#39;</span><span class="o">+</span>
-                     <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">K3_u</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">beta_l</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">g3_l</span><span class="se">\&#39;</span><span class="s1">,  </span><span class="se">\&#39;</span><span class="s1">K3_l</span><span class="se">\&#39;</span><span class="s1"> must be set.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>   <span class="p">(</span><span class="n">beta11_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">beta13_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">beta33_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+            <span class="ow">or</span> <span class="p">(</span><span class="n">beta11_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">beta13_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">beta33_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+            <span class="ow">or</span> <span class="p">(</span><span class="n">K3_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">K3_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;RT_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">beta11_u</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">beta13_u</span><span class="se">\&#39;</span><span class="s1">,&#39;</span>
+                     <span class="o">+</span><span class="s1">&#39; </span><span class="se">\&#39;</span><span class="s1">beta33_u</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">K3_u</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">beta11_l</span><span class="se">\&#39;</span><span class="s1">, </span><span class="se">\&#39;</span><span class="s1">beta13_l</span><span class="se">\&#39;</span><span class="s1">, &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">beta33_l</span><span class="se">\&#39;</span><span class="s1">,  </span><span class="se">\&#39;</span><span class="s1">K3_l</span><span class="se">\&#39;</span><span class="s1"> must be set.&#39;</span><span class="p">)</span>
             
         <span class="c1"># Check if normalisation is set correctly</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;flux&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
@@ -1171,9 +1253,6 @@
         <span class="n">tPa</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">rMa</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">tMa</span> <span class="o">=</span> <span class="kc">None</span>
-            
-        <span class="c1"># Frequency meshgrid</span>
-        <span class="n">Om</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
         
         <span class="c1"># For zero frequency and zero horizontal-wavenumber we will encounter</span>
         <span class="c1"># divisions by zero. </span>
@@ -1186,85 +1265,98 @@
         <span class="n">K3n_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">K3n_u</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">Dw</span><span class="p">()</span>
         <span class="n">K3n_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">K3n_l</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">Dw</span><span class="p">()</span>
         
+        <span class="n">hu</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">beta11_u</span><span class="o">*</span><span class="n">beta33_u</span><span class="o">-</span><span class="n">beta13_u</span><span class="o">*</span><span class="n">beta13_u</span> <span class="p">)</span>
+        <span class="n">hl</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">beta11_l</span><span class="o">*</span><span class="n">beta33_l</span><span class="o">-</span><span class="n">beta13_l</span><span class="o">*</span><span class="n">beta13_l</span> <span class="p">)</span>
+        
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">):</span>
             
-            <span class="c1"># True medium</span>
-            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="p">(</span><span class="n">K3_l</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span>
-            <span class="n">rP</span> <span class="o">=</span>  <span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span> 
-            <span class="n">rM</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tP</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span><span class="o">*</span><span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tM</span> <span class="o">=</span> <span class="n">tP</span>
+            <span class="c1">#####################</span>
+            <span class="c1"># NOT YET IMPLEMENTED</span>
+            <span class="c1">#####################</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">RT_k1_w (ReciprocalMedium is True)&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------------------------------------&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the scattering coefficients are &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;not yet implemented.&#39;</span><span class="p">)</span>
             
-            <span class="c1"># Correct the zero frequency, zero horizontal-wavenumber component</span>
-            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="p">(</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span>
-            <span class="n">rP</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span>  <span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span> 
-            <span class="n">rM</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tP</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">beta_l</span><span class="o">*</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tM</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">tP</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="c1"># Adjoint medium</span>
-                <span class="n">rPa</span> <span class="o">=</span> <span class="n">rP</span> 
-                <span class="n">tPa</span> <span class="o">=</span> <span class="n">tP</span> 
-                <span class="n">rMa</span> <span class="o">=</span> <span class="n">rM</span> 
-                <span class="n">tMa</span> <span class="o">=</span> <span class="n">tM</span> 
-    
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">RT_k1_w: (AdjointMedium is True) and (ReciprocalMedium is True)&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="mi">72</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the scattering coefficients in a medium and its adjoint medium are identical.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        
-        <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
-            
-            <span class="c1"># True medium</span>
-            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="p">(</span><span class="n">K3_l</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span>
-            <span class="n">rP</span> <span class="o">=</span>  <span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">rM</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tP</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tM</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span> <span class="o">*</span> <span class="n">denom</span>
-            
-            <span class="c1"># Correct the zero frequency, zero horizontal-wavenumber component</span>
-            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="p">(</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span>
-            <span class="n">rP</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span>  <span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span> 
-            <span class="n">rM</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span> <span class="p">(</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">g3_u</span><span class="p">)</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="p">(</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">g3_l</span><span class="p">)</span><span class="o">*</span><span class="n">beta_u</span> <span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tP</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_u</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tM</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_l</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">beta_u</span> <span class="o">*</span> <span class="n">denom</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">RT_k1_w: (AdjointMedium is True) and (normalisation=</span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="mi">72</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="c1">#            # True medium</span>
+<span class="c1">#            denom = 1/( (K3_u-Om*g3_u)*beta_l + (K3_l+Om*g3_l)*beta_u )</span>
+<span class="c1">#            rP =  ( (K3_u+Om*g3_u)*beta_l - (K3_l+Om*g3_l)*beta_u ) * denom </span>
+<span class="c1">#            rM = -( (K3_u-Om*g3_u)*beta_l - (K3_l-Om*g3_l)*beta_u ) * denom</span>
+<span class="c1">#            tP = 2*(K3_u*beta_l*K3_l*beta_u)**0.5 * denom</span>
+<span class="c1">#            tM = tP</span>
+<span class="c1">#            </span>
+<span class="c1">#            # Correct the zero frequency, zero horizontal-wavenumber component</span>
+<span class="c1">#            denom = 1/( (K3_u[0,0]-g3_u)*beta_l + (K3_l[0,0]+g3_l)*beta_u )</span>
+<span class="c1">#            rP[0,0] =  ( (K3_u[0,0]+g3_u)*beta_l - (K3_l[0,0]+g3_l)*beta_u ) * denom </span>
+<span class="c1">#            rM[0,0] = -( (K3_u[0,0]-g3_u)*beta_l - (K3_l[0,0]-g3_l)*beta_u ) * denom</span>
+<span class="c1">#            tP[0,0] = 2*(K3_u[0,0]*beta_l*K3_l[0,0]*beta_u)**0.5 * denom</span>
+<span class="c1">#            tM[0,0] = tP[0,0]</span>
+<span class="c1">#            </span>
+<span class="c1">#            if self.AdjointMedium is True:</span>
+<span class="c1">#                # Adjoint medium</span>
+<span class="c1">#                rPa = rP </span>
+<span class="c1">#                tPa = tP </span>
+<span class="c1">#                rMa = rM </span>
+<span class="c1">#                tMa = tM </span>
+<span class="c1">#    </span>
+<span class="c1">#                if self.verbose is True:</span>
+<span class="c1">#                    print(&#39;\nRT_k1_w: (AdjointMedium is True) and (ReciprocalMedium is True)&#39;)</span>
+<span class="c1">#                    print(72*&#39;-&#39;)</span>
+<span class="c1">#                    print(&#39;For reciprocal media, the scattering coefficients in a medium and its adjoint medium are identical.\n&#39;)</span>
+<span class="c1">#        </span>
+<span class="c1">#        elif (self.ReciprocalMedium is True) and (normalisation is &#39;pressure&#39;):</span>
+<span class="c1">#            </span>
+<span class="c1">#            # True medium</span>
+<span class="c1">#            denom = 1/( (K3_u-Om*g3_u)*beta_l + (K3_l+Om*g3_l)*beta_u )</span>
+<span class="c1">#            rP =  ( (K3_u+Om*g3_u)*beta_l - (K3_l+Om*g3_l)*beta_u ) * denom</span>
+<span class="c1">#            rM = -( (K3_u-Om*g3_u)*beta_l - (K3_l-Om*g3_l)*beta_u ) * denom</span>
+<span class="c1">#            tP = 2*K3_u*beta_l * denom</span>
+<span class="c1">#            tM = 2*K3_l*beta_u * denom</span>
+<span class="c1">#            </span>
+<span class="c1">#            # Correct the zero frequency, zero horizontal-wavenumber component</span>
+<span class="c1">#            denom = 1/( (K3_u[0,0]-g3_u)*beta_l + (K3_l[0,0]+g3_l)*beta_u )</span>
+<span class="c1">#            rP[0,0] =  ( (K3_u[0,0]+g3_u)*beta_l - (K3_l[0,0]+g3_l)*beta_u ) * denom </span>
+<span class="c1">#            rM[0,0] = -( (K3_u[0,0]-g3_u)*beta_l - (K3_l[0,0]-g3_l)*beta_u ) * denom</span>
+<span class="c1">#            tP[0,0] = 2*K3_u[0,0]*beta_l * denom</span>
+<span class="c1">#            tM[0,0] = 2*K3_l[0,0]*beta_u * denom</span>
+<span class="c1">#            </span>
+<span class="c1">#            if self.verbose is True and self.AdjointMedium is True:</span>
+<span class="c1">#                print(&#39;\nRT_k1_w: (AdjointMedium is True) and (normalisation=\&#39;pressure\&#39;)&#39;)</span>
+<span class="c1">#                print(72*&#39;-&#39;)</span>
+<span class="c1">#                print(&#39;We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.\n&#39;)</span>
             
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">):</span>
             
             <span class="c1"># True medium (no need to coorect (w,k1)=(0,0) element)</span>
-            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span>
-            <span class="n">rP</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span> <span class="o">*</span><span class="n">denom</span>
-            <span class="n">tP</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span><span class="o">*</span><span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">denom</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">+</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span>
+            <span class="n">rP</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">-</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span> <span class="o">*</span><span class="n">denom</span>
+            <span class="n">tP</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">hu</span><span class="o">*</span><span class="n">K3_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">denom</span>
             <span class="n">rM</span> <span class="o">=</span> <span class="o">-</span><span class="n">rP</span>
             <span class="n">tM</span> <span class="o">=</span> <span class="n">tP</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="c1"># Adjoint medium (no need to coorect (w,k1)=(0,0) element)</span>
-                <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="n">K3n_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span>
-                <span class="n">rPa</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="n">K3n_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-                <span class="n">tPa</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">beta_l</span><span class="o">*</span><span class="n">K3n_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">denom</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">+</span> <span class="n">K3n_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span>
+                <span class="n">rPa</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">-</span> <span class="n">K3n_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
+                <span class="n">tPa</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">hu</span><span class="o">*</span><span class="n">K3n_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">*</span> <span class="n">denom</span>
                 <span class="n">rMa</span> <span class="o">=</span> <span class="o">-</span><span class="n">rPa</span>
                 <span class="n">tMa</span> <span class="o">=</span> <span class="n">tPa</span> 
             
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
             
             <span class="c1"># True medium  (no need to coorect (w,k1)=(0,0) element)</span>
-            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">+</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span>
-            <span class="n">rP</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">-</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span><span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
-            <span class="n">tP</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_u</span><span class="o">*</span><span class="n">beta_l</span> <span class="o">*</span> <span class="n">denom</span>
+            <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">+</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span>
+            <span class="n">rP</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">-</span> <span class="n">K3_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
+            <span class="n">tP</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_u</span><span class="o">*</span><span class="n">hu</span><span class="o">*</span><span class="n">denom</span>
             <span class="n">rM</span> <span class="o">=</span> <span class="o">-</span><span class="n">rP</span>
-            <span class="n">tM</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3_l</span><span class="o">*</span><span class="n">beta_u</span> <span class="o">*</span> <span class="n">denom</span>
+            <span class="n">tM</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">rP</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">RT_k1_w: (AdjointMedium is True) and (normalisation=</span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="mi">72</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have defined the scattering coefficients of the &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;adjoint medium only for flux-normalisation.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
             
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rP&#39;</span><span class="p">:</span><span class="n">rP</span><span class="p">,</span><span class="s1">&#39;tP&#39;</span><span class="p">:</span><span class="n">tP</span><span class="p">,</span><span class="s1">&#39;rM&#39;</span><span class="p">:</span><span class="n">rM</span><span class="p">,</span><span class="s1">&#39;tM&#39;</span><span class="p">:</span><span class="n">tM</span><span class="p">,</span><span class="s1">&#39;rPa&#39;</span><span class="p">:</span><span class="n">rPa</span><span class="p">,</span><span class="s1">&#39;tPa&#39;</span><span class="p">:</span><span class="n">tPa</span><span class="p">,</span><span class="s1">&#39;rMa&#39;</span><span class="p">:</span><span class="n">rMa</span><span class="p">,</span><span class="s1">&#39;tMa&#39;</span><span class="p">:</span><span class="n">tMa</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
