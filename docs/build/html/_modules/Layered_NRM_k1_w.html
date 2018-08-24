@@ -693,6 +693,7 @@
 <span class="sd">        operator matrix :math:`\\rm{\\bf A}` in the wavenumber-frequency </span>
 <span class="sd">        domain.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
@@ -704,9 +705,10 @@
 <span class="sd">                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1`. </span>
 <span class="sd">                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1`.   </span>
 <span class="sd">                </span>
-<span class="sd">            All eigenvalue matrices are stored in a in a (nf,nr)-array. The </span>
-<span class="sd">            dimensions correspond to all combinations of frequencies </span>
-<span class="sd">            :math:`\omega` and horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">            All eigenvalue matrices are stored in a in a (nf,nr,n)-array. The </span>
+<span class="sd">            dimensions correspond to the temporal frequencies :math:`\omega`, </span>
+<span class="sd">            the horizontal-wavenumbers :math:`k_1` and to the layers of the </span>
+<span class="sd">            medium.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. todo::</span>
@@ -749,6 +751,10 @@
         <span class="n">Om</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
         <span class="n">K1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;K1gridfft&#39;</span><span class="p">]</span>
         
+        <span class="c1"># Eigenvalues for adjoint medium</span>
+        <span class="n">LPn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">LMn</span> <span class="o">=</span> <span class="kc">None</span>
+        
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             
             <span class="n">LP</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -783,9 +789,6 @@
                     
                     <span class="n">LPn</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">tmp1</span> <span class="o">+</span> <span class="n">tmp2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
                     <span class="n">LMn</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">tmp1</span> <span class="o">-</span> <span class="n">tmp2</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">LPn</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">LMn</span> <span class="o">=</span> <span class="kc">None</span>
                 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Eigenvalues_k1_w (ReciprocalMedium is False)&#39;</span><span class="p">)</span>
@@ -806,6 +809,7 @@
                       <span class="o">+</span><span class="s1">&#39;implemented.&#39;</span><span class="p">)</span>
         
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;LP&quot;</span><span class="p">:</span><span class="n">LP</span><span class="p">,</span><span class="s2">&quot;LM&quot;</span><span class="p">:</span><span class="n">LM</span><span class="p">,</span><span class="s2">&quot;LPn&quot;</span><span class="p">:</span><span class="n">LPn</span><span class="p">,</span><span class="s2">&quot;LMn&quot;</span><span class="p">:</span><span class="n">LMn</span><span class="p">}</span></div>
+    
     
 <div class="viewcode-block" id="Layered_NRM_k1_w.L_eigenvectors_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">L_eigenvectors_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">beta11</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta13</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">beta33</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                             <span class="n">K3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">):</span>
@@ -1361,35 +1365,49 @@
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rP&#39;</span><span class="p">:</span><span class="n">rP</span><span class="p">,</span><span class="s1">&#39;tP&#39;</span><span class="p">:</span><span class="n">tP</span><span class="p">,</span><span class="s1">&#39;rM&#39;</span><span class="p">:</span><span class="n">rM</span><span class="p">,</span><span class="s1">&#39;tM&#39;</span><span class="p">:</span><span class="n">tM</span><span class="p">,</span><span class="s1">&#39;rPa&#39;</span><span class="p">:</span><span class="n">rPa</span><span class="p">,</span><span class="s1">&#39;tPa&#39;</span><span class="p">:</span><span class="n">tPa</span><span class="p">,</span><span class="s1">&#39;rMa&#39;</span><span class="p">:</span><span class="n">rMa</span><span class="p">,</span><span class="s1">&#39;tMa&#39;</span><span class="p">:</span><span class="n">tMa</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
     
-<div class="viewcode-block" id="Layered_NRM_k1_w.W_propagators_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.W_propagators_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">W_propagators_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">K3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">g3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">dx3</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;computes the downgoing propagator &#39;wP&#39; and the upgoing progagator &#39;wM&#39; for all sampled vertical-wavenumbers &#39;K3&#39; and a vertical distance &#39;dx3&#39; (downward pointing :math:`x_3`-axis).</span>
+<div class="viewcode-block" id="Layered_NRM_k1_w.W_propagators_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.W_propagators_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">W_propagators_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">LP</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">LM</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">LPn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">LMn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">dx3</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the downgoing propagator &#39;wP&#39; and the upgoing progagator </span>
+<span class="sd">        &#39;wM&#39; for all sampled eigenvalues &#39;LP&#39; and &#39;LM&#39; and a vertical distance </span>
+<span class="sd">        &#39;dx3&#39; (downward pointing :math:`x_3`-axis).</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">    </span>
-<span class="sd">        K3 : numpy.ndarray</span>
-<span class="sd">            Vertical-wavenumber meshgrid :math:`k_3` for all frquencies :math:`\omega` and all horizontal-wavenumbers :math:`k_1`.</span>
-<span class="sd">        </span>
-<span class="sd">        K3n : inumpy.ndarray, optional (required if &#39;AdjointMedium=True&#39;)</span>
-<span class="sd">            Vertical-wavenumber meshgrid :math:`k_3` for all frquencies :math:`\omega` and all sign-inverted horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">        LP : numpy.ndarray</span>
+<span class="sd">            Eigenvalus :math:`\lambda^+` for all frquencies :math:`\omega` and </span>
+<span class="sd">            all horizontal-wavenumbers :math:`k_1`.</span>
 <span class="sd">            </span>
-<span class="sd">        g3 : int, float</span>
-<span class="sd">            Medium parameter :math:`\gamma_3`.</span>
+<span class="sd">        LM : numpy.ndarray</span>
+<span class="sd">            Eigenvalus :math:`\lambda^-` for all frquencies :math:`\omega` and </span>
+<span class="sd">            all horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">        </span>
+<span class="sd">        LPn : numpy.ndarray, optional (required if &#39;AdjointMedium=True&#39;)</span>
+<span class="sd">            Eigenvalus :math:`\lambda^+` for all frquencies :math:`\omega` and </span>
+<span class="sd">            all sign-inverted horizontal-wavenumbers :math:`k_1`.</span>
+<span class="sd">            </span>
+<span class="sd">        LMn : numpy.ndarray, optional (required if &#39;AdjointMedium=True&#39;)</span>
+<span class="sd">            Eigenvalus :math:`\lambda^-` for all frquencies :math:`\omega` and </span>
+<span class="sd">            all sign-inverted horizontal-wavenumbers :math:`k_1`.</span>
 <span class="sd">            </span>
 <span class="sd">        dx3 : int, float</span>
-<span class="sd">            Vertical propagation distance :math:`\Delta x_3` (downward pointing :math:`x_3`-axis).</span>
+<span class="sd">            Vertical propagation distance :math:`\Delta x_3` (downward </span>
+<span class="sd">            pointing :math:`x_3`-axis).</span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
 <span class="sd">        dict</span>
 <span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
 <span class="sd">                - **wP**: Downward propagator :math:`\\tilde{w}^+`.</span>
 <span class="sd">                - **wM**: Upward propagator :math:`\\tilde{w}^-`.</span>
 <span class="sd">                - **wPa**: Downward propagator :math:`\\tilde{w}^{+(a)}` (adjoint medium). </span>
 <span class="sd">                - **wMa**: Upward propagator :math:`\\tilde{w}^{-(a)}` (adjoint medium). </span>
-<span class="sd">            All propagators are stored in an arrays of shape (nf,nr). The variables &#39;wPa&#39; and &#39;wMa&#39; are computed for the setting &#39;AdjointMedium=True&#39;.</span>
+<span class="sd">                </span>
+<span class="sd">            All propagators are stored in an arrays of shape (nf,nr). The </span>
+<span class="sd">            variables &#39;wPa&#39; and &#39;wMa&#39; are computed only for the setting </span>
+<span class="sd">            &#39;AdjointMedium=True&#39;.</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        .. todo::</span>
@@ -1397,7 +1415,7 @@
 <span class="sd">            In a non-reciprocal medium, for a complex-valued frequency </span>
 <span class="sd">            :math:`\omega&#39;=\omega+\mathrm{j}\epsilon` one of the propagators </span>
 <span class="sd">            has an exponentially growing term. Does that cause errors? If yes, </span>
-<span class="sd">            can wefix that manually?</span>
+<span class="sd">            can we fix that manually? (still the case?)</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        References</span>
@@ -1408,6 +1426,7 @@
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 <span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; TO BE UPDATED</span>
 <span class="sd">        &gt;&gt;&gt; from Layered_NRM_k1_w import Layered_NRM_k1_w as LM</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
 <span class="sd">        </span>
@@ -1433,45 +1452,49 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="c1"># Check if required input variables are given</span>
-        <span class="k">if</span> <span class="p">(</span>    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">K3</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span> 
-             <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">g3</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">dx3</span><span class="p">))</span> <span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;W_propagators_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">g3</span><span class="se">\&#39;</span><span class="s1"> and  &#39;</span><span class="o">+</span>
-                     <span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">dx3</span><span class="se">\&#39;</span><span class="s1"> must be scalars. The input variable </span><span class="se">\&#39;</span><span class="s1">K3</span><span class="se">\&#39;</span><span class="s1"> must&#39;</span><span class="o">+</span>
-                     <span class="s1">&#39; have the shape (nf,nr)=(</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">).&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+        <span class="k">if</span> <span class="p">(</span>    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LP</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span> 
+             <span class="ow">or</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LM</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">dx3</span><span class="p">))</span> <span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;W_propagators_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">LP</span><span class="se">\&#39;</span><span class="s1"> and  &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">LM</span><span class="se">\&#39;</span><span class="s1"> must have the shape (nf,nr)=(</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">). The input &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">dx3</span><span class="se">\&#39;</span><span class="s1"> be a scalar.&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
             
-        <span class="c1"># If AdjointMedium=True it is required to set K3n=K3(-k1)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">K3n</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">)):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;W_propagators_k1_w: If </span><span class="se">\&#39;</span><span class="s1">AdjointMedium=True</span><span class="se">\&#39;</span><span class="s1"> the input&#39;</span><span class="o">+</span>
-                     <span class="s1">&#39;variable </span><span class="se">\&#39;</span><span class="s1">K3n</span><span class="se">\&#39;</span><span class="s1"> must be given, and it must have the &#39;</span><span class="o">+</span>
-                      <span class="s1">&#39;shape (nf,nr)=(</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">).&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+        <span class="c1"># If AdjointMedium=True it is required to set LPn=LP(-k1) and LMn=LM(-k1)</span>
+        <span class="k">if</span> <span class="p">(</span>    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> 
+            <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LPn</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">LMn</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span> <span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;W_propagators_k1_w: If </span><span class="se">\&#39;</span><span class="s1">AdjointMedium=True</span><span class="se">\&#39;</span><span class="s1"> the input&#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;variables </span><span class="se">\&#39;</span><span class="s1">LPn</span><span class="se">\&#39;</span><span class="s1"> and </span><span class="se">\&#39;</span><span class="s1">LMn</span><span class="se">\&#39;</span><span class="s1"> must be given, and it &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;must have the shape (nf,nr)=(</span><span class="si">%d</span><span class="s1">,</span><span class="si">%d</span><span class="s1">).&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+        
+        <span class="c1"># Propagators in the adjoint medium</span>
+        <span class="n">wPa</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">wMa</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            
-            <span class="n">wP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">K3</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
-            <span class="n">wM</span> <span class="o">=</span> <span class="n">wP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">wPa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">K3n</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
-                <span class="n">wMa</span> <span class="o">=</span> <span class="n">wPa</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span> 
-                <span class="n">wPa</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">wMa</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1">#####################</span>
+            <span class="c1"># NOT YET IMPLEMENTED</span>
+            <span class="c1">#####################</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">W_propagators_k1_w (ReciprocalMedium is True)&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;-----------------------------------------------&#39;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the propagators are not yet &#39;</span>
+                      <span class="o">+</span><span class="s1">&#39;implemented.&#39;</span><span class="p">)</span>
+<span class="c1">#            wP = np.exp(1j*K3*dx3)</span>
+<span class="c1">#            wM = wP.copy()</span>
+<span class="c1">#            </span>
+<span class="c1">#            if self.AdjointMedium is True:</span>
+<span class="c1">#                wPa = np.exp(1j*K3n*dx3)</span>
+<span class="c1">#                wMa = wPa.copy()                </span>
         
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
             
-            <span class="c1"># Frequency meshgrid</span>
-            <span class="n">Om</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
-            
-            <span class="n">wP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">K3</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3</span><span class="p">)</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
-            <span class="n">wM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">K3</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3</span><span class="p">)</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
+            <span class="n">wP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">LP</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
+            <span class="n">wM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">LM</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
         
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">wPa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">K3n</span><span class="o">-</span><span class="n">Om</span><span class="o">*</span><span class="n">g3</span><span class="p">)</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
-                <span class="n">wMa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="p">(</span><span class="n">K3n</span><span class="o">+</span><span class="n">Om</span><span class="o">*</span><span class="n">g3</span><span class="p">)</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span> 
-                <span class="n">wPa</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">wMa</span> <span class="o">=</span> <span class="kc">None</span>
-                
+                <span class="n">wPa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">LMn</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
+                <span class="n">wMa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">LPn</span><span class="o">*</span><span class="n">dx3</span><span class="p">)</span>
+           
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;wP&#39;</span><span class="p">:</span><span class="n">wP</span><span class="p">,</span><span class="s1">&#39;wM&#39;</span><span class="p">:</span><span class="n">wM</span><span class="p">,</span><span class="s1">&#39;wPa&#39;</span><span class="p">:</span><span class="n">wPa</span><span class="p">,</span><span class="s1">&#39;wMa&#39;</span><span class="p">:</span><span class="n">wMa</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
     

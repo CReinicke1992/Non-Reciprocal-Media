@@ -596,9 +596,10 @@ domain.</p>
 <li><strong>LMn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{-}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</li>
 </ul>
 </div></blockquote>
-<p>All eigenvalue matrices are stored in a in a (nf,nr)-array. The 
-dimensions correspond to all combinations of frequencies 
-<span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+<p>All eigenvalue matrices are stored in a in a (nf,nr,n)-array. The 
+dimensions correspond to the temporal frequencies <span class="math notranslate">\(\omega\)</span>, 
+the horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> and to the layers of the 
+medium.</p>
 </div></blockquote>
 <div class="admonition-todo last admonition" id="index-1">
 <p class="first admonition-title">Todo</p>
@@ -898,50 +899,62 @@ computation of the scattering coefficients. I have fixed that, however, I believ
 
 <dl class="method">
 <dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.W_propagators_k1_w">
-<code class="descname">W_propagators_k1_w</code><span class="sig-paren">(</span><em>K3=None</em>, <em>K3n=None</em>, <em>g3=None</em>, <em>dx3=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.W_propagators_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.W_propagators_k1_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>computes the downgoing propagator ‘wP’ and the upgoing progagator ‘wM’ for all sampled vertical-wavenumbers ‘K3’ and a vertical distance ‘dx3’ (downward pointing <span class="math notranslate">\(x_3\)</span>-axis).</p>
+<code class="descname">W_propagators_k1_w</code><span class="sig-paren">(</span><em>LP=None</em>, <em>LM=None</em>, <em>LPn=None</em>, <em>LMn=None</em>, <em>dx3=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.W_propagators_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.W_propagators_k1_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the downgoing propagator ‘wP’ and the upgoing progagator 
+‘wM’ for all sampled eigenvalues ‘LP’ and ‘LM’ and a vertical distance 
+‘dx3’ (downward pointing <span class="math notranslate">\(x_3\)</span>-axis).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>K3</strong> : numpy.ndarray</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>LP</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Vertical-wavenumber meshgrid <span class="math notranslate">\(k_3\)</span> for all frquencies <span class="math notranslate">\(\omega\)</span> and all horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+<div><p>Eigenvalus <span class="math notranslate">\(\lambda^+\)</span> for all frquencies <span class="math notranslate">\(\omega\)</span> and 
+all horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
 </div></blockquote>
-<p><strong>K3n</strong> : inumpy.ndarray, optional (required if ‘AdjointMedium=True’)</p>
+<p><strong>LM</strong> : numpy.ndarray</p>
 <blockquote>
-<div><p>Vertical-wavenumber meshgrid <span class="math notranslate">\(k_3\)</span> for all frquencies <span class="math notranslate">\(\omega\)</span> and all sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+<div><p>Eigenvalus <span class="math notranslate">\(\lambda^-\)</span> for all frquencies <span class="math notranslate">\(\omega\)</span> and 
+all horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
 </div></blockquote>
-<p><strong>g3</strong> : int, float</p>
+<p><strong>LPn</strong> : numpy.ndarray, optional (required if ‘AdjointMedium=True’)</p>
 <blockquote>
-<div><p>Medium parameter <span class="math notranslate">\(\gamma_3\)</span>.</p>
+<div><p>Eigenvalus <span class="math notranslate">\(\lambda^+\)</span> for all frquencies <span class="math notranslate">\(\omega\)</span> and 
+all sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
+</div></blockquote>
+<p><strong>LMn</strong> : numpy.ndarray, optional (required if ‘AdjointMedium=True’)</p>
+<blockquote>
+<div><p>Eigenvalus <span class="math notranslate">\(\lambda^-\)</span> for all frquencies <span class="math notranslate">\(\omega\)</span> and 
+all sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</p>
 </div></blockquote>
 <p><strong>dx3</strong> : int, float</p>
 <blockquote>
-<div><p>Vertical propagation distance <span class="math notranslate">\(\Delta x_3\)</span> (downward pointing <span class="math notranslate">\(x_3\)</span>-axis).</p>
+<div><p>Vertical propagation distance <span class="math notranslate">\(\Delta x_3\)</span> (downward 
+pointing <span class="math notranslate">\(x_3\)</span>-axis).</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>Dictionary that contains </dt>
-<dd><ul class="first last simple">
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
 <li><strong>wP</strong>: Downward propagator <span class="math notranslate">\(\tilde{w}^+\)</span>.</li>
 <li><strong>wM</strong>: Upward propagator <span class="math notranslate">\(\tilde{w}^-\)</span>.</li>
 <li><strong>wPa</strong>: Downward propagator <span class="math notranslate">\(\tilde{w}^{+(a)}\)</span> (adjoint medium).</li>
 <li><strong>wMa</strong>: Upward propagator <span class="math notranslate">\(\tilde{w}^{-(a)}\)</span> (adjoint medium).</li>
 </ul>
-</dd>
-</dl>
-<p>All propagators are stored in an arrays of shape (nf,nr). The variables ‘wPa’ and ‘wMa’ are computed for the setting ‘AdjointMedium=True’.</p>
+</div></blockquote>
+<p>All propagators are stored in an arrays of shape (nf,nr). The 
+variables ‘wPa’ and ‘wMa’ are computed only for the setting 
+‘AdjointMedium=True’.</p>
 </div></blockquote>
 <div class="admonition-todo last admonition" id="index-3">
 <p class="first admonition-title">Todo</p>
 <p class="last">In a non-reciprocal medium, for a complex-valued frequency 
 <span class="math notranslate">\(\omega'=\omega+\mathrm{j}\epsilon\)</span> one of the propagators 
 has an exponentially growing term. Does that cause errors? If yes, 
-can wefix that manually?</p>
+can we fix that manually? (still the case?)</p>
 </div>
 </td>
 </tr>
@@ -950,7 +963,8 @@ can wefix that manually?</p>
 <p class="rubric">References</p>
 <p>Kees document as soon as it is published.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_k1_w</span> <span class="k">import</span> <span class="n">Layered_NRM_k1_w</span> <span class="k">as</span> <span class="n">LM</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TO</span> <span class="n">BE</span> <span class="n">UPDATED</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_k1_w</span> <span class="k">import</span> <span class="n">Layered_NRM_k1_w</span> <span class="k">as</span> <span class="n">LM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 </pre></div>
 </div>

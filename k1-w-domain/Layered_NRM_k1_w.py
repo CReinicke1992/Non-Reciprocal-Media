@@ -638,6 +638,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         operator matrix :math:`\\rm{\\bf A}` in the wavenumber-frequency 
         domain.
         
+        
         Returns
         -------
     
@@ -649,9 +650,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1`. 
                 - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1`.   
                 
-            All eigenvalue matrices are stored in a in a (nf,nr)-array. The 
-            dimensions correspond to all combinations of frequencies 
-            :math:`\omega` and horizontal-wavenumbers :math:`k_1`.
+            All eigenvalue matrices are stored in a in a (nf,nr,n)-array. The 
+            dimensions correspond to the temporal frequencies :math:`\omega`, 
+            the horizontal-wavenumbers :math:`k_1` and to the layers of the 
+            medium.
         
         
         .. todo::
@@ -694,6 +696,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         Om = self.W_K1_grid()['Wgrid']
         K1 = self.W_K1_grid()['K1gridfft']
         
+        # Eigenvalues for adjoint medium
+        LPn = None
+        LMn = None
+        
         if self.ReciprocalMedium is False:
             
             LP  = np.zeros((self.nf,self.nr,self.x3vec.size),dtype=complex)
@@ -728,9 +734,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                     
                     LPn[:,:,layer] = 1j*(tmp1 + tmp2) / self.b11vec[layer]
                     LMn[:,:,layer] = 1j*(tmp1 - tmp2) / self.b11vec[layer]
-            else:
-                LPn = None
-                LMn = None
                 
             if self.verbose is True:
                 print('\nEigenvalues_k1_w (ReciprocalMedium is False)')
@@ -751,6 +754,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                       +'implemented.')
         
         return {"LP":LP,"LM":LM,"LPn":LPn,"LMn":LMn}
+    
     
     def L_eigenvectors_k1_w(self,beta11=None,beta13=None,beta33=None,
                             K3=None,K3n=None,normalisation='flux'):
@@ -1306,35 +1310,49 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         out = {'rP':rP,'tP':tP,'rM':rM,'tM':tM,'rPa':rPa,'tPa':tPa,'rMa':rMa,'tMa':tMa}
         return out
     
-    def W_propagators_k1_w(self,K3=None,K3n=None,g3=None,dx3=None):
-        """computes the downgoing propagator 'wP' and the upgoing progagator 'wM' for all sampled vertical-wavenumbers 'K3' and a vertical distance 'dx3' (downward pointing :math:`x_3`-axis).
+    def W_propagators_k1_w(self,LP=None,LM=None,LPn=None,LMn=None,dx3=None):
+        """computes the downgoing propagator 'wP' and the upgoing progagator 
+        'wM' for all sampled eigenvalues 'LP' and 'LM' and a vertical distance 
+        'dx3' (downward pointing :math:`x_3`-axis).
         
         
         Parameters
         ----------
     
-        K3 : numpy.ndarray
-            Vertical-wavenumber meshgrid :math:`k_3` for all frquencies :math:`\omega` and all horizontal-wavenumbers :math:`k_1`.
-        
-        K3n : inumpy.ndarray, optional (required if 'AdjointMedium=True')
-            Vertical-wavenumber meshgrid :math:`k_3` for all frquencies :math:`\omega` and all sign-inverted horizontal-wavenumbers :math:`k_1`.
+        LP : numpy.ndarray
+            Eigenvalus :math:`\lambda^+` for all frquencies :math:`\omega` and 
+            all horizontal-wavenumbers :math:`k_1`.
             
-        g3 : int, float
-            Medium parameter :math:`\gamma_3`.
+        LM : numpy.ndarray
+            Eigenvalus :math:`\lambda^-` for all frquencies :math:`\omega` and 
+            all horizontal-wavenumbers :math:`k_1`.
+        
+        LPn : numpy.ndarray, optional (required if 'AdjointMedium=True')
+            Eigenvalus :math:`\lambda^+` for all frquencies :math:`\omega` and 
+            all sign-inverted horizontal-wavenumbers :math:`k_1`.
+            
+        LMn : numpy.ndarray, optional (required if 'AdjointMedium=True')
+            Eigenvalus :math:`\lambda^-` for all frquencies :math:`\omega` and 
+            all sign-inverted horizontal-wavenumbers :math:`k_1`.
             
         dx3 : int, float
-            Vertical propagation distance :math:`\Delta x_3` (downward pointing :math:`x_3`-axis).
+            Vertical propagation distance :math:`\Delta x_3` (downward 
+            pointing :math:`x_3`-axis).
             
         Returns
         -------
     
         dict
             Dictionary that contains 
+            
                 - **wP**: Downward propagator :math:`\\tilde{w}^+`.
                 - **wM**: Upward propagator :math:`\\tilde{w}^-`.
                 - **wPa**: Downward propagator :math:`\\tilde{w}^{+(a)}` (adjoint medium). 
                 - **wMa**: Upward propagator :math:`\\tilde{w}^{-(a)}` (adjoint medium). 
-            All propagators are stored in an arrays of shape (nf,nr). The variables 'wPa' and 'wMa' are computed for the setting 'AdjointMedium=True'.
+                
+            All propagators are stored in an arrays of shape (nf,nr). The 
+            variables 'wPa' and 'wMa' are computed only for the setting 
+            'AdjointMedium=True'.
         
         
         .. todo::
@@ -1342,7 +1360,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             In a non-reciprocal medium, for a complex-valued frequency 
             :math:`\omega'=\omega+\mathrm{j}\epsilon` one of the propagators 
             has an exponentially growing term. Does that cause errors? If yes, 
-            can wefix that manually?
+            can we fix that manually? (still the case?)
         
         
         References
@@ -1353,6 +1371,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         Examples
         --------
         
+        >>> TO BE UPDATED
         >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
         >>> import numpy as np
         
@@ -1378,45 +1397,49 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         """
         
         # Check if required input variables are given
-        if (    (np.shape(K3) != (self.nf,self.nr)) 
-             or (not np.isscalar(g3)) or (not np.isscalar(dx3)) ):
-            sys.exit('W_propagators_k1_w: The input variables \'g3\' and  '+
-                     '\'dx3\' must be scalars. The input variable \'K3\' must'+
-                     ' have the shape (nf,nr)=(%d,%d).'%(self.nf,self.nr))
+        if (    (np.shape(LP) != (self.nf,self.nr)) 
+             or (np.shape(LM) != (self.nf,self.nr)) or (not np.isscalar(dx3)) ):
+            sys.exit('W_propagators_k1_w: The input variables \'LP\' and  '
+                     +'\'LM\' must have the shape (nf,nr)=(%d,%d). The input '
+                     +'\'dx3\' be a scalar.'%(self.nf,self.nr))
             
-        # If AdjointMedium=True it is required to set K3n=K3(-k1)
-        if (self.AdjointMedium is True) and (np.shape(K3n) != (self.nf,self.nr)):
-            sys.exit('W_propagators_k1_w: If \'AdjointMedium=True\' the input'+
-                     'variable \'K3n\' must be given, and it must have the '+
-                      'shape (nf,nr)=(%d,%d).'%(self.nf,self.nr))
+        # If AdjointMedium=True it is required to set LPn=LP(-k1) and LMn=LM(-k1)
+        if (    (self.AdjointMedium is True) 
+            and (np.shape(LPn) != (self.nf,self.nr))
+            and (np.shape(LMn) != (self.nf,self.nr)) ):
+            sys.exit('W_propagators_k1_w: If \'AdjointMedium=True\' the input'
+                     +'variables \'LPn\' and \'LMn\' must be given, and it '
+                     +'must have the shape (nf,nr)=(%d,%d).'%(self.nf,self.nr))
+        
+        # Propagators in the adjoint medium
+        wPa = None
+        wMa = None
         
         if self.ReciprocalMedium is True:
-            
-            wP = np.exp(1j*K3*dx3)
-            wM = wP.copy()
-            
-            if self.AdjointMedium is True:
-                wPa = np.exp(1j*K3n*dx3)
-                wMa = wPa.copy()
-            else: 
-                wPa = None
-                wMa = None
+            #####################
+            # NOT YET IMPLEMENTED
+            #####################
+            if self.verbose is True:
+                print('\nW_propagators_k1_w (ReciprocalMedium is True)')
+                print('-----------------------------------------------')
+                print('For reciprocal media, the propagators are not yet '
+                      +'implemented.')
+#            wP = np.exp(1j*K3*dx3)
+#            wM = wP.copy()
+#            
+#            if self.AdjointMedium is True:
+#                wPa = np.exp(1j*K3n*dx3)
+#                wMa = wPa.copy()                
         
         elif self.ReciprocalMedium is False:
             
-            # Frequency meshgrid
-            Om = self.W_K1_grid()['Wgrid']
-            
-            wP = np.exp(1j*(K3+Om*g3)*dx3)
-            wM = np.exp(1j*(K3-Om*g3)*dx3)
+            wP = np.exp(-LP*dx3)
+            wM = np.exp(LM*dx3)
         
             if self.AdjointMedium is True:
-                wPa = np.exp(1j*(K3n-Om*g3)*dx3)
-                wMa = np.exp(1j*(K3n+Om*g3)*dx3)
-            else: 
-                wPa = None
-                wMa = None
-                
+                wPa = np.exp(LMn*dx3)
+                wMa = np.exp(-LPn*dx3)
+           
         out = {'wP':wP,'wM':wM,'wPa':wPa,'wMa':wMa}
         return out
     
