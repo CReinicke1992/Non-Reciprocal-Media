@@ -57,7 +57,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             \int F(\omega + \mathrm{j} \epsilon) \; 
             \mathrm{e}^{\mathrm{j} (\omega + \mathrm{j} \epsilon) t} 
             \mathrm{d}\omega`.
-        Recommended value eps = :math:`\\frac{3 nf}{dt}`.
+        Recommended value eps = :math:`\\frac{3}{n_f dt}`.
         
     x3vec : numpy.ndarray
         Vertical spatial vector :math:`x_3`, for n layers 'x3vec' must have the 
@@ -177,24 +177,30 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     -----
     
     - We format the data as described below.
+    
         - Wavefields are saved in an array of dimensions (nf,nr) in the frequency domain and (nt,nr) in the time domain.
         - Wavefields are in the :math:`k_1`-:math:`\omega` domain.
+        
             - The zero frequency component is placed at the first index position of the first dimension.
             - The zero horizontal-wavenumber component is placed at the first index position of the second dimension.
+        
         - If the wavefield is transformed to the space-time domain: 
+            
             - The zero time component is placed at the first index position of the first dimension, followed by nt/2-1 positive time samples and nt/2 negative time samples. 
             - The zero offset component is placed at the first index position of the second dimension, followed by nr/2-1 positive offset samples and nr/2 negative offset samples.
-        - For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,
+            
+    - For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,
         
         \t:math:`k_3=-j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)  \omega^2}`.
         
-        - By default, **NumPy** makes the oppostie sign choice, 
+    - By default, **NumPy** makes the oppostie sign choice, 
         
         \t:math:`k_3=+j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)\omega^2}`.
         
-        - For convenience, we stick to **NumPy**'s sign choice. Thus, we will also adapt the sign choice for the propagators,
-              - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\pm \lambda^{\pm} \Delta x_3)`.
-              - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\mp \lambda^{\pm} \Delta x_3)`.
+    - For convenience, we stick to **NumPy**'s sign choice. Thus, we will also adapt the sign choice for the propagators,
+        
+        - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\pm \lambda^{\pm} \Delta x_3)`.
+        - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\mp \lambda^{\pm} \Delta x_3)`.
         
     References
     ----------
@@ -667,7 +673,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         Notes
         -----
-            - The eigenvalues are associated with non-reciprocal media.
+            
+        - The eigenvalues are associated with non-reciprocal media.
+        - We keep the sign-convention by Kees for the eigenvalues,
+        
+        :math:`\lambda^{\pm} = -j\omega \left(\gamma_3 + a_0 (\gamma_1-p_1)
+        \pm \\sqrt{b_0b_1}p_3\\right)`.
+            
         
         References
         ----------
@@ -688,7 +700,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         >>> Lam = F.Eigenvalues_k1_w()
         >>> lP = Lam["LP"]
         >>> lP[1,0,0]  # Evaluate for k1=0 and \omega = \Delta \omega
-        0.0006226976760655292j
+        -0.0006226976760655292j
         
         """
         
@@ -715,8 +727,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                                  - self.b13vec[layer]**2 ) 
                         *self.K3[:,:,layer]*np.sign(self.b11vec[layer]) )
                 
-                LP[:,:,layer] = 1j*(tmp1 + tmp2) / self.b11vec[layer]
-                LM[:,:,layer] = 1j*(tmp1 - tmp2) / self.b11vec[layer]
+                LP[:,:,layer] = -1j*(tmp1 + tmp2) / self.b11vec[layer]
+                LM[:,:,layer] = -1j*(tmp1 - tmp2) / self.b11vec[layer]
                     
             if self.AdjointMedium is True:
                 LPn = LP.copy()
@@ -732,8 +744,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                                      - self.b13vec[layer]**2 ) 
                             *self.K3n[:,:,layer]*np.sign(self.b11vec[layer]) )
                     
-                    LPn[:,:,layer] = 1j*(tmp1 + tmp2) / self.b11vec[layer]
-                    LMn[:,:,layer] = 1j*(tmp1 - tmp2) / self.b11vec[layer]
+                    LPn[:,:,layer] = -1j*(tmp1 + tmp2) / self.b11vec[layer]
+                    LMn[:,:,layer] = -1j*(tmp1 - tmp2) / self.b11vec[layer]
                 
             if self.verbose is True:
                 print('\nEigenvalues_k1_w (ReciprocalMedium is False)')
@@ -813,7 +825,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         - The eigenvector matrix 'L' and its inverse 'Linv' are different for reciprocal and non-reciprocal media (I assume that has not changed, but check it!).
         - For reciprocal media, the eigenvectors of the adjoint medium are identical to the eigenvectors of the true medium (verify!).
         - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.
-        - At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \'L\' and their inverse \'Linv\' contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.
+        - If the frequency :math:`\omega` is real-valued ('eps'=0): At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \'L\' and their inverse \'Linv\' contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.
         
         References
         ----------
@@ -881,12 +893,16 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         Lainv = None
         
         # Construct a vertical ray-parameter
-        # Exclude poles at zero-frequency
-        Om           = self.W_K1_grid()['Wgrid']
-        P3           = K3.copy()
-        P3[1:,:]     = K3[1:,:]/Om[1:,:]
-        P3[0,:]      = 0
+        Om = self.W_K1_grid()['Wgrid']
+        P3 = K3.copy()
         
+        # Exclude poles at zero-frequency if omega is real-valued
+        if (self.eps is None) or (self.eps == 0):
+            P3[1:,:] = K3[1:,:]/Om[1:,:]
+            P3[0,:]  = 0
+        else:
+            P3 = K3/Om
+            
         # Construct an inverse vertical ray-parameter
         # Exclude pole at zero frequency and zero horizontal-wavenumber
         # K3[0,0] = 0
@@ -982,19 +998,28 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                     
                 # Construct a vertical ray-parameter  for sign-inverted 
                 # horizontal-wavenumbers
-                # Exclude poles at zero-frequency
-                Om           = self.W_K1_grid()['Wgrid']
-                P3n           = K3n.copy()
-                P3n[1:,:]     = K3n[1:,:]/Om[1:,:]
-                P3n[0,:]      = 0
+                Om  = self.W_K1_grid()['Wgrid']
+                P3n = K3n.copy()
                 
+                # Exclude poles at zero-frequency if omega is real-valued
+                if (self.eps is None) or (self.eps == 0):
+                    P3n[1:,:] = K3n[1:,:]/Om[1:,:]
+                    P3n[0,:]  = 0
+                else:
+                    P3n = K3n/Om
+                    
                 # Construct an inverse vertical ray-parameter  for sign-inverted 
                 # horizontal-wavenumbers
                 # Exclude pole at zero frequency and zero horizontal-wavenumber
                 # K3[0,0] = 0
                 # P3[0,:] = 0
                 P3ninv = P3n.copy()
-                P3ninv[1:,:] = Om[1:,:]/K3n[1:,:]
+                
+                # Exclude poles at zero-frequency if omega is real-valued
+                if (self.eps is None) or (self.eps == 0):
+                    P3ninv[1:,:] = Om[1:,:]/K3n[1:,:]
+                else:
+                    P3ninv = Om/K3n
                 
                 # L matrix (adjoint medium) = N Transpose( Inverse( L(-k1) )) N
                 La = np.zeros((self.nf,self.nr,2,2),dtype=complex)
@@ -1117,7 +1142,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         .. todo::
             
             (1) For :math:`(k_1 , \omega) = (0,0)` there is a zero division in the 
-            computation of the scattering coefficients. I have fixed that, however, I believe that the fix is (mathmatically) wrong. Check that!
+            computation of the scattering coefficients. I have fixed that, however, I believe that the fix is (mathmatically) wrong. Check that! If the frequency is complex-valued, :math:`\omega'=\omega+j\epsilon`, the zero division is omitted and there is no manual fix.
         
         
         Notes
@@ -1209,10 +1234,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         # such that there is no division by zero, and such that the resulting
         # scattering coefficients are correct
         # The (w,k1)=(0,0) element of K3 is actually a ray-parameter P3
-        K3_u[0,0]  = K3_u[1,0]/self.Dw()
-        K3_l[0,0]  = K3_l[1,0]/self.Dw()
-        K3n_u[0,0] = K3n_u[1,0]/self.Dw()
-        K3n_l[0,0] = K3n_l[1,0]/self.Dw()
+        if (self.eps is None) or (self.eps == 0):
+            K3_u[0,0]  = K3_u[1,0]/self.Dw()
+            K3_l[0,0]  = K3_l[1,0]/self.Dw()
+            K3n_u[0,0] = K3n_u[1,0]/self.Dw()
+            K3n_l[0,0] = K3n_l[1,0]/self.Dw()
         
         hu = 1/np.sqrt( beta11_u*beta33_u-beta13_u*beta13_u )
         hl = 1/np.sqrt( beta11_l*beta33_l-beta13_l*beta13_l )
@@ -1337,7 +1363,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             
         dx3 : int, float
             Vertical propagation distance :math:`\Delta x_3` (downward 
-            pointing :math:`x_3`-axis).
+            pointing :math:`x_3`-axis). The variable 'dx3' should be greater 
+            than, or equal to zero.
             
         Returns
         -------
@@ -1362,54 +1389,86 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             has an exponentially growing term. Does that cause errors? If yes, 
             can we fix that manually? (still the case?)
         
+        Notes
+        -----
+        
+        - For evanescent waves, Kees makes a sign choice for the vertical-wavenumber,
+        
+        \t:math:`k_3=-j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)  \omega^2}`.
+        
+        - By default, **NumPy** makes the oppostie sign choice, 
+        
+        \t:math:`k_3=+j \sqrt{ k_1^2 - 2\gamma_1 k_1 \omega - (\\alpha \\beta_{11} -\gamma_1^2)\omega^2}`.
+        
+        - For convenience, we stick to **NumPy**'s sign choice. Thus, we will also adapt the sign choice for the propagators,
+        
+            - Kees chose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\pm \lambda^{\pm} \Delta x_3)`.
+            - We choose: :math:`\\tilde{w}^{\pm} = \mathrm{exp}(\mp \lambda^{\pm} \Delta x_3)`. 
+        
         
         References
         ----------
+        
         Kees document as soon as it is published.
 
 
         Examples
         --------
         
-        >>> TO BE UPDATED
         >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
         >>> import numpy as np
         
         >>> # Initialise a wavefield
         >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=12.5,x3vec=np.array([1.1,2.2,3.7]),
-        >>>      avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
-        >>>      g1vec=1j*np.array([0.8,2,1.3])*1e-4,
-        >>>      g3vec=1j*np.array([1.8,0.7,2.3])*1e-4,
-        >>>      ReciprocalMedium=True,AdjointMedium=True)
+        >>>      avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>      b13vec=np.array([0.4,2.4,1.2])*1e-4,b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>      g1vec=np.array([0.8,2,1.3])*1e-4,g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>      ReciprocalMedium=False,AdjointMedium=True)
 
+        >>> # Compute eigenvalues in layer 0
+        >>> Eig = F.Eigenvalues_k1_w()
+        >>> LP=Eig["LP"][:,:,0]
+        >>> LM=Eig["LM"][:,:,0]
+        >>> LPn=Eig["LPn"][:,:,0]
+        >>> LMn=Eig["LMn"][:,:,0]
+        
         >>> # Compute the propagators of the first layer
-        >>> Prop = F.W_propagators_k1_w(K3=F.K3[:,:,0],K3n=F.K3n[:,:,0],
-        >>>                             g3=F.g3vec[0],dx3=F.x3vec[0])
-
-        >>> wP = Prop['wP']
-        >>> wM = Prop['wM']
+        >>> Prop = F.W_propagators_k1_w(LP=LP[:,:,0],LPn=LPn[:,:,0],
+                                        LM=LM[:,:,0],LMn=LMn[:,:,0],
+                                        dx3=F.x3vec[0])
+        >>> wP = np.fft.fftshift(Prop['wP'],axes=1)
+        >>> wM = np.fft.fftshift(Prop['wM'],axes=1)
+        >>> wPa = np.fft.fftshift(Prop['wPa'],axes=1)
+        >>> wMa = np.fft.fftshift(Prop['wMa'],axes=1)
+        >>> # We plot the resulting propagators below.
         
-        >>> # In reciprocal media the down- and upgoing propagators are identical
-        >>> np.linalg.norm(wP-wM)
-        0.0
         
+        .. image:: ../pictures/cropped/Propagators.png
+           :width: 200px
+           :height: 200px
        
+        
         """
         
         # Check if required input variables are given
         if (    (np.shape(LP) != (self.nf,self.nr)) 
-             or (np.shape(LM) != (self.nf,self.nr)) or (not np.isscalar(dx3)) ):
+             or (np.shape(LM) != (self.nf,self.nr)) ):
             sys.exit('W_propagators_k1_w: The input variables \'LP\' and  '
-                     +'\'LM\' must have the shape (nf,nr)=(%d,%d). The input '
-                     +'\'dx3\' be a scalar.'%(self.nf,self.nr))
+                     +'\'LM\' must be given and must have the shape (nf,nr).')
+            
+        # Check if dx3 is a scalar
+        if ( (not np.isscalar(dx3)) or (not isinstance(dx3,float))
+            or (not isinstance(dx3,float)) ):
+            sys.exit('The input variable \'dx3\' must be given and must be a '
+                     +'scalar.')
             
         # If AdjointMedium=True it is required to set LPn=LP(-k1) and LMn=LM(-k1)
         if (    (self.AdjointMedium is True) 
             and (np.shape(LPn) != (self.nf,self.nr))
             and (np.shape(LMn) != (self.nf,self.nr)) ):
-            sys.exit('W_propagators_k1_w: If \'AdjointMedium=True\' the input'
-                     +'variables \'LPn\' and \'LMn\' must be given, and it '
-                     +'must have the shape (nf,nr)=(%d,%d).'%(self.nf,self.nr))
+            sys.exit('W_propagators_k1_w: If \'AdjointMedium=True\' the input '
+                     +'variables \'LPn\' and \'LMn\' must be given, and they '
+                     +'must have the shape (nf,nr).')
         
         # Propagators in the adjoint medium
         wPa = None
@@ -1494,7 +1553,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         return
             
     
-    def RT_response_k1_w(self,x3vec=None,avec=None,bvec=None,g1vec=None,g3vec=None,
+    def RT_response_k1_w(self,x3vec=None,avec=None,b11vec=None,b13vec=None,
+                         b33vec=None,g1vec=None,g3vec=None,
                          normalisation='flux',InternalMultiples=True):
         """computes the reflection and transmission responses from above and 
         from below. The medium parameters defined in **Layered_NRM_k1_w** are 
@@ -1521,9 +1581,17 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             Medium parameter :math:`\\alpha` (real-valued), for n layers 'avec' 
             must have the shape (n,).
             
-        bvec : numpy.ndarray, optional
-            Medium parameter :math:`\\beta` (real-valued), for n layers 'bvec' 
-            must have the shape (n,).
+        b11vec : numpy.ndarray, optional
+            Medium parameter :math:`\\beta_{11}` (real-valued), for n layers 
+            'b11vec' must have the shape (n,).
+            
+        b13vec : numpy.ndarray, optional
+            Medium parameter :math:`\\beta_{13}` (real-valued), for n layers 
+            'b11vec' must have the shape (n,).
+            
+        b33vec : numpy.ndarray, optional
+            Medium parameter :math:`\\beta_{33}` (real-valued), for n layers 
+            'b11vec' must have the shape (n,).
         
         g1vec : numpy.ndarray, optional
             Medium parameter :math:`\gamma_1` (real-valued for non-reciprocal 
@@ -1548,6 +1616,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     
         dict
             Dictionary that contains 
+            
                 - **RP**: Reflection response from above.
                 - **TP**: Transmission response from above.
                 - **RM**: Reflection response from below.
@@ -1556,6 +1625,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 - **TPa**: Transmission response from above (adjoint medium).
                 - **RMa**: Reflection response from below (adjoint medium).
                 - **TMa**: Transmission response from below (adjoint medium).
+                
             All medium responses are stored in arrays of shape (nf,nr). The 
             variables 'RPa', 'TPa', 'RMa' and 'TMa' are computed only if one 
             sets 'AdjointMedium=True'.
@@ -1572,36 +1642,41 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         >>> import matplotlib.pyplot as plt
         
         >>> # Initialise a wavefield in a 1D reciprocal medium
-        >>> F = LM(nt=4096,dt=0.005,nr=2048,dx1=12.5,eps=2/(2049*0.005),
-                   x3vec=np.array([1.1,2.2,3.7])*1e3,
-                   avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
-                   g1vec=np.array([0.8,2,1.3])*1e-4,
-                   g3vec=np.array([1.8,0.7,2.3])*1e-4,
-                   ReciprocalMedium=False,AdjointMedium=True) 
+        >>> F = LM(LM(nt=1024,dt=0.005,nr=2048,dx1=12.5,
+        >>>           x3vec=np.array([1.1,2.2,3.7,4])*4e2,
+        >>>           avec=np.array([1,2,3,4])*1e-3,
+        >>>           b11vec=np.array([1.4,3.14,2,4])*1e-4,
+        >>>           b13vec=np.array([0.4,2.4,1.2,1.2])*1e-4,
+        >>>           b33vec=np.array([1.4,3.14,2,2])*1e-4,
+        >>>           g1vec=np.array([0.8,2,1.3,1.3])*1e-4,
+        >>>           g3vec=np.array([1.8,0.7,2.3,2.3])*1e-4,
+        >>>           eps=3/(513*0.005),ReciprocalMedium=False,
+        >>>           AdjointMedium=True)
         
         >>> # Model the medium responses
         >>> RT = F.RT_response_k1_w(normalisation='flux',InternalMultiples=True)
         >>> RP = RT['RP']
+        >>> TP = RT['TP']
+        >>> RM = RT['RM']
+        >>> TM = RT['TM']
+        
+        
         >>> # Make a Ricker wavelet
         >>> Wav=F.RickerWavelet_w(f0=30)
-        >>> # Compute gain function (correct for complex-valued frequency)
-        >>> gain = F.Gain_t()
-        >>> # Apply wavelet, transform to the space-time domain and apply gain
-        >>> rP = np.fft.fftshift(gain*F.K1W2X1T(Wav*RP),axes=(0,1))
+    
+        >>> # Compute correction for complex-valued frequency
+        >>> gain = np.fft.fftshift(Fe.Gain_t(),axes=0)
         
-        >>> # Plot reflection response
-        >>> T   = F.Tvec()['tvec']
-        >>> X1  = F.Xvec()['xvec']
-        >>> ex  = (X1[0,0], X1[-1,0], T[-1,0], T[0,0])
-        >>> asp = X1[-1,0]/T[-1,0]
-        >>> plt.figure(); plt.imshow(rP,cmap='seismic',vmin=-1e-3,vmax=1e-3,
-                                     extent=ex,aspect=asp)
-        >>> plt.xlabel('Offset (m)')
-        >>> plt.ylabel('Time (s)')
+        >>> # Apply inverse Fourier transform to the space-time domain
+        >>> tP = gain*np.fft.fftshift(Fe.K1W2X1T(Wav*TP),axes=(0,1))
+        >>> rM = gain*np.fft.fftshift(Fe.K1W2X1T(Wav*RM),axes=(0,1))
+        >>> rP = gain*np.fft.fftshift(Fe.K1W2X1T(Wav*RP),axes=(0,1))
+        >>> tM = gain*np.fft.fftshift(Fe.K1W2X1T(Wav*TM),axes=(0,1))
+        >>> # We plot the resulting wavefields below.
         
-        .. image:: ../pictures/cropped/Rplus_k1_w.png
+        .. image:: ../pictures/cropped/RT_Responses.png
             :height: 200px
-            :width: 200 px
+            :width: 300 px
         
         
         """
@@ -1620,7 +1695,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         # Check if a layer stack is given
         if (isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) 
-        and isinstance(bvec,np.ndarray) and isinstance(g1vec,np.ndarray) 
+        and isinstance(b11vec,np.ndarray) and isinstance(b13vec,np.ndarray) 
+        and isinstance(b33vec,np.ndarray) and isinstance(g1vec,np.ndarray) 
         and isinstance(g3vec,np.ndarray)):
             
             # Create a wavefield in a sub-medium
@@ -1629,24 +1705,36 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
                                             self.verbose,eps=self.eps,
                                             x3vec=x3vec,avec=avec,
-                                            bvec=bvec,g1vec=g1vec,g3vec=g3vec,
+                                            b11vec=b11vec,b13vec=b13vec,
+                                            b33vec=b33vec,
+                                            g1vec=g1vec,g3vec=g3vec,
                                             ReciprocalMedium=self.ReciprocalMedium,
                                             AdjointMedium=self.AdjointMedium)
             
-            x3vec = self.SubSelf.x3vec
-            bvec  = self.SubSelf.bvec
-            g3vec = self.SubSelf.g3vec
-            K3    = self.SubSelf.K3
-            K3n   = self.SubSelf.K3n
+            x3vec   = self.SubSelf.x3vec
+            b11vec  = self.SubSelf.b11vec
+            b13vec  = self.SubSelf.b13vec
+            b33vec  = self.SubSelf.b33vec
+            K3      = self.SubSelf.K3
+            K3n     = self.SubSelf.K3n
+            Eig     = self.SubSelf.Eigenvalues_k1_w()
                 
         # Else compute response of entire medium
         else:
-            x3vec = self.x3vec
-            bvec  = self.bvec
-            g3vec = self.g3vec
-            K3    = self.K3
-            K3n   = self.K3n
-            
+            x3vec   = self.x3vec
+            b11vec  = self.b11vec
+            b13vec  = self.b13vec
+            b33vec  = self.b33vec
+            K3      = self.K3
+            K3n     = self.K3n    
+            Eig = self.Eigenvalues_k1_w()
+        
+        # Eigenvalues
+        LP = Eig['LP']
+        LM = Eig['LM']
+        LPn = Eig['LPn']
+        LMn = Eig['LMn']
+        del Eig
         
         # Number of layers
         N = np.size(x3vec)
@@ -1685,20 +1773,22 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         for n in range(0,N-1):
             
             # Scattering coefficients
-            ScatCoeffs = self.RT_k1_w(beta_u=bvec[n],g3_u=g3vec[n],
-                                     K3_u=K3[:,:,n],K3n_u=K3n[:,:,n],
-                                     beta_l=bvec[n+1],g3_l=g3vec[n+1],
-                                     K3_l=K3[:,:,n+1],K3n_l=K3n[:,:,n+1],
-                                     normalisation=normalisation)
-            
+            ScatCoeffs = self.RT_k1_w(beta11_u=b11vec[n],beta13_u=b13vec[n],
+                                      beta33_u=b33vec[n],K3_u=K3[:,:,n],
+                                      K3n_u=K3n[:,:,n],
+                                      beta11_l=b11vec[n+1],beta13_l=b13vec[n+1],
+                                      beta33_l=b33vec[n+1],K3_l=K3[:,:,n+1],
+                                      K3n_l=K3n[:,:,n+1],
+                                      normalisation=normalisation)
             rP = ScatCoeffs['rP']
             tP = ScatCoeffs['tP']
             rM = ScatCoeffs['rM']
             tM = ScatCoeffs['tM']
             
             # Propagators
-            W = self.W_propagators_k1_w(K3=K3[:,:,n],K3n=K3n[:,:,n],
-                                        g3=g3vec[n],dx3=dx3vec[n]    )
+            W = self.W_propagators_k1_w(LP=LP[:,:,n],LM=LM[:,:,n],
+                                        LPn=LPn[:,:,n],LMn=LMn[:,:,n],
+                                        dx3=dx3vec[n])
             WP = W['wP']
             WM = W['wM']
             
@@ -1769,38 +1859,48 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     
         dict
             Dictionary that contains 
+            
                 - **x3vec**: Updated depth vector.
                 - **avec**:  Updated :math:`\\alpha` vector.
-                - **bvec**:  Updated :math:`\\beta` vector.
+                - **b11vec**:  Updated :math:`\\beta_{11}` vector.
+                - **b13vec**:  Updated :math:`\\beta_{11}` vector.
+                - **b33vec**:  Updated :math:`\\beta_{11}` vector.
                 - **g1vec**: Updated :math:`\gamma_1` vector.
                 - **g3vec**: Updated :math:`\gamma_3` vector.
                 - **K3**:    Updated :math:`k_3(k_1)` vector.
                 - **K3n**:   Updated :math:`k_3(-k_1)` vector.
+                
             All medium parameter vectors are stored in arrays of shape (n,).
             The vertical wavenumbers are stored in arrays of shape (nf,nr,n).
         
         Examples
         --------
-
+        
         >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
         >>> import numpy as np
         
         >>> # Initialise a wavefield in a 1D reciprocal medium
-        >>> F=LM(nt=1024,dt=0.005,nr=512,dx1=10,
-                 x3vec=np.array([10,150,200]),
-                 avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),
-                 g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]))
+        >>> F = LM(LM(nt=1024,dt=0.005,nr=2048,dx1=12.5,
+        >>>           x3vec=np.array([1.1,2.2,3.7,4])*4e2,
+        >>>           avec=np.array([1,2,3,4])*1e-3,
+        >>>           b11vec=np.array([1.4,3.14,2,4])*1e-4,
+        >>>           b13vec=np.array([0.4,2.4,1.2,1.2])*1e-4,
+        >>>           b33vec=np.array([1.4,3.14,2,2])*1e-4,
+        >>>           g1vec=np.array([0.8,2,1.3,1.3])*1e-4,
+        >>>           g3vec=np.array([1.8,0.7,2.3,2.3])*1e-4,
+        >>>           eps=3/(513*0.005),ReciprocalMedium=False,
+        >>>           AdjointMedium=True)
         
         >>> # Insert a transparent layer at x3=1
         >>> out=F.Insert_layer(x3=1,UpdateSelf=False)
         
         >>> # Updated depth vector
         >>> out['x3vec']
-        array([  1,  10, 150, 200])
+        array([1.00e+00, 4.40e+02, 8.80e+02, 1.48e+03, 1.60e+03])
         
         >>> # Updated alpha vector
         >>> out['avec']
-        array([1, 1, 2, 3])
+        array([0.001, 0.001, 0.002, 0.003, 0.004])
         
         """
         
@@ -1809,7 +1909,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 or  isinstance(x3,float) 
                 or (isinstance(x3,np.ndarray) and x3.ndim == 1) ):
             sys.exit('Insert_layer: The input variable \'x3\' must be either '
-                     +'a scalar, or an array of shape (n,).')
+                     +'a real-valued scalar, or an array of shape (n,) with '
+                     +'real-valued elements.')
         
         if isinstance(x3,int) or  isinstance(x3,float):
             x3 = np.array([x3])
@@ -1824,13 +1925,15 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             sys.exit('Insert_layer: Each element of the input variable \'x3\' '
                      +'must be  greater than, or equal to zero.')
         
-        X3vec = self.x3vec
-        Avec  = self.avec
-        Bvec  = self.bvec
-        G1vec = self.g1vec
-        G3vec = self.g3vec
-        K3    = self.K3
-        K3n   = self.K3n
+        X3vec  = self.x3vec
+        Avec   = self.avec
+        B11vec = self.b11vec
+        B13vec = self.b13vec
+        B33vec = self.b33vec
+        G1vec  = self.g1vec
+        G3vec  = self.g3vec
+        K3     = self.K3
+        K3n    = self.K3n
         
         for i in range(np.size(x3)):
         
@@ -1839,33 +1942,39 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             
             # Case1: x3[i] smaller than X3vec[0]
             if L.size == 0:
-                X3vec = np.hstack([x3[i]   ,X3vec])
-                Avec  = np.hstack([Avec[0] ,Avec])
-                Bvec  = np.hstack([Bvec[0] ,Bvec])
-                G1vec = np.hstack([G1vec[0],G1vec])
-                G3vec = np.hstack([G3vec[0],G3vec])
-                K3    = np.dstack([K3[:,:,:1]   ,K3])
-                K3n   = np.dstack([K3n[:,:,:1]  ,K3n])
+                X3vec  = np.hstack([x3[i]      ,X3vec])
+                Avec   = np.hstack([Avec[0]    ,Avec])
+                B11vec = np.hstack([B11vec[0]  ,B11vec])
+                B13vec = np.hstack([B13vec[0]  ,B13vec])
+                B33vec = np.hstack([B33vec[0]  ,B33vec])
+                G1vec  = np.hstack([G1vec[0]   ,G1vec])
+                G3vec  = np.hstack([G3vec[0]   ,G3vec])
+                K3     = np.dstack([K3[:,:,:1] ,K3])
+                K3n    = np.dstack([K3n[:,:,:1],K3n])
             
             # Case2: x3[i] coincides with an element of X3vec
             elif L[-1] == x3[i]:
-                X3vec = X3vec
-                Avec  = Avec
-                Bvec  = Bvec
-                G1vec = G1vec
-                G3vec = G3vec
-                K3    = K3
-                K3n   = K3n
+                X3vec  = X3vec
+                Avec   = Avec
+                B11vec = B11vec
+                B13vec = B13vec
+                B33vec = B33vec
+                G1vec  = G1vec
+                G3vec  = G3vec
+                K3     = K3
+                K3n    = K3n
             
             # Case 3: x3[i] is larger than X3vec[-1]
             elif L.size == X3vec.size:
-                X3vec = np.hstack([X3vec,x3[i]])
-                Avec  = np.hstack([Avec ,Avec[-1]])
-                Bvec  = np.hstack([Bvec ,Bvec[-1]])
-                G1vec = np.hstack([G1vec,G1vec[-1]])
-                G3vec = np.hstack([G3vec,G3vec[-1]])
-                K3    = np.dstack([K3   ,K3[:,:,-1:]])
-                K3n   = np.dstack([K3n  ,K3n[:,:,-1:]])
+                X3vec  = np.hstack([X3vec,x3[i]])
+                Avec   = np.hstack([Avec  ,Avec[-1]])
+                B11vec = np.hstack([B11vec,B11vec[-1]])
+                B13vec = np.hstack([B13vec,B13vec[-1]])
+                B33vec = np.hstack([B33vec,B33vec[-1]])
+                G1vec  = np.hstack([G1vec ,G1vec[-1]])
+                G3vec  = np.hstack([G3vec ,G3vec[-1]])
+                K3     = np.dstack([K3    ,K3[:,:,-1:]])
+                K3n    = np.dstack([K3n   ,K3n[:,:,-1:]])
                 
             # Case 4: x3[i] is between X3vec[0] and X3vec[-1] AND does not 
             # coincide with any element of X3vec
@@ -1874,26 +1983,31 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 b = L[-1] 
                 ind = X3vec.tolist().index(b)
                 
-                X3vec = np.hstack([X3vec[:ind+1],x3[i]       ,X3vec[ind+1:]])
-                Avec  = np.hstack([Avec[:ind+1] ,Avec[ind+1] ,Avec[ind+1:]])
-                Bvec  = np.hstack([Bvec[:ind+1] ,Bvec[ind+1] ,Bvec[ind+1:]])
-                G1vec = np.hstack([G1vec[:ind+1],G1vec[ind+1],G1vec[ind+1:]])
-                G3vec = np.hstack([G3vec[:ind+1],G3vec[ind+1],G3vec[ind+1:]])
-                K3    = np.dstack([K3[:,:,:ind+1]   ,K3[:,:,ind+1:ind+2]   ,K3[:,:,ind+1:]])
-                K3n   = np.dstack([K3n[:,:,:ind+1]  ,K3n[:,:,ind+1:ind+2]  ,K3n[:,:,ind+1:]])
+                X3vec  = np.hstack([X3vec[:ind+1]  ,x3[i]               ,X3vec[ind+1:]])
+                Avec   = np.hstack([Avec[:ind+1]   ,Avec[ind+1]         ,Avec[ind+1:]])
+                B11vec = np.hstack([B11vec[:ind+1] ,B11vec[ind+1]       ,B11vec[ind+1:]])
+                B13vec = np.hstack([B13vec[:ind+1] ,B13vec[ind+1]       ,B13vec[ind+1:]])
+                B33vec = np.hstack([B33vec[:ind+1] ,B33vec[ind+1]       ,B33vec[ind+1:]])
+                G1vec  = np.hstack([G1vec[:ind+1]  ,G1vec[ind+1]        ,G1vec[ind+1:]])
+                G3vec  = np.hstack([G3vec[:ind+1]  ,G3vec[ind+1]        ,G3vec[ind+1:]])
+                K3     = np.dstack([K3[:,:,:ind+1] ,K3[:,:,ind+1:ind+2] ,K3[:,:,ind+1:]])
+                K3n    = np.dstack([K3n[:,:,:ind+1],K3n[:,:,ind+1:ind+2],K3n[:,:,ind+1:]])
             
         # Update self: Apply layer insertion to the self-parameters    
         if UpdateSelf is True:
-            self.x3vec = X3vec
-            self.avec  = Avec
-            self.bvec  = Bvec
-            self.g1vec = G1vec
-            self.g3vec = G3vec
-            self.K3    = K3
-            self.K3n   = K3n
+            self.x3vec  = X3vec
+            self.avec   = Avec
+            self.b11vec = B11vec
+            self.b13vec = B13vec
+            self.b33vec = B33vec
+            self.g1vec  = G1vec
+            self.g3vec  = G3vec
+            self.K3     = K3
+            self.K3n    = K3n
             
-        out = {'x3vec':X3vec,'avec':Avec,'bvec':Bvec,
-               'g1vec':G1vec,'g3vec':G3vec,'K3':K3,'K3n':K3n}
+        out = {'x3vec':X3vec,'avec':Avec,'b11vec':B11vec,'b13vec':B13vec,
+               'b33vec':B33vec,'g1vec':G1vec,'g3vec':G3vec,'K3':K3,'K3n':K3n}
+        
         return out
     
     def GreensFunction_k1_w(self,x3R,x3S,normalisation='flux',
@@ -1904,6 +2018,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         define the receiver and source depths just below \'x3R\' and \'x3S\', 
         respectively (this is important if the receiver or source depth 
         coincides with an interface).
+        
         
         Parameters
         ----------
@@ -1922,11 +2037,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             To model internal multiples set 'InternalMultiples=True'. To 
             exclude internal multiples set 'InternalMultiples=False'.
             
+            
         Returns
         -------
     
         dict
             Dictionary that contains 
+            
                 - **GPP**: Green\'s function :math:`G^{+,+}` (true medium).
                 - **GPM**: Green\'s function :math:`G^{+,-}` (true medium).
                 - **GMP**: Green\'s function :math:`G^{-,+}` (true medium).
@@ -1935,9 +2052,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 - **GPMa**: Green\'s function :math:`G^{+,-}` (adjoint medium).
                 - **GMPa**: Green\'s function :math:`G^{-,+}` (adjoint medium).
                 - **GMMa**: Green\'s function :math:`G^{-,-}` (adjoint medium).
+                
             All medium responses are stored in arrays of shape (nf,nr). The 
             variables 'GPPa', 'GPMa', 'GMPa' and 'GMMa' are computed, only if 
             one sets 'AdjointMedium=True'.
+        
         
         Notes
         -----
@@ -1947,9 +2066,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         - The first superscript refers to the wavefield at the receiver-side.
         - The second superscript refers to the wavefield at the source-side.
         
+        
         References
         ----------
         Kees document as soon as it is published.
+        
         
         Examples
         --------
@@ -1960,19 +2081,40 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         >>> import matplotlib.pyplot as plt
         
         >>> # Initialise a wavefield in a 1D reciprocal medium
-        >>> F = LM(nt=4096,dt=0.005,nr=2048,dx1=12.5,eps=2/(2049*0.005),
+        >>> F = LM(nt=1024,dt=0.005,nr=4096,dx1=12.5,eps=3/(513*0.005),
                    x3vec=np.array([1.1,2.2,3.7])*1e3,
-                   avec=np.array([1,2,3])*1e-3,bvec=np.array([1.4,3.14,2])*1e-4,
+                   avec=np.array([1,2,3])*1e-3,b11vec=np.array([1.4,3.14,2])*1e-4,
+                   b13vec=np.array([0.4,2.4,1.2])*1e-4,
+                   b33vec=np.array([1.4,3.14,2])*1e-4
                    g1vec=np.array([0.8,2,1.3])*1e-4,
                    g3vec=np.array([1.8,0.7,2.3])*1e-4,
                    ReciprocalMedium=False,AdjointMedium=True) 
         
-        >>> G = F.GreensFunction_p_w(x3R=0,x3S=0,normalisation=normalisation,
-        >>>                          InternalMultiples=InternalMultiples)
-        >>> RT=F.RT_response_p_w(normalisation=normalisation,
-        >>>                      InternalMultiples=InternalMultiples)
-        >>> np.linalg.norm(RT['RP']-G['GMP']
-        0.0
+        >>> # Compute response to a source at x3=500 measured at x3=2000
+        >>> G = Fe.GreensFunction_k1_w(x3S=500,x3R=2000,normalisation='flux',
+        >>>                            InternalMultiples=True)
+        >>> GPP = G['GPP']
+        >>> GPM = G['GPM']
+        >>> GMP = G['GMP']
+        >>> GMM = G['GMM']
+        
+        >>> # Ricker wavelet
+        >>> Wav = Fe.RickerWavelet_w(f0=30)
+        
+        >>> # Correct for complex-valued frequency
+        >>> gain = Fe.Gain_t()
+
+        >>> # Tranform to the space-time domain
+        >>> gPP = np.fft.fftshift(gain*Fe.K1W2X1T(Wav*GPP),axes=(0,1))
+        >>> gPM = np.fft.fftshift(gain*Fe.K1W2X1T(Wav*GPM),axes=(0,1))
+        >>> gMP = np.fft.fftshift(gain*Fe.K1W2X1T(Wav*GMP),axes=(0,1))
+        >>> gMM = np.fft.fftshift(gain*Fe.K1W2X1T(Wav*GMM),axes=(0,1))
+        >>> # The resulting plot is shown below.
+        
+        .. image:: ../pictures/cropped/G_Functions.png
+           :width: 300px
+           :height: 200px
+        
         
         """
         
@@ -1993,11 +2135,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             Tmp_medium = self.Insert_layer(x3=np.array([x3R,x3S]),
                                            UpdateSelf=False)
             
-        X3vec = Tmp_medium['x3vec']
-        Avec  = Tmp_medium['avec']
-        Bvec  = Tmp_medium['bvec']
-        G1vec = Tmp_medium['g1vec']
-        G3vec = Tmp_medium['g3vec']
+        X3vec  = Tmp_medium['x3vec']
+        Avec   = Tmp_medium['avec']
+        B11vec = Tmp_medium['b11vec']
+        B13vec = Tmp_medium['b13vec']
+        B33vec = Tmp_medium['b33vec']
+        G1vec  = Tmp_medium['g1vec']
+        G3vec  = Tmp_medium['g3vec']
         
         # Get indices of the receiver and source interfaces
         r = X3vec.tolist().index(x3R)
@@ -2006,47 +2150,55 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         if x3R > x3S:
             
             # Overburden
-            x3vec = X3vec[:s+2]
-            avec  = Avec[:s+2]
-            bvec  = Bvec[:s+2]
-            g1vec = G1vec[:s+2]
-            g3vec = G3vec[:s+2]
+            x3vec  = X3vec[:s+2]
+            avec   = Avec[:s+2]
+            b11vec = B11vec[:s+2]
+            b13vec = B13vec[:s+2]
+            b33vec = B33vec[:s+2]
+            g1vec  = G1vec[:s+2]
+            g3vec  = G3vec[:s+2]
             
-            L1 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
+            L1 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                      b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                      g3vec=g3vec,normalisation=normalisation,
                                       InternalMultiples=InternalMultiples)
 
             # Sandwiched layer stack
-            x3vec = X3vec[s+1:r+2] - X3vec[s]
-            avec  = Avec[s+1:r+2]
-            bvec  = Bvec[s+1:r+2]
-            g1vec = G1vec[s+1:r+2]
-            g3vec = G3vec[s+1:r+2]
+            x3vec  = X3vec[s+1:r+2] - X3vec[s]
+            avec   = Avec[s+1:r+2]
+            b11vec = B11vec[s+1:r+2]
+            b13vec = B13vec[s+1:r+2]
+            b33vec = B33vec[s+1:r+2]
+            g1vec  = G1vec[s+1:r+2]
+            g3vec  = G3vec[s+1:r+2]
             
-            L2 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
+            L2 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                      b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                      g3vec=g3vec,normalisation=normalisation,
                                       InternalMultiples=InternalMultiples)
             
             # Underburden
-            x3vec = X3vec[r+1:] - X3vec[r]
-            avec  = Avec[r+1:]
-            bvec  = Bvec[r+1:]
-            g1vec = G1vec[r+1:]
-            g3vec = G3vec[r+1:]
+            x3vec  = X3vec[r+1:] - X3vec[r]
+            avec   = Avec[r+1:]
+            b11vec = B11vec[r+1:]
+            b13vec = B13vec[r+1:]
+            b33vec = B33vec[r+1:]
+            g1vec  = G1vec[r+1:]
+            g3vec  = G3vec[r+1:]
             
             # Exception if underburden is homogeneous
             if x3vec.size == 0:
-                x3vec = np.array([0])
-                avec  = Avec[r:]
-                bvec  = Bvec[r:]
-                g1vec = G1vec[r:]
-                g3vec = G3vec[r:]
+                x3vec  = np.array([0])
+                avec   = Avec[r:]
+                b11vec = B11vec[r:]
+                b13vec = B13vec[r:]
+                b33vec = B33vec[r:]
+                g1vec  = G1vec[r:]
+                g3vec  = G3vec[r:]
             
-            L3 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
+            L3 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                      b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                      g3vec=g3vec,normalisation=normalisation,
                                       InternalMultiples=InternalMultiples)
 
             # Get variables that are used multiple times to avoid multiple 
@@ -2110,36 +2262,42 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         elif x3R == x3S:
             
             # Overburden
-            x3vec = X3vec[:s+2]
-            avec  = Avec[:s+2]
-            bvec  = Bvec[:s+2]
-            g1vec = G1vec[:s+2]
-            g3vec = G3vec[:s+2]
+            x3vec  = X3vec[:s+2]
+            avec   = Avec[:s+2]
+            b11vec = B11vec[:s+2]
+            b13vec = B13vec[:s+2]
+            b33vec = B33vec[:s+2]
+            g1vec  = G1vec[:s+2]
+            g3vec  = G3vec[:s+2]
             
-            L1 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
+            L1 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                      b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                      g3vec=g3vec,normalisation=normalisation,
                                       InternalMultiples=InternalMultiples)
             
             # Underburden
-            x3vec = X3vec[r+1:] - X3vec[r]
-            avec  = Avec[r+1:]
-            bvec  = Bvec[r+1:]
-            g1vec = G1vec[r+1:]
-            g3vec = G3vec[r+1:]
+            x3vec  = X3vec[r+1:] - X3vec[r]
+            avec   = Avec[r+1:]
+            b11vec = B11vec[r+1:]
+            b13vec = B13vec[r+1:]
+            b33vec = B33vec[r+1:]
+            g1vec  = G1vec[r+1:]
+            g3vec  = G3vec[r+1:]
             
             # Exception if underburden is homogeneous
             if x3vec.size == 0:
                 x3vec = np.array([0])
                 avec  = Avec[r:]
-                bvec  = Bvec[r:]
+                b11vec = B11vec[r:]
+                b13vec = B13vec[r:]
+                b33vec = B33vec[r:]
                 g1vec = G1vec[r:]
                 g3vec = G3vec[r:]
             
-            L3 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
-                                      InternalMultiples=InternalMultiples)
+            L3 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                       b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                       g3vec=g3vec,normalisation=normalisation,
+                                       InternalMultiples=InternalMultiples)
           
             # Get variables that are used multiple times to avoid multiple 
             # reading from dictionary
@@ -2188,48 +2346,56 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         elif x3R < x3S:
             
             # Overburden
-            x3vec = X3vec[:r+2]
-            avec  = Avec[:r+2]
-            bvec  = Bvec[:r+2]
-            g1vec = G1vec[:r+2]
-            g3vec = G3vec[:r+2]
+            x3vec  = X3vec[:r+2]
+            avec   = Avec[:r+2]
+            b11vec = B11vec[:r+2]
+            b13vec = B13vec[:r+2]
+            b33vec = B33vec[:r+2]
+            g1vec  = G1vec[:r+2]
+            g3vec  = G3vec[:r+2]
             
-            L1 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
-                                      InternalMultiples=InternalMultiples)
+            L1 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                       b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                       g3vec=g3vec,normalisation=normalisation,
+                                       InternalMultiples=InternalMultiples)
             
             # Sandwiched layer stack
-            x3vec = X3vec[r+1:s+2] - X3vec[r]
-            avec  = Avec[r+1:s+2]
-            bvec  = Bvec[r+1:s+2]
-            g1vec = G1vec[r+1:s+2]
-            g3vec = G3vec[r+1:s+2]
+            x3vec  = X3vec[r+1:s+2] - X3vec[r]
+            avec   = Avec[r+1:s+2]
+            b11vec = B11vec[r+1:s+2]
+            b13vec = B13vec[r+1:s+2]
+            b33vec = B33vec[r+1:s+2]
+            g1vec  = G1vec[r+1:s+2]
+            g3vec  = G3vec[r+1:s+2]
             
-            L2 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
-                                      InternalMultiples=InternalMultiples)
+            L2 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                       b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                       g3vec=g3vec,normalisation=normalisation,
+                                       InternalMultiples=InternalMultiples)
             
             # Underburden
-            x3vec = X3vec[s+1:] - X3vec[s]
-            avec  = Avec[s+1:]
-            bvec  = Bvec[s+1:]
-            g1vec = G1vec[s+1:]
-            g3vec = G3vec[s+1:]
+            x3vec  = X3vec[s+1:] - X3vec[s]
+            avec   = Avec[s+1:]
+            b11vec = B11vec[s+1:]
+            b13vec = B13vec[s+1:]
+            b33vec = B33vec[s+1:]
+            g1vec  = G1vec[s+1:]
+            g3vec  = G3vec[s+1:]
             
             # Exception if underburden is homogeneous
             if x3vec.size == 0:
-                x3vec = np.array([0])
-                avec  = Avec[s:]
-                bvec  = Bvec[s:]
-                g1vec = G1vec[s:]
-                g3vec = G3vec[s:]
+                x3vec  = np.array([0])
+                avec   = Avec[s:]
+                b11vec = B11vec[s:]
+                b13vec = B13vec[s:]
+                b33vec = B33vec[s:]
+                g1vec  = G1vec[s:]
+                g3vec  = G3vec[s:]
             
-            L3 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,bvec=bvec,
-                                      g1vec=g1vec,g3vec=g3vec,
-                                      normalisation=normalisation,
-                                      InternalMultiples=InternalMultiples)
+            L3 = self.RT_response_k1_w(x3vec=x3vec,avec=avec,b11vec=b11vec,
+                                       b13vec=b13vec,b33vec=b33vec,g1vec=g1vec,
+                                       g3vec=g3vec,normalisation=normalisation,
+                                       InternalMultiples=InternalMultiples)
             
             # Get variables that are used multiple times to avoid multiple 
             # reading from dictionary
@@ -2316,6 +2482,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 
         out = {'GPP':GPP13  ,'GPM':GPM13  ,'GMP':GMP13  ,'GMM':GMM13,
                'GPPa':GPP13a,'GPMa':GPM13a,'GMPa':GMP13a,'GMMa':GMM13a}
+        
         return out
     
     def FocusingFunction_p_w(self,x3F,normalisation='flux',InternalMultiples=True):
