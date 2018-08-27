@@ -354,6 +354,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         self.g3vec  = g3vec
         self.ReciprocalMedium = ReciprocalMedium
         self.AdjointMedium    = AdjointMedium
+        self.eps = eps
+        
+        if (self.eps is not None) and (self.eps < 0):
+            print('WARNING: Layered_NRM_k1_w\n'+72*'-'
+                  +'\nThe parameter \'eps\' should be positive. \n'
+                  +'(Exception) The function \'FocusingFunction_k1_w\' uses a '
+                  +'negative \'eps\' value to handle the wrap-around correctly'
+                  +' in case of complex-conjugated focusing functions.')
         
         # Calculate vertical ray-parameter p3=p3(+p1) p3n=p3(-p1) 
         # Note: By default python uses opposite sign convention for evanescent waves as Kees: (-1)**0.5=1j
@@ -381,11 +389,17 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                     K3[:,:,layer]  = (tmp[layer]*W**2 + 2*self.g1vec[layer]*K1*W - K1**2)
                     K3n[:,:,layer] = (tmp[layer]*W**2 - 2*self.g1vec[layer]*K1*W - K1**2)
                     
-                    K3[:,:,layer]  = K3[:,:,layer].real  + 1j*np.abs(K3[:,:,layer].imag)
-                    K3n[:,:,layer] = K3n[:,:,layer].real + 1j*np.abs(K3n[:,:,layer].imag)
+                    K3[:,:,layer]  = K3[:,:,layer].real  + 1j*np.abs(K3[:,:,layer].imag)  *np.sign(self.eps)
+                    K3n[:,:,layer] = K3n[:,:,layer].real + 1j*np.abs(K3n[:,:,layer].imag) *np.sign(self.eps)
                     
         self.K3  = K3**0.5
         self.K3n = K3n**0.5
+        
+        # Predefine eigenvalues
+        self.LP  = None
+        self.LM  = None
+        self.LPn = None
+        self.LMn = None
         
     
     def FK1_mask_k1_w(self,RelativeTaperLength=2**(-5),wmax=None,Opening=1.0):
@@ -642,9 +656,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     def Eigenvalues_k1_w(self):
         """computes the eigenvalues :math:`\lambda^{\pm}` of the two-way 
         operator matrix :math:`\\rm{\\bf A}` in the wavenumber-frequency 
-        domain.
-        
-        
+        domain. The eigenvalues are associated with the medium parameters 
+        defined at initialisation of the wavefield.
+            
+            
         Returns
         -------
     
@@ -685,6 +700,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         ----------
         Kees document as soon as it is published.
 
+
         Examples
         --------
 
@@ -703,7 +719,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         -0.0006226976760655292j
         
         """
-        
         # Frequency and horizontal-wavenumber meshgrids
         Om = self.W_K1_grid()['Wgrid']
         K1 = self.W_K1_grid()['K1gridfft']
@@ -764,6 +779,12 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 print('--------------------------------------------')
                 print('For reciprocal media, the eigenvalues are not yet '
                       +'implemented.')
+                
+        # Save eigenvalues in self
+        self.LP  = LP
+        self.LM  = LM
+        self.LPn = LPn
+        self.LMn = LMn
         
         return {"LP":LP,"LM":LM,"LPn":LPn,"LMn":LMn}
     
@@ -1568,6 +1589,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         included. However, the propagation through the deepest layer is 
         excluded.
         
+        
         Parameters
         ----------
     
@@ -1727,7 +1749,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             b33vec  = self.b33vec
             K3      = self.K3
             K3n     = self.K3n    
-            Eig = self.Eigenvalues_k1_w()
+            Eig     = self.Eigenvalues_k1_w()
         
         # Eigenvalues
         LP = Eig['LP']
@@ -1869,9 +1891,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 - **g3vec**: Updated :math:`\gamma_3` vector.
                 - **K3**:    Updated :math:`k_3(k_1)` vector.
                 - **K3n**:   Updated :math:`k_3(-k_1)` vector.
+                - **LP**:    Updated eigenvalues :math:`\lambda^+(k_1)`.
+                - **LPn**:   Updated eigenvalues :math:`\lambda^+(-k_1)`.
+                - **LM**:    Updated eigenvalues :math:`\lambda^-(k_1)`.
+                - **LMn**:   Updated eigenvalues :math:`\lambda^-(-k_1)`.
                 
             All medium parameter vectors are stored in arrays of shape (n,).
-            The vertical wavenumbers are stored in arrays of shape (nf,nr,n).
+            The vertical wavenumbers and the eigenvalues are stored in arrays 
+            of shape (nf,nr,n).
         
         Examples
         --------
@@ -1934,6 +1961,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         G3vec  = self.g3vec
         K3     = self.K3
         K3n    = self.K3n
+        LP     = self.LP
+        LPn    = self.LPn
+        LM     = self.LM
+        LMn    = self.LMn
         
         for i in range(np.size(x3)):
         
@@ -1951,6 +1982,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 G3vec  = np.hstack([G3vec[0]   ,G3vec])
                 K3     = np.dstack([K3[:,:,:1] ,K3])
                 K3n    = np.dstack([K3n[:,:,:1],K3n])
+                
+                if not (     (LP is None) and  (LPn is None) 
+                        and  (LM is None) and  (LMn is None) ):
+                    LP  = np.dstack([LP[:,:,:1]  ,LP])
+                    LPn = np.dstack([LPn[:,:,:1] ,LPn])
+                    LM  = np.dstack([LM[:,:,:1]  ,LM])
+                    LMn = np.dstack([LMn[:,:,:1] ,LMn])
             
             # Case2: x3[i] coincides with an element of X3vec
             elif L[-1] == x3[i]:
@@ -1963,6 +2001,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 G3vec  = G3vec
                 K3     = K3
                 K3n    = K3n
+                
+                if not (     (LP is None) and  (LPn is None) 
+                        and  (LM is None) and  (LMn is None) ):
+                    LP  = LP
+                    LPn = LPn
+                    LM  = LM
+                    LMn = LMn
             
             # Case 3: x3[i] is larger than X3vec[-1]
             elif L.size == X3vec.size:
@@ -1975,6 +2020,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 G3vec  = np.hstack([G3vec ,G3vec[-1]])
                 K3     = np.dstack([K3    ,K3[:,:,-1:]])
                 K3n    = np.dstack([K3n   ,K3n[:,:,-1:]])
+                
+                if not (     (LP is None) and  (LPn is None) 
+                        and  (LM is None) and  (LMn is None) ):
+                    LP  = np.dstack([LP  , LP[:,:,-1:]])
+                    LPn = np.dstack([LPn , LPn[:,:,-1:]])
+                    LM  = np.dstack([LM  , LM[:,:,-1:]])
+                    LMn = np.dstack([LMn , LMn[:,:,-1:]])
                 
             # Case 4: x3[i] is between X3vec[0] and X3vec[-1] AND does not 
             # coincide with any element of X3vec
@@ -1992,6 +2044,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 G3vec  = np.hstack([G3vec[:ind+1]  ,G3vec[ind+1]        ,G3vec[ind+1:]])
                 K3     = np.dstack([K3[:,:,:ind+1] ,K3[:,:,ind+1:ind+2] ,K3[:,:,ind+1:]])
                 K3n    = np.dstack([K3n[:,:,:ind+1],K3n[:,:,ind+1:ind+2],K3n[:,:,ind+1:]])
+                
+                if not (     (LP is None) and  (LPn is None) 
+                        and  (LM is None) and  (LMn is None) ):
+                    LP  = np.dstack([LP[:,:,:ind+1] ,LP[:,:,ind+1:ind+2] ,LP[:,:,ind+1:]])
+                    LPn = np.dstack([LPn[:,:,:ind+1],LPn[:,:,ind+1:ind+2],LPn[:,:,ind+1:]])
+                    LM  = np.dstack([LM[:,:,:ind+1] ,LM[:,:,ind+1:ind+2] ,LM[:,:,ind+1:]])
+                    LMn = np.dstack([LMn[:,:,:ind+1],LMn[:,:,ind+1:ind+2],LMn[:,:,ind+1:]])
             
         # Update self: Apply layer insertion to the self-parameters    
         if UpdateSelf is True:
@@ -2005,8 +2064,17 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             self.K3     = K3
             self.K3n    = K3n
             
+            if not (     (LP is None) and  (LPn is None) 
+                        and  (LM is None) and  (LMn is None) ):
+                self.LP  = LP
+                self.LPn = LPn
+                self.LM  = LM
+                self.LMn = LMn
+            
+            
         out = {'x3vec':X3vec,'avec':Avec,'b11vec':B11vec,'b13vec':B13vec,
-               'b33vec':B33vec,'g1vec':G1vec,'g3vec':G3vec,'K3':K3,'K3n':K3n}
+               'b33vec':B33vec,'g1vec':G1vec,'g3vec':G3vec,'K3':K3,'K3n':K3n,
+               'LP':LP,'LPn':LPn,'LM':LM,'LMn':LMn}
         
         return out
     
@@ -2485,8 +2553,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         return out
     
-    def FocusingFunction_p_w(self,x3F,normalisation='flux',InternalMultiples=True):
-        """computes the focusing functions between the top surface (:math:`x_3=0`) and the focusing depth defined by the input variable \'x3F\'. We define the focusing depth just below \'x3F\'. Hence, if the focusing depth coincides with an interface the focusing function focuses below that interface.
+    def FocusingFunction_k1_w(self,x3F,normalisation='flux',
+                              InternalMultiples=True,Negative_eps=False):
+        """computes the focusing functions between the top surface 
+        (:math:`x_3=0`) and the focusing depth defined by the input variable 
+        \'x3F\'. We define the focusing depth just below \'x3F\'. Hence, if the 
+        focusing depth coincides with an interface the focusing function 
+        focuses below that interface.
         
         Parameters
         ----------
@@ -2495,16 +2568,34 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             Focusing depth.
             
         normalisation : str, optional
-            For pressure-normalisation set normalisation='pressure', for flux-normalisation set normalisation='flux'. Until now, this function only models the focusing function for flux-normalisation.
+            For pressure-normalisation set normalisation='pressure', for 
+            flux-normalisation set normalisation='flux'. Until now, this 
+            function only models the focusing function for flux-normalisation.
+            For pressure-normalisation, I still have to derive the analytic 
+            expression to recursively compute the focusing function.
             
         InternalMultiples : bool, optional
-            To model internal multiples set 'InternalMultiples=True'. To ignore internal multiples set 'InternalMultiples=False'.
+            To model internal multiples set 'InternalMultiples=True'. To ignore 
+            internal multiples set 'InternalMultiples=False'.
+            
+        Negative_eps : bool, optional
+            If 'Negative_eps=True' the focusing functions are computed for both 
+            a positive and a negative parameter 'eps' (imaginary-part of the
+            frequency,
+            :math:`\omega\' = \omega + j \epsilon`). 
+            The representation theorem of the corrleation-type only holds 
+            accurately if the complex-conjugated focusing functions are 
+            computed with a negative 'eps' parameter, whereas all other 
+            qunatities (Green's functions and reflection response) must be 
+            computed using a positive 'eps' parameter.
+            
             
         Returns
         -------
     
         dict
             Dictionary that contains 
+            
                 - **FP**: Downgoing focusing function.
                 - **RP**: Reflection response from above.
                 - **TP**: Transmission response from above.
@@ -2517,7 +2608,17 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 - **FMa**: Upgoing focusing function (adjoint medium).
                 - **RMa**: Reflection response from below (adjoint medium).
                 - **TMa**: Transmission response from below (adjoint medium).
-            All medium responses are stored in arrays of shape (nf,1). The variables 'FPa', 'RPa', 'TPa', 'FMa', 'RMa' and 'TMa' are computed only if one sets 'AdjointMedium=True'.
+                - **FP_neps**: Downgoing focusing function with negative 'eps' parameter, :math:`\omega\' = \omega - j \\vert \epsilon \\vert`.
+                - **FM_neps**: Upgoing focusing function with negative 'eps' parameter, :math:`\omega\' = \omega - j \\vert \epsilon \\vert`.
+                - **FPa_neps**: Downgoing focusing function with negative 'eps' parameter, :math:`\omega\' = \omega - j \\vert \epsilon \\vert`,  in adjoint medium.
+                - **FMa_neps**: Upgoing focusing function with negative 'eps' parameter, :math:`\omega\' = \omega - j  \\vert \epsilon \\vert`,  in adjoint medium.
+                - **RPa_neps**: Reflection response from above  with negative 'eps' parameter, :math:`\omega\' = \omega - j \\vert \epsilon \\vert`,  in adjoint medium.
+                
+            All medium responses are stored in arrays of shape (nf,nr). The 
+            variables 'FPa', 'RPa', 'TPa', 'FMa', 'RMa' and 'TMa' are computed 
+            only if one sets 'AdjointMedium=True'. The variables ending on 
+            '_neps' are only computed if one set 'Negative_eps=True'.
+        
         
         Notes
         -----
@@ -2526,27 +2627,84 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             :math:`\\tilde{F}_{1,n}^+ = \\tilde{F}_{1,n-1}^+ (\\tilde{w}_n^+)^{-1} (1 - \\tilde{w}_n^+ \\tilde{R}_{n-1}^{\cap} \\tilde{w}_n^- \\tilde{r}_n^{\cup} )^{-1} (\\tilde{t}_n^+)^{-1}`
         - The upgoing focusing function is computed by applying the reflection response :math:`R^{\cup}` on the downgoing focusing funtion :math:`\\tilde{F}_1^+`:
             :math:`\\tilde{F}_{1,n}^- = \\tilde{R}^{\cup} \\tilde{F}_{1,n}^+`.
+        - When using a complex-valued frequency :math:`\omega' = \omega + j \epsilon`, the representation theorem of the corrleation-type only holds accurately if the complex-conjugated focusing functions are computed with a negative 'eps' parameter, whereas all other qunatities (Green's functions and reflection response) must be computed using a positive 'eps' parameter.
+        
         
         References
         ----------
         Kees document as soon as it is published.
         
+        
         Examples
         --------
 
-        >>> from Layered_NRM_p_w import Layered_NRM_p_w as LM
+        >>> from Layered_NRM_k1_w import Layered_NRM_k1_w as LM
         >>> import numpy as np
+        >>> import matplotlib.pyplot as plt
 
-        >>> F=LM( nt=1024,dt=0.005,x3vec=np.array([10,150,200]),
-        >>>       avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),
-        >>>       g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),
-        >>>       p1=2e-4,ReciprocalMedium=False,AdjointMedium=True )
+        >>> # Initialise wavefield
+        >>> F = LM(nt=1024,dt=5e-3,nr=4096,dx1=12.5,
+                   x3vec=np.array([1.1,2.2,3.7])*1e3,eps=3/(513*5e-3),
+                   avec=np.array([1,2,3])*1e-3,
+                   b11vec=np.array([1.4,3.14,2])*1e-4,
+                   b13vec=np.array([0.4,2.4,1.2])*1e-4,
+                   b33vec=np.array([1.4,3.14,2])*1e-4,
+                   g1vec=np.array([0.8,2,1.3])*1e-4,
+                   g3vec=np.array([1.8,0.7,2.3])*1e-4,
+                   ReciprocalMedium=False,AdjointMedium=True)
+        
+        >>> # Compute Ricker wavelet
+        >>> Wav = F.RickerWavelet_w(f0=30)
+        
+        >>> # Compute correction term
+        >>> gain = F.Gain_t()
+        
+        >>> # Make FK-filter
+        >>> M = F.FK1_mask_k1_w(wmax=400,Opening=1.0)
+        >>> FK = M['FK_global_tap']
+        
+        >>> # Focusing depth
+        >>> xF = 2200
+        
+        >>> # Compute focusing function in actual medium
+        >>> Focus = F.FocusingFunction_k1_w(x3F=xF,normalisation='flux',
+                                            InternalMultiples=True,
+                                            Negative_eps=True)
+        >>> FP = Focus['FP_neps']
+        >>> FM = Focus['FM_neps']
+        
+        >>> # Compute reflection response of actual medium
+        >>> RT = F.RT_response_k1_w(normalisation='flux',InternalMultiples=True)
+        >>> RP = RT['RP']
+        
+        >>> # Compute Green's function G++ in actual medium
+        >>> G = F.GreensFunction_k1_w(x3S=0,x3R=xF,normalisation='flux',
+        >>>                           InternalMultiples=True)
+        >>> GPP = G['GPP']
+        
+        >>> # Transform all fields to the space-time domain
+        >>> gPP   = np.fft.fftshift(gain*F.K1W2X1T(FK*Wav*GPP)          ,axes=(0,1))
+        >>> fPc   = np.fft.fftshift(gain*F.K1W2X1T(FK*Wav*FP.conj())    ,axes=(0,1))
+        >>> rPfMc = np.fft.fftshift(gain*F.K1W2X1T(FK*Wav*RP*FM.conj()) ,axes=(0,1))
+        >>> # We plot the resulting fields below.
+
+        
+        .. image:: ../pictures/cropped/RecipCorr.png
+           :width: 700px
+           :height: 200px
         
         """
         
         # Check if normalisation is set correctly
         if normalisation is not 'flux':
-            sys.exit('FocusingFunction_p_w: This function only models the focusing function for flux-normalisation. (For pressure-normalistiont the required equations have to be derived.)')
+            sys.exit('FocusingFunction_k1_w: This function only models the '
+                     +'focusing function for flux-normalisation. (For '
+                     +'pressure-normalistiont the required equations have to '
+                     +'be derived.)')
+            
+        # Eigenvalues: To ensure that the eigenvalues are defined as 'self'
+        # parameters
+        Eig = self.Eigenvalues_k1_w()
         
         # Insert transparent interfaces at the focusing depth level.
         # The insertion implicitly checks that x3F is non-negative 
@@ -2561,45 +2719,51 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         else:
             Tmp_medium = self.Insert_layer(x3=x3F,UpdateSelf=False)
         
-        X3vec = Tmp_medium['x3vec']
-        Bvec = Tmp_medium['bvec']
-        G3vec = Tmp_medium['g3vec']
-        P3    = Tmp_medium['p3']
-        P3n   = Tmp_medium['p3n']
+        
+        
+        X3  = Tmp_medium['x3vec']
+        A  = Tmp_medium['avec']
+        B11 = Tmp_medium['b11vec']
+        B13 = Tmp_medium['b13vec']
+        B33 = Tmp_medium['b33vec']
+        G1  = Tmp_medium['g1vec']
+        G3  = Tmp_medium['g3vec']
+        K3  = Tmp_medium['K3']
+        K3n = Tmp_medium['K3n']
+        LP  = Tmp_medium['LP']
+        LPn = Tmp_medium['LPn']
+        LM  = Tmp_medium['LM']
+        LMn = Tmp_medium['LMn']
         
         # Index of the focusing depth
-        f = X3vec.tolist().index(x3F)
-        
-        # Only allow propagating waves to model the focusing function
-        if np.iscomplex(P3[:f+1]).any() or np.iscomplex(P3n[:f+1]).any():
-            sys.exit('FocusingFunction_p_w: (Here,) We only define the focusing function for propagating waves, i.e. not evanescent waves.')
+        f = X3.tolist().index(x3F)
         
         # Vector with layer thicknesses
-        dx3vec = X3vec.copy()
-        dx3vec[1:] = X3vec[1:]-X3vec[:-1]
+        dx3vec = X3.copy()
+        dx3vec[1:] = X3[1:]-X3[:-1]
         
         # Down- and upgoing focusing functions: Initial value
         # Here every frequency component has an amplitude equal to one. Hence,
         # the total wavefield has a strength of sqrt(nt)
         # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
         # Hence in the time domain the wavefield has an amplitude equal to one.
-        FP = np.ones((self.nf,1),dtype=complex)
-        FM = np.zeros((self.nf,1),dtype=complex)
+        FP = np.ones((self.nf,self.nr),dtype=complex)
+        FM = np.zeros((self.nf,self.nr),dtype=complex)
         
         # Reflection responses: Initial value
-        RP = np.zeros((self.nf,1),dtype=complex)
-        RM = np.zeros((self.nf,1),dtype=complex)
+        RP = np.zeros((self.nf,self.nr),dtype=complex)
+        RM = np.zeros((self.nf,self.nr),dtype=complex)
         
         # Here every frequency component has an amplitude equal to one. Hence,
         # the total wavefield has a strength of sqrt(nt)
         # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
         # Hence in the time domain the wavefield has an amplitude equal to one.
-        TP = np.ones((self.nf,1),dtype=complex)
-        TM = np.ones((self.nf,1),dtype=complex)
+        TP = np.ones((self.nf,self.nr),dtype=complex)
+        TM = np.ones((self.nf,self.nr),dtype=complex)
         
         # Internal multiple operator: Initial value
-        M1 = np.ones((self.nf,1),dtype=complex)
-        M2 = np.ones((self.nf,1),dtype=complex)
+        M1 = np.ones((self.nf,self.nr),dtype=complex)
+        M2 = np.ones((self.nf,self.nr),dtype=complex)
         
         if self.AdjointMedium is True:
             FPa = FP.copy()
@@ -2622,9 +2786,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         for n in range(0,f+1):
             
             # Scattering coefficients
-            ScatCoeffs = self.RT_p_w(beta_u=Bvec[n]  ,g3_u=G3vec[n]  ,p3_u=P3[n]  ,p3n_u=P3n[n],
-                                     beta_l=Bvec[n+1],g3_l=G3vec[n+1],p3_l=P3[n+1],p3n_l=P3n[n+1],
-                                     normalisation=normalisation)
+            ScatCoeffs = self.RT_k1_w(beta11_u=B11[n],beta13_u=B13[n],
+                                      beta33_u=B33[n],
+                                      K3_u=K3[:,:,n],K3n_u=K3n[:,:,n],
+                                      beta11_l=B11[n+1],beta13_l=B13[n+1],
+                                      beta33_l=B33[n+1],
+                                      K3_l=K3[:,:,n+1],K3n_l=K3n[:,:,n+1],
+                                      normalisation=normalisation)
             
             rP = ScatCoeffs['rP']
             tP = ScatCoeffs['tP']
@@ -2632,7 +2800,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             tM = ScatCoeffs['tM']
             
             # Propagators
-            W = self.W_propagators_p_w(p3=P3[n],p3n=P3n[n],g3=G3vec[n],dx3=dx3vec[n])
+            W = self.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                                        LM=LM[:,:,n],LMn=LMn[:,:,n],
+                                        dx3=dx3vec[n])
             WP = W['wP']
             WM = W['wM']
         
@@ -2671,86 +2841,147 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 
         # Verbose: Inform the user if any wavefield contains NaNs of Infs.
         if self.verbose is True:
-            
-            if (   np.isnan(FP).any() or np.isnan(FM).any() 
-                or np.isnan(RP).any() or np.isnan(RM).any() 
-                or np.isnan(TP).any() or np.isnan(TM).any()
-                or np.isinf(FP).any() or np.isinf(FM).any()
-                or np.isinf(RP).any() or np.isinf(TP).any() 
-                or np.isinf(RM).any() or np.isinf(TM).any()):
-                print('\n')
-                print('FocusingFunction_p_w:')
-                print('\n'+100*'-'+'\n')
-                print('One of the modelled wavefields in the true medium contains a NaN (Not a Number) or an Inf (infinite) element.')
-                print('\n')
-                
-                if np.isnan(FP).any():
-                    print('\t - FP contains '+np.count_nonzero(np.isnan(FP))+' NaN.')
-                if np.isinf(FP).any():
-                    print('\t - FP contains '+np.count_nonzero(np.isinf(FP))+' Inf.')
-                if np.isnan(RP).any():
-                    print('\t - RP contains '+np.count_nonzero(np.isnan(RP))+' NaN.')
-                if np.isinf(RP).any():
-                    print('\t - RP contains '+np.count_nonzero(np.isinf(RP))+' Inf.')
-                if np.isnan(TP).any():
-                    print('\t - TP contains '+np.count_nonzero(np.isnan(TP))+' NaN.')
-                if np.isinf(TP).any():
-                    print('\t - TP contains '+np.count_nonzero(np.isinf(TP))+' Inf.')
-                if np.isnan(FM).any():
-                    print('\t - FM contains '+np.count_nonzero(np.isnan(FM))+' NaN.')
-                if np.isinf(FM).any():
-                    print('\t - FM contains '+np.count_nonzero(np.isinf(FM))+' Inf.')
-                if np.isnan(RM).any():
-                    print('\t - RM contains '+np.count_nonzero(np.isnan(RM))+' NaN.')
-                if np.isinf(RM).any():
-                    print('\t - RM contains '+np.count_nonzero(np.isinf(RM))+' Inf.')
-                if np.isnan(TM).any():
-                    print('\t - TM contains '+np.count_nonzero(np.isnan(TM))+' NaN.')
-                if np.isinf(TM).any():
-                    print('\t - TM contains '+np.count_nonzero(np.isinf(TM))+' Inf.')
+            self.Contains_Nan_Inf('FocusingFunction_k1_w',(FP,'FP'),(FM,'FM'),
+                                  (RP,'RP'),(RM,'RM'),(TP,'TP'),(TM,'TM'))
             
             if self.AdjointMedium is True:
-                
-                if (   np.isnan(FPa).any() or np.isnan(FMa).any() 
-                    or np.isnan(RPa).any() or np.isnan(RMa).any() 
-                    or np.isnan(TPa).any() or np.isnan(TMa).any()
-                    or np.isinf(FPa).any() or np.isinf(FMa).any()
-                    or np.isinf(RPa).any() or np.isinf(TPa).any() 
-                    or np.isinf(RMa).any() or np.isinf(TMa).any()):
-                    print('\n')
-                    print('FocusingFunction_p_w:')
-                    print('\n'+100*'-'+'\n')
-                    print('One of the modelled wavefields in the adoint medium contains a NaN (Not a Number) or an Inf (infinite) element.')
-                    print('\n')
-                    
-                    if np.isnan(FPa).any():
-                        print('\t - FPa contains '+np.count_nonzero(np.isnan(FPa))+' NaN.')
-                    if np.isinf(FPa).any():
-                        print('\t - FPa contains '+np.count_nonzero(np.isinf(FPa))+' Inf.')
-                    if np.isnan(RPa).any():
-                        print('\t - RPa contains '+np.count_nonzero(np.isnan(RPa))+' NaN.')
-                    if np.isinf(RPa).any():
-                        print('\t - RPa contains '+np.count_nonzero(np.isinf(RPa))+' Inf.')
-                    if np.isnan(TPa).any():
-                        print('\t - TPa contains '+np.count_nonzero(np.isnan(TPa))+' NaN.')
-                    if np.isinf(TPa).any():
-                        print('\t - TPa contains '+np.count_nonzero(np.isinf(TPa))+' Inf.')
-                    if np.isnan(FMa).any():
-                        print('\t - FMa contains '+np.count_nonzero(np.isnan(FMa))+' NaN.')
-                    if np.isinf(FMa).any():
-                        print('\t - FMa contains '+np.count_nonzero(np.isinf(FMa))+' Inf.')
-                    if np.isnan(RMa).any():
-                        print('\t - RMa contains '+np.count_nonzero(np.isnan(RMa))+' NaN.')
-                    if np.isinf(RMa).any():
-                        print('\t - RMa contains '+np.count_nonzero(np.isinf(RMa))+' Inf.')
-                    if np.isnan(TMa).any():
-                        print('\t - TMa contains '+np.count_nonzero(np.isnan(TMa))+' NaN.')
-                    if np.isinf(TMa).any():
-                        print('\t - TMa contains '+np.count_nonzero(np.isinf(TMa))+' Inf.')
-                
-                print('\n')
-
+                self.Contains_Nan_Inf('FocusingFunction_k1_w',(FPa,'FPa'),
+                                      (FMa,'FMa'),(RPa,'RPa'),(RMa,'RMa'),
+                                      (TPa,'TPa'),(TMa,'TMa'))
                 
         out={'FP':FP  ,'RP':RP  ,'TP':TP  ,'FM':FM  ,'RM':RM  ,'TM':TM,
-             'FPa':FPa,'RPa':RPa,'TPa':TPa,'FMa':FMa,'RMa':RMa,'TMa':TMa}
+                 'FPa':FPa,'RPa':RPa,'TPa':TPa,'FMa':FMa,'RMa':RMa,'TMa':TMa}
+        
+        # When focusing functions are complex-conjugated the imaginary-part
+        # of a complex-valued frequency, eps, should be negative.
+        # If requested the corresponding focusing functions are computed below.
+        if (self.eps is not None) and (self.eps != 0) and (Negative_eps is True):
+            self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
+                                            self.verbose,eps=-self.eps,
+                                            x3vec=X3,avec=A,
+                                            b11vec=B11,b13vec=B13,b33vec=B33,
+                                            g1vec=G1,g3vec=G3,
+                                            ReciprocalMedium=self.ReciprocalMedium,
+                                            AdjointMedium=self.AdjointMedium)
+                
+            # Eigenvalues: 
+            Eig = self.SubSelf.Eigenvalues_k1_w()
+            LP  = Eig['LP']
+            LM  = Eig['LM']
+            LPn = Eig['LPn']
+            LMn = Eig['LMn']
+            
+            # Vertical wavenumbers
+            K3  = self.SubSelf.K3
+            K3n = self.SubSelf.K3n
+            
+            # Down- and upgoing focusing functions: Initial value
+            # Here every frequency component has an amplitude equal to one. Hence,
+            # the total wavefield has a strength of sqrt(nt)
+            # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
+            # Hence in the time domain the wavefield has an amplitude equal to one.
+            FP = np.ones((self.nf,self.nr),dtype=complex)
+            FM = np.zeros((self.nf,self.nr),dtype=complex)
+            
+            # Reflection responses: Initial value
+            RP = np.zeros((self.nf,self.nr),dtype=complex)
+            RM = np.zeros((self.nf,self.nr),dtype=complex)
+            
+            # Here every frequency component has an amplitude equal to one. Hence,
+            # the total wavefield has a strength of sqrt(nt)
+            # When an ifft is applied the wavefield is scaled by 1/sqrt(nt).
+            # Hence in the time domain the wavefield has an amplitude equal to one.
+            TP = np.ones((self.nf,self.nr),dtype=complex)
+            TM = np.ones((self.nf,self.nr),dtype=complex)
+            
+            # Internal multiple operator: Initial value
+            M1 = np.ones((self.nf,self.nr),dtype=complex)
+            M2 = np.ones((self.nf,self.nr),dtype=complex)
+            
+            if self.AdjointMedium is True:
+                FPa = FP.copy()
+                FMa = FM.copy()
+                RPa = RP.copy()
+                RMa = RP.copy()
+                TPa = TP.copy()
+                TMa = TP.copy()
+            else:
+                FPa = None
+                FMa = None
+                RPa = None
+                TPa = None
+                RMa = None
+                TMa = None
+        
+            # Loop over f+1 interfaces
+            # Thus, the wavefield propagates to the focusing depth, and scatters
+            # at the focusing depth.
+            for n in range(0,f+1):
+                
+                # Scattering coefficients
+                ScatCoeffs = self.SubSelf.RT_k1_w(beta11_u=B11[n],beta13_u=B13[n],
+                                                  beta33_u=B33[n],
+                                                  K3_u=K3[:,:,n],K3n_u=K3n[:,:,n],
+                                                  beta11_l=B11[n+1],beta13_l=B13[n+1],
+                                                  beta33_l=B33[n+1],
+                                                  K3_l=K3[:,:,n+1],K3n_l=K3n[:,:,n+1],
+                                                  normalisation=normalisation)
+                
+                rP = ScatCoeffs['rP']
+                tP = ScatCoeffs['tP']
+                rM = ScatCoeffs['rM']
+                tM = ScatCoeffs['tM']
+                
+                # Propagators
+                W = self.SubSelf.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                                                    LM=LM[:,:,n],LMn=LMn[:,:,n],
+                                                    dx3=dx3vec[n])
+                WP = W['wP']
+                WM = W['wM']
+            
+                if InternalMultiples is True:
+                    M1 = 1 / (1 - RM*WM*rP*WP)
+                    M2 = 1 / (1 - rP*WP*RM*WM)
+                
+                # Update focusing functions and reflection / transmission responses
+                FP = FP/WP*(1-WP*RM*WM*rP)/tP
+                RP = RP + TM*WM*rP*WP*M1*TP
+                RM = rM + tP*WP*RM*WM*M2*tM
+                TP = tP*WP*M1*TP
+                TM = TM*WM*M2*tM  
+                FM = RP*FP
+                
+                # Model focusing functions in the adjoint medium
+                if self.AdjointMedium is True:
+                    rP = ScatCoeffs['rPa']
+                    tP = ScatCoeffs['tPa']
+                    rM = ScatCoeffs['rMa']
+                    tM = ScatCoeffs['tMa']
+                    WP = W['wPa']
+                    WM = W['wMa']
+                
+                    if InternalMultiples is True:
+                        M1 = 1 / (1 - RMa*WM*rP*WP)
+                        M2 = 1 / (1 - rP*WP*RMa*WM)
+                    
+                    # Update focusing functions and reflection / transmission responses
+                    FPa = FPa/WP*(1-WP*RMa*WM*rP)/tP
+                    RPa = RPa + TMa*WM*rP*WP*M1*TPa
+                    RMa = rM + tP*WP*RMa*WM*M2*tM
+                    TPa = tP*WP*M1*TPa
+                    TMa = TMa*WM*M2*tM  
+                    FMa = RPa*FPa
+                    
+            # Verbose: Inform the user if any wavefield contains NaNs of Infs.
+            if self.verbose is True:
+                self.Contains_Nan_Inf('FocusingFunction_k1_w',(FP,'FP'),(FM,'FM'),
+                                      (RP,'RP'),(RM,'RM'),(TP,'TP'),(TM,'TM'))
+                
+                if self.AdjointMedium is True:
+                    self.Contains_Nan_Inf('FocusingFunction_k1_w',(FPa,'FPa'),
+                                          (FMa,'FMa'),(RPa,'RPa'),(RMa,'RMa'),
+                                          (TPa,'TPa'),(TMa,'TMa'))
+                    
+            out.update({'FP_neps':FP   ,'FM_neps':FM  ,'RP_neps':RP ,
+                        'FPa_neps':FPa ,'FMa_neps':FMa})
         return out

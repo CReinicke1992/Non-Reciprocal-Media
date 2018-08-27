@@ -576,7 +576,8 @@ applied to complex-valued arrays.</p>
 <code class="descname">Eigenvalues_k1_w</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.Eigenvalues_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.Eigenvalues_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the eigenvalues <span class="math notranslate">\(\lambda^{\pm}\)</span> of the two-way 
 operator matrix <span class="math notranslate">\(\rm{\bf A}\)</span> in the wavenumber-frequency 
-domain.</p>
+domain. The eigenvalues are associated with the medium parameters 
+defined at initialisation of the wavefield.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1230,10 +1231,15 @@ update the ‘self’ parameters.</p>
 <li><strong>g3vec</strong>: Updated <span class="math notranslate">\(\gamma_3\)</span> vector.</li>
 <li><strong>K3</strong>:    Updated <span class="math notranslate">\(k_3(k_1)\)</span> vector.</li>
 <li><strong>K3n</strong>:   Updated <span class="math notranslate">\(k_3(-k_1)\)</span> vector.</li>
+<li><strong>LP</strong>:    Updated eigenvalues <span class="math notranslate">\(\lambda^+(k_1)\)</span>.</li>
+<li><strong>LPn</strong>:   Updated eigenvalues <span class="math notranslate">\(\lambda^+(-k_1)\)</span>.</li>
+<li><strong>LM</strong>:    Updated eigenvalues <span class="math notranslate">\(\lambda^-(k_1)\)</span>.</li>
+<li><strong>LMn</strong>:   Updated eigenvalues <span class="math notranslate">\(\lambda^-(-k_1)\)</span>.</li>
 </ul>
 </div></blockquote>
 <p>All medium parameter vectors are stored in arrays of shape (n,).
-The vertical wavenumbers are stored in arrays of shape (nf,nr,n).</p>
+The vertical wavenumbers and the eigenvalues are stored in arrays 
+of shape (nf,nr,n).</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1385,9 +1391,13 @@ one sets ‘AdjointMedium=True’.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_p_w">
-<code class="descname">FocusingFunction_p_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.FocusingFunction_p_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_p_w" title="Permalink to this definition">¶</a></dt>
-<dd><p>computes the focusing functions between the top surface (<span class="math notranslate">\(x_3=0\)</span>) and the focusing depth defined by the input variable ‘x3F’. We define the focusing depth just below ‘x3F’. Hence, if the focusing depth coincides with an interface the focusing function focuses below that interface.</p>
+<dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w">
+<code class="descname">FocusingFunction_k1_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em>, <em>Negative_eps=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.FocusingFunction_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the focusing functions between the top surface 
+(<span class="math notranslate">\(x_3=0\)</span>) and the focusing depth defined by the input variable 
+‘x3F’. We define the focusing depth just below ‘x3F’. Hence, if the 
+focusing depth coincides with an interface the focusing function 
+focuses below that interface.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1398,19 +1408,36 @@ one sets ‘AdjointMedium=True’.</p>
 </div></blockquote>
 <p><strong>normalisation</strong> : str, optional</p>
 <blockquote>
-<div><p>For pressure-normalisation set normalisation=’pressure’, for flux-normalisation set normalisation=’flux’. Until now, this function only models the focusing function for flux-normalisation.</p>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for 
+flux-normalisation set normalisation=’flux’. Until now, this 
+function only models the focusing function for flux-normalisation.
+For pressure-normalisation, I still have to derive the analytic 
+expression to recursively compute the focusing function.</p>
 </div></blockquote>
 <p><strong>InternalMultiples</strong> : bool, optional</p>
 <blockquote>
-<div><p>To model internal multiples set ‘InternalMultiples=True’. To ignore internal multiples set ‘InternalMultiples=False’.</p>
+<div><p>To model internal multiples set ‘InternalMultiples=True’. To ignore 
+internal multiples set ‘InternalMultiples=False’.</p>
+</div></blockquote>
+<p><strong>Negative_eps</strong> : bool, optional</p>
+<blockquote>
+<div><p>If ‘Negative_eps=True’ the focusing functions are computed for both 
+a positive and a negative parameter ‘eps’ (imaginary-part of the
+frequency,
+<span class="math notranslate">\(\omega' = \omega + j \epsilon\)</span>). 
+The representation theorem of the corrleation-type only holds 
+accurately if the complex-conjugated focusing functions are 
+computed with a negative ‘eps’ parameter, whereas all other 
+qunatities (Green’s functions and reflection response) must be 
+computed using a positive ‘eps’ parameter.</p>
 </div></blockquote>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
 <blockquote class="last">
-<div><dl class="docutils">
-<dt>Dictionary that contains </dt>
-<dd><ul class="first last simple">
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
 <li><strong>FP</strong>: Downgoing focusing function.</li>
 <li><strong>RP</strong>: Reflection response from above.</li>
 <li><strong>TP</strong>: Transmission response from above.</li>
@@ -1423,10 +1450,17 @@ one sets ‘AdjointMedium=True’.</p>
 <li><strong>FMa</strong>: Upgoing focusing function (adjoint medium).</li>
 <li><strong>RMa</strong>: Reflection response from below (adjoint medium).</li>
 <li><strong>TMa</strong>: Transmission response from below (adjoint medium).</li>
+<li><strong>FP_neps</strong>: Downgoing focusing function with negative ‘eps’ parameter, <span class="math notranslate">\(\omega' = \omega - j \vert \epsilon \vert\)</span>.</li>
+<li><strong>FM_neps</strong>: Upgoing focusing function with negative ‘eps’ parameter, <span class="math notranslate">\(\omega' = \omega - j \vert \epsilon \vert\)</span>.</li>
+<li><strong>FPa_neps</strong>: Downgoing focusing function with negative ‘eps’ parameter, <span class="math notranslate">\(\omega' = \omega - j \vert \epsilon \vert\)</span>,  in adjoint medium.</li>
+<li><strong>FMa_neps</strong>: Upgoing focusing function with negative ‘eps’ parameter, <span class="math notranslate">\(\omega' = \omega - j  \vert \epsilon \vert\)</span>,  in adjoint medium.</li>
+<li><strong>RPa_neps</strong>: Reflection response from above  with negative ‘eps’ parameter, <span class="math notranslate">\(\omega' = \omega - j \vert \epsilon \vert\)</span>,  in adjoint medium.</li>
 </ul>
-</dd>
-</dl>
-<p>All medium responses are stored in arrays of shape (nf,1). The variables ‘FPa’, ‘RPa’, ‘TPa’, ‘FMa’, ‘RMa’ and ‘TMa’ are computed only if one sets ‘AdjointMedium=True’.</p>
+</div></blockquote>
+<p>All medium responses are stored in arrays of shape (nf,nr). The 
+variables ‘FPa’, ‘RPa’, ‘TPa’, ‘FMa’, ‘RMa’ and ‘TMa’ are computed 
+only if one sets ‘AdjointMedium=True’. The variables ending on 
+‘_neps’ are only computed if one set ‘Negative_eps=True’.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -1444,20 +1478,72 @@ one sets ‘AdjointMedium=True’.</p>
 <dd><span class="math notranslate">\(\tilde{F}_{1,n}^- = \tilde{R}^{\cup} \tilde{F}_{1,n}^+\)</span>.</dd>
 </dl>
 </li>
+<li>When using a complex-valued frequency <span class="math notranslate">\(\omega' = \omega + j \epsilon\)</span>, the representation theorem of the corrleation-type only holds accurately if the complex-conjugated focusing functions are computed with a negative ‘eps’ parameter, whereas all other qunatities (Green’s functions and reflection response) must be computed using a positive ‘eps’ parameter.</li>
 </ul>
 <p class="rubric">References</p>
 <p>Kees document as soon as it is published.</p>
 <p class="rubric">Examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_p_w</span> <span class="k">import</span> <span class="n">Layered_NRM_p_w</span> <span class="k">as</span> <span class="n">LM</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Layered_NRM_k1_w</span> <span class="k">import</span> <span class="n">Layered_NRM_k1_w</span> <span class="k">as</span> <span class="n">LM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">F</span><span class="o">=</span><span class="n">LM</span><span class="p">(</span> <span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span><span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">10</span><span class="p">,</span><span class="mi">150</span><span class="p">,</span><span class="mi">200</span><span class="p">]),</span>
-<span class="gp">&gt;&gt;&gt; </span>      <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]),</span><span class="n">bvec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">]),</span>
-<span class="gp">&gt;&gt;&gt; </span>      <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">]),</span><span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.14</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]),</span>
-<span class="gp">&gt;&gt;&gt; </span>      <span class="n">p1</span><span class="o">=</span><span class="mf">2e-4</span><span class="p">,</span><span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">LM</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">5e-3</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span>
+<span class="go">           x3vec=np.array([1.1,2.2,3.7])*1e3,eps=3/(513*5e-3),</span>
+<span class="go">           avec=np.array([1,2,3])*1e-3,</span>
+<span class="go">           b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="go">           b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="go">           b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="go">           g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="go">           g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="go">           ReciprocalMedium=False,AdjointMedium=True)</span>
 </pre></div>
 </div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute Ricker wavelet</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Wav</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">RickerWavelet_w</span><span class="p">(</span><span class="n">f0</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute correction term</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gain</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">Gain_t</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Make FK-filter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">M</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">FK1_mask_k1_w</span><span class="p">(</span><span class="n">wmax</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span><span class="n">Opening</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FK</span> <span class="o">=</span> <span class="n">M</span><span class="p">[</span><span class="s1">&#39;FK_global_tap&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Focusing depth</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">xF</span> <span class="o">=</span> <span class="mi">2200</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute focusing function in actual medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Focus</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">FocusingFunction_k1_w</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="n">xF</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
+<span class="go">                                    InternalMultiples=True,</span>
+<span class="go">                                    Negative_eps=True)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FP</span> <span class="o">=</span> <span class="n">Focus</span><span class="p">[</span><span class="s1">&#39;FP_neps&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FM</span> <span class="o">=</span> <span class="n">Focus</span><span class="p">[</span><span class="s1">&#39;FM_neps&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute reflection response of actual medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RT</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">RT_response_k1_w</span><span class="p">(</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span><span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">RP</span> <span class="o">=</span> <span class="n">RT</span><span class="p">[</span><span class="s1">&#39;RP&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute Green&#39;s function G++ in actual medium</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">GreensFunction_k1_w</span><span class="p">(</span><span class="n">x3S</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">x3R</span><span class="o">=</span><span class="n">xF</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                          <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">GPP</span> <span class="o">=</span> <span class="n">G</span><span class="p">[</span><span class="s1">&#39;GPP&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Transform all fields to the space-time domain</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gPP</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="n">F</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FK</span><span class="o">*</span><span class="n">Wav</span><span class="o">*</span><span class="n">GPP</span><span class="p">)</span>          <span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fPc</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="n">F</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FK</span><span class="o">*</span><span class="n">Wav</span><span class="o">*</span><span class="n">FP</span><span class="o">.</span><span class="n">conj</span><span class="p">())</span>    <span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rPfMc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="n">F</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FK</span><span class="o">*</span><span class="n">Wav</span><span class="o">*</span><span class="n">RP</span><span class="o">*</span><span class="n">FM</span><span class="o">.</span><span class="n">conj</span><span class="p">())</span> <span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># We plot the resulting fields below.</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/RecipCorr.png"><img alt="_images/RecipCorr.png" src="_images/RecipCorr.png" style="width: 700px; height: 200px;" /></a>
 </dd></dl>
 
 </dd></dl>

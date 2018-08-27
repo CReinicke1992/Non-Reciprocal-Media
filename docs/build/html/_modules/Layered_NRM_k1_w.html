@@ -409,6 +409,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span>  <span class="o">=</span> <span class="n">g3vec</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="o">=</span> <span class="n">ReciprocalMedium</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span>    <span class="o">=</span> <span class="n">AdjointMedium</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">=</span> <span class="n">eps</span>
+        
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;WARNING: Layered_NRM_k1_w</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="mi">72</span><span class="o">*</span><span class="s1">&#39;-&#39;</span>
+                  <span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">The parameter </span><span class="se">\&#39;</span><span class="s1">eps</span><span class="se">\&#39;</span><span class="s1"> should be positive. </span><span class="se">\n</span><span class="s1">&#39;</span>
+                  <span class="o">+</span><span class="s1">&#39;(Exception) The function </span><span class="se">\&#39;</span><span class="s1">FocusingFunction_k1_w</span><span class="se">\&#39;</span><span class="s1"> uses a &#39;</span>
+                  <span class="o">+</span><span class="s1">&#39;negative </span><span class="se">\&#39;</span><span class="s1">eps</span><span class="se">\&#39;</span><span class="s1"> value to handle the wrap-around correctly&#39;</span>
+                  <span class="o">+</span><span class="s1">&#39; in case of complex-conjugated focusing functions.&#39;</span><span class="p">)</span>
         
         <span class="c1"># Calculate vertical ray-parameter p3=p3(+p1) p3n=p3(-p1) </span>
         <span class="c1"># Note: By default python uses opposite sign convention for evanescent waves as Kees: (-1)**0.5=1j</span>
@@ -436,11 +444,17 @@
                     <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     
-                    <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>  <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
-                    <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>
+                    <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>  <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>  <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+                    <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
                     
         <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>  <span class="o">=</span> <span class="n">K3</span><span class="o">**</span><span class="mf">0.5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span> <span class="o">=</span> <span class="n">K3n</span><span class="o">**</span><span class="mf">0.5</span>
+        
+        <span class="c1"># Predefine eigenvalues</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LP</span>  <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LM</span>  <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LPn</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LMn</span> <span class="o">=</span> <span class="kc">None</span>
         
     
 <div class="viewcode-block" id="Layered_NRM_k1_w.FK1_mask_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.FK1_mask_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">FK1_mask_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">),</span><span class="n">wmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">Opening</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
@@ -697,9 +711,10 @@
 <div class="viewcode-block" id="Layered_NRM_k1_w.Eigenvalues_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.Eigenvalues_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">Eigenvalues_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the eigenvalues :math:`\lambda^{\pm}` of the two-way </span>
 <span class="sd">        operator matrix :math:`\\rm{\\bf A}` in the wavenumber-frequency </span>
-<span class="sd">        domain.</span>
-<span class="sd">        </span>
-<span class="sd">        </span>
+<span class="sd">        domain. The eigenvalues are associated with the medium parameters </span>
+<span class="sd">        defined at initialisation of the wavefield.</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
@@ -740,6 +755,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        Kees document as soon as it is published.</span>
 
+
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
@@ -758,7 +774,6 @@
 <span class="sd">        -0.0006226976760655292j</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        
         <span class="c1"># Frequency and horizontal-wavenumber meshgrids</span>
         <span class="n">Om</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
         <span class="n">K1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;K1gridfft&#39;</span><span class="p">]</span>
@@ -819,6 +834,12 @@
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;--------------------------------------------&#39;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;For reciprocal media, the eigenvalues are not yet &#39;</span>
                       <span class="o">+</span><span class="s1">&#39;implemented.&#39;</span><span class="p">)</span>
+                
+        <span class="c1"># Save eigenvalues in self</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LP</span>  <span class="o">=</span> <span class="n">LP</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LM</span>  <span class="o">=</span> <span class="n">LM</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LPn</span> <span class="o">=</span> <span class="n">LPn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">LMn</span> <span class="o">=</span> <span class="n">LMn</span>
         
         <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;LP&quot;</span><span class="p">:</span><span class="n">LP</span><span class="p">,</span><span class="s2">&quot;LM&quot;</span><span class="p">:</span><span class="n">LM</span><span class="p">,</span><span class="s2">&quot;LPn&quot;</span><span class="p">:</span><span class="n">LPn</span><span class="p">,</span><span class="s2">&quot;LMn&quot;</span><span class="p">:</span><span class="n">LMn</span><span class="p">}</span></div>
     
@@ -1623,6 +1644,7 @@
 <span class="sd">        included. However, the propagation through the deepest layer is </span>
 <span class="sd">        excluded.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">    </span>
@@ -1782,7 +1804,7 @@
             <span class="n">b33vec</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b33vec</span>
             <span class="n">K3</span>      <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>
             <span class="n">K3n</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span>    
-            <span class="n">Eig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
+            <span class="n">Eig</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
         
         <span class="c1"># Eigenvalues</span>
         <span class="n">LP</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LP&#39;</span><span class="p">]</span>
@@ -1924,9 +1946,14 @@
 <span class="sd">                - **g3vec**: Updated :math:`\gamma_3` vector.</span>
 <span class="sd">                - **K3**:    Updated :math:`k_3(k_1)` vector.</span>
 <span class="sd">                - **K3n**:   Updated :math:`k_3(-k_1)` vector.</span>
+<span class="sd">                - **LP**:    Updated eigenvalues :math:`\lambda^+(k_1)`.</span>
+<span class="sd">                - **LPn**:   Updated eigenvalues :math:`\lambda^+(-k_1)`.</span>
+<span class="sd">                - **LM**:    Updated eigenvalues :math:`\lambda^-(k_1)`.</span>
+<span class="sd">                - **LMn**:   Updated eigenvalues :math:`\lambda^-(-k_1)`.</span>
 <span class="sd">                </span>
 <span class="sd">            All medium parameter vectors are stored in arrays of shape (n,).</span>
-<span class="sd">            The vertical wavenumbers are stored in arrays of shape (nf,nr,n).</span>
+<span class="sd">            The vertical wavenumbers and the eigenvalues are stored in arrays </span>
+<span class="sd">            of shape (nf,nr,n).</span>
 <span class="sd">        </span>
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1989,6 +2016,10 @@
         <span class="n">G3vec</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span>
         <span class="n">K3</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>
         <span class="n">K3n</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span>
+        <span class="n">LP</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LP</span>
+        <span class="n">LPn</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LPn</span>
+        <span class="n">LM</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LM</span>
+        <span class="n">LMn</span>    <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">LMn</span>
         
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">x3</span><span class="p">)):</span>
         
@@ -2006,6 +2037,13 @@
                 <span class="n">G3vec</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">G3vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>   <span class="p">,</span><span class="n">G3vec</span><span class="p">])</span>
                 <span class="n">K3</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">K3</span><span class="p">[:,:,:</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">K3</span><span class="p">])</span>
                 <span class="n">K3n</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">K3n</span><span class="p">[:,:,:</span><span class="mi">1</span><span class="p">],</span><span class="n">K3n</span><span class="p">])</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>     <span class="p">(</span><span class="n">LP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LPn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+                        <span class="ow">and</span>  <span class="p">(</span><span class="n">LM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LMn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
+                    <span class="n">LP</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LP</span><span class="p">[:,:,:</span><span class="mi">1</span><span class="p">]</span>  <span class="p">,</span><span class="n">LP</span><span class="p">])</span>
+                    <span class="n">LPn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LPn</span><span class="p">[:,:,:</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">LPn</span><span class="p">])</span>
+                    <span class="n">LM</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LM</span><span class="p">[:,:,:</span><span class="mi">1</span><span class="p">]</span>  <span class="p">,</span><span class="n">LM</span><span class="p">])</span>
+                    <span class="n">LMn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LMn</span><span class="p">[:,:,:</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">LMn</span><span class="p">])</span>
             
             <span class="c1"># Case2: x3[i] coincides with an element of X3vec</span>
             <span class="k">elif</span> <span class="n">L</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">x3</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
@@ -2018,6 +2056,13 @@
                 <span class="n">G3vec</span>  <span class="o">=</span> <span class="n">G3vec</span>
                 <span class="n">K3</span>     <span class="o">=</span> <span class="n">K3</span>
                 <span class="n">K3n</span>    <span class="o">=</span> <span class="n">K3n</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>     <span class="p">(</span><span class="n">LP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LPn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+                        <span class="ow">and</span>  <span class="p">(</span><span class="n">LM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LMn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
+                    <span class="n">LP</span>  <span class="o">=</span> <span class="n">LP</span>
+                    <span class="n">LPn</span> <span class="o">=</span> <span class="n">LPn</span>
+                    <span class="n">LM</span>  <span class="o">=</span> <span class="n">LM</span>
+                    <span class="n">LMn</span> <span class="o">=</span> <span class="n">LMn</span>
             
             <span class="c1"># Case 3: x3[i] is larger than X3vec[-1]</span>
             <span class="k">elif</span> <span class="n">L</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="n">X3vec</span><span class="o">.</span><span class="n">size</span><span class="p">:</span>
@@ -2030,6 +2075,13 @@
                 <span class="n">G3vec</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">G3vec</span> <span class="p">,</span><span class="n">G3vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
                 <span class="n">K3</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">K3</span>    <span class="p">,</span><span class="n">K3</span><span class="p">[:,:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]])</span>
                 <span class="n">K3n</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">K3n</span>   <span class="p">,</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]])</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>     <span class="p">(</span><span class="n">LP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LPn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+                        <span class="ow">and</span>  <span class="p">(</span><span class="n">LM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LMn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
+                    <span class="n">LP</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LP</span>  <span class="p">,</span> <span class="n">LP</span><span class="p">[:,:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]])</span>
+                    <span class="n">LPn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LPn</span> <span class="p">,</span> <span class="n">LPn</span><span class="p">[:,:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]])</span>
+                    <span class="n">LM</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LM</span>  <span class="p">,</span> <span class="n">LM</span><span class="p">[:,:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]])</span>
+                    <span class="n">LMn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LMn</span> <span class="p">,</span> <span class="n">LMn</span><span class="p">[:,:,</span><span class="o">-</span><span class="mi">1</span><span class="p">:]])</span>
                 
             <span class="c1"># Case 4: x3[i] is between X3vec[0] and X3vec[-1] AND does not </span>
             <span class="c1"># coincide with any element of X3vec</span>
@@ -2047,6 +2099,13 @@
                 <span class="n">G3vec</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">([</span><span class="n">G3vec</span><span class="p">[:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>  <span class="p">,</span><span class="n">G3vec</span><span class="p">[</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>        <span class="p">,</span><span class="n">G3vec</span><span class="p">[</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
                 <span class="n">K3</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">K3</span><span class="p">[:,:,:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="p">,</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
                 <span class="n">K3n</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">K3n</span><span class="p">[:,:,:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
+                
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>     <span class="p">(</span><span class="n">LP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LPn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+                        <span class="ow">and</span>  <span class="p">(</span><span class="n">LM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LMn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
+                    <span class="n">LP</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LP</span><span class="p">[:,:,:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="p">,</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
+                    <span class="n">LPn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LPn</span><span class="p">[:,:,:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
+                    <span class="n">LM</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LM</span><span class="p">[:,:,:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span> <span class="p">,</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
+                    <span class="n">LMn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">([</span><span class="n">LMn</span><span class="p">[:,:,:</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">ind</span><span class="o">+</span><span class="mi">2</span><span class="p">],</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">ind</span><span class="o">+</span><span class="mi">1</span><span class="p">:]])</span>
             
         <span class="c1"># Update self: Apply layer insertion to the self-parameters    </span>
         <span class="k">if</span> <span class="n">UpdateSelf</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
@@ -2060,8 +2119,17 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>     <span class="o">=</span> <span class="n">K3</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span>    <span class="o">=</span> <span class="n">K3n</span>
             
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>     <span class="p">(</span><span class="n">LP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LPn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
+                        <span class="ow">and</span>  <span class="p">(</span><span class="n">LM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LMn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LP</span>  <span class="o">=</span> <span class="n">LP</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LPn</span> <span class="o">=</span> <span class="n">LPn</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LM</span>  <span class="o">=</span> <span class="n">LM</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">LMn</span> <span class="o">=</span> <span class="n">LMn</span>
+            
+            
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x3vec&#39;</span><span class="p">:</span><span class="n">X3vec</span><span class="p">,</span><span class="s1">&#39;avec&#39;</span><span class="p">:</span><span class="n">Avec</span><span class="p">,</span><span class="s1">&#39;b11vec&#39;</span><span class="p">:</span><span class="n">B11vec</span><span class="p">,</span><span class="s1">&#39;b13vec&#39;</span><span class="p">:</span><span class="n">B13vec</span><span class="p">,</span>
-               <span class="s1">&#39;b33vec&#39;</span><span class="p">:</span><span class="n">B33vec</span><span class="p">,</span><span class="s1">&#39;g1vec&#39;</span><span class="p">:</span><span class="n">G1vec</span><span class="p">,</span><span class="s1">&#39;g3vec&#39;</span><span class="p">:</span><span class="n">G3vec</span><span class="p">,</span><span class="s1">&#39;K3&#39;</span><span class="p">:</span><span class="n">K3</span><span class="p">,</span><span class="s1">&#39;K3n&#39;</span><span class="p">:</span><span class="n">K3n</span><span class="p">}</span>
+               <span class="s1">&#39;b33vec&#39;</span><span class="p">:</span><span class="n">B33vec</span><span class="p">,</span><span class="s1">&#39;g1vec&#39;</span><span class="p">:</span><span class="n">G1vec</span><span class="p">,</span><span class="s1">&#39;g3vec&#39;</span><span class="p">:</span><span class="n">G3vec</span><span class="p">,</span><span class="s1">&#39;K3&#39;</span><span class="p">:</span><span class="n">K3</span><span class="p">,</span><span class="s1">&#39;K3n&#39;</span><span class="p">:</span><span class="n">K3n</span><span class="p">,</span>
+               <span class="s1">&#39;LP&#39;</span><span class="p">:</span><span class="n">LP</span><span class="p">,</span><span class="s1">&#39;LPn&#39;</span><span class="p">:</span><span class="n">LPn</span><span class="p">,</span><span class="s1">&#39;LM&#39;</span><span class="p">:</span><span class="n">LM</span><span class="p">,</span><span class="s1">&#39;LMn&#39;</span><span class="p">:</span><span class="n">LMn</span><span class="p">}</span>
         
         <span class="k">return</span> <span class="n">out</span></div>
     
@@ -2540,8 +2608,13 @@
         
         <span class="k">return</span> <span class="n">out</span></div>
     
-<div class="viewcode-block" id="Layered_NRM_k1_w.FocusingFunction_p_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_p_w">[docs]</a>    <span class="k">def</span> <span class="nf">FocusingFunction_p_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x3F</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span><span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;computes the focusing functions between the top surface (:math:`x_3=0`) and the focusing depth defined by the input variable \&#39;x3F\&#39;. We define the focusing depth just below \&#39;x3F\&#39;. Hence, if the focusing depth coincides with an interface the focusing function focuses below that interface.</span>
+<div class="viewcode-block" id="Layered_NRM_k1_w.FocusingFunction_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">FocusingFunction_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x3F</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
+                              <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">Negative_eps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the focusing functions between the top surface </span>
+<span class="sd">        (:math:`x_3=0`) and the focusing depth defined by the input variable </span>
+<span class="sd">        \&#39;x3F\&#39;. We define the focusing depth just below \&#39;x3F\&#39;. Hence, if the </span>
+<span class="sd">        focusing depth coincides with an interface the focusing function </span>
+<span class="sd">        focuses below that interface.</span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2550,16 +2623,34 @@
 <span class="sd">            Focusing depth.</span>
 <span class="sd">            </span>
 <span class="sd">        normalisation : str, optional</span>
-<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for flux-normalisation set normalisation=&#39;flux&#39;. Until now, this function only models the focusing function for flux-normalisation.</span>
+<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for </span>
+<span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;. Until now, this </span>
+<span class="sd">            function only models the focusing function for flux-normalisation.</span>
+<span class="sd">            For pressure-normalisation, I still have to derive the analytic </span>
+<span class="sd">            expression to recursively compute the focusing function.</span>
 <span class="sd">            </span>
 <span class="sd">        InternalMultiples : bool, optional</span>
-<span class="sd">            To model internal multiples set &#39;InternalMultiples=True&#39;. To ignore internal multiples set &#39;InternalMultiples=False&#39;.</span>
+<span class="sd">            To model internal multiples set &#39;InternalMultiples=True&#39;. To ignore </span>
+<span class="sd">            internal multiples set &#39;InternalMultiples=False&#39;.</span>
+<span class="sd">            </span>
+<span class="sd">        Negative_eps : bool, optional</span>
+<span class="sd">            If &#39;Negative_eps=True&#39; the focusing functions are computed for both </span>
+<span class="sd">            a positive and a negative parameter &#39;eps&#39; (imaginary-part of the</span>
+<span class="sd">            frequency,</span>
+<span class="sd">            :math:`\omega\&#39; = \omega + j \epsilon`). </span>
+<span class="sd">            The representation theorem of the corrleation-type only holds </span>
+<span class="sd">            accurately if the complex-conjugated focusing functions are </span>
+<span class="sd">            computed with a negative &#39;eps&#39; parameter, whereas all other </span>
+<span class="sd">            qunatities (Green&#39;s functions and reflection response) must be </span>
+<span class="sd">            computed using a positive &#39;eps&#39; parameter.</span>
+<span class="sd">            </span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
 <span class="sd">        dict</span>
 <span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
 <span class="sd">                - **FP**: Downgoing focusing function.</span>
 <span class="sd">                - **RP**: Reflection response from above.</span>
 <span class="sd">                - **TP**: Transmission response from above.</span>
@@ -2572,7 +2663,17 @@
 <span class="sd">                - **FMa**: Upgoing focusing function (adjoint medium).</span>
 <span class="sd">                - **RMa**: Reflection response from below (adjoint medium).</span>
 <span class="sd">                - **TMa**: Transmission response from below (adjoint medium).</span>
-<span class="sd">            All medium responses are stored in arrays of shape (nf,1). The variables &#39;FPa&#39;, &#39;RPa&#39;, &#39;TPa&#39;, &#39;FMa&#39;, &#39;RMa&#39; and &#39;TMa&#39; are computed only if one sets &#39;AdjointMedium=True&#39;.</span>
+<span class="sd">                - **FP_neps**: Downgoing focusing function with negative &#39;eps&#39; parameter, :math:`\omega\&#39; = \omega - j \\vert \epsilon \\vert`.</span>
+<span class="sd">                - **FM_neps**: Upgoing focusing function with negative &#39;eps&#39; parameter, :math:`\omega\&#39; = \omega - j \\vert \epsilon \\vert`.</span>
+<span class="sd">                - **FPa_neps**: Downgoing focusing function with negative &#39;eps&#39; parameter, :math:`\omega\&#39; = \omega - j \\vert \epsilon \\vert`,  in adjoint medium.</span>
+<span class="sd">                - **FMa_neps**: Upgoing focusing function with negative &#39;eps&#39; parameter, :math:`\omega\&#39; = \omega - j  \\vert \epsilon \\vert`,  in adjoint medium.</span>
+<span class="sd">                - **RPa_neps**: Reflection response from above  with negative &#39;eps&#39; parameter, :math:`\omega\&#39; = \omega - j \\vert \epsilon \\vert`,  in adjoint medium.</span>
+<span class="sd">                </span>
+<span class="sd">            All medium responses are stored in arrays of shape (nf,nr). The </span>
+<span class="sd">            variables &#39;FPa&#39;, &#39;RPa&#39;, &#39;TPa&#39;, &#39;FMa&#39;, &#39;RMa&#39; and &#39;TMa&#39; are computed </span>
+<span class="sd">            only if one sets &#39;AdjointMedium=True&#39;. The variables ending on </span>
+<span class="sd">            &#39;_neps&#39; are only computed if one set &#39;Negative_eps=True&#39;.</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -2581,27 +2682,84 @@
 <span class="sd">            :math:`\\tilde{F}_{1,n}^+ = \\tilde{F}_{1,n-1}^+ (\\tilde{w}_n^+)^{-1} (1 - \\tilde{w}_n^+ \\tilde{R}_{n-1}^{\cap} \\tilde{w}_n^- \\tilde{r}_n^{\cup} )^{-1} (\\tilde{t}_n^+)^{-1}`</span>
 <span class="sd">        - The upgoing focusing function is computed by applying the reflection response :math:`R^{\cup}` on the downgoing focusing funtion :math:`\\tilde{F}_1^+`:</span>
 <span class="sd">            :math:`\\tilde{F}_{1,n}^- = \\tilde{R}^{\cup} \\tilde{F}_{1,n}^+`.</span>
+<span class="sd">        - When using a complex-valued frequency :math:`\omega&#39; = \omega + j \epsilon`, the representation theorem of the corrleation-type only holds accurately if the complex-conjugated focusing functions are computed with a negative &#39;eps&#39; parameter, whereas all other qunatities (Green&#39;s functions and reflection response) must be computed using a positive &#39;eps&#39; parameter.</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
 <span class="sd">        Kees document as soon as it is published.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
 
-<span class="sd">        &gt;&gt;&gt; from Layered_NRM_p_w import Layered_NRM_p_w as LM</span>
+<span class="sd">        &gt;&gt;&gt; from Layered_NRM_k1_w import Layered_NRM_k1_w as LM</span>
 <span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; import matplotlib.pyplot as plt</span>
 
-<span class="sd">        &gt;&gt;&gt; F=LM( nt=1024,dt=0.005,x3vec=np.array([10,150,200]),</span>
-<span class="sd">        &gt;&gt;&gt;       avec=np.array([1,2,3]),bvec=np.array([0.4,3.14,2]),</span>
-<span class="sd">        &gt;&gt;&gt;       g1vec=np.array([0.9,2.1,0.3]),g3vec=np.array([0.7,1.14,0.2]),</span>
-<span class="sd">        &gt;&gt;&gt;       p1=2e-4,ReciprocalMedium=False,AdjointMedium=True )</span>
+<span class="sd">        &gt;&gt;&gt; # Initialise wavefield</span>
+<span class="sd">        &gt;&gt;&gt; F = LM(nt=1024,dt=5e-3,nr=4096,dx1=12.5,</span>
+<span class="sd">                   x3vec=np.array([1.1,2.2,3.7])*1e3,eps=3/(513*5e-3),</span>
+<span class="sd">                   avec=np.array([1,2,3])*1e-3,</span>
+<span class="sd">                   b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">                   b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="sd">                   b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">                   g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="sd">                   g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">                   ReciprocalMedium=False,AdjointMedium=True)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute Ricker wavelet</span>
+<span class="sd">        &gt;&gt;&gt; Wav = F.RickerWavelet_w(f0=30)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute correction term</span>
+<span class="sd">        &gt;&gt;&gt; gain = F.Gain_t()</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Make FK-filter</span>
+<span class="sd">        &gt;&gt;&gt; M = F.FK1_mask_k1_w(wmax=400,Opening=1.0)</span>
+<span class="sd">        &gt;&gt;&gt; FK = M[&#39;FK_global_tap&#39;]</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Focusing depth</span>
+<span class="sd">        &gt;&gt;&gt; xF = 2200</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute focusing function in actual medium</span>
+<span class="sd">        &gt;&gt;&gt; Focus = F.FocusingFunction_k1_w(x3F=xF,normalisation=&#39;flux&#39;,</span>
+<span class="sd">                                            InternalMultiples=True,</span>
+<span class="sd">                                            Negative_eps=True)</span>
+<span class="sd">        &gt;&gt;&gt; FP = Focus[&#39;FP_neps&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; FM = Focus[&#39;FM_neps&#39;]</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute reflection response of actual medium</span>
+<span class="sd">        &gt;&gt;&gt; RT = F.RT_response_k1_w(normalisation=&#39;flux&#39;,InternalMultiples=True)</span>
+<span class="sd">        &gt;&gt;&gt; RP = RT[&#39;RP&#39;]</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute Green&#39;s function G++ in actual medium</span>
+<span class="sd">        &gt;&gt;&gt; G = F.GreensFunction_k1_w(x3S=0,x3R=xF,normalisation=&#39;flux&#39;,</span>
+<span class="sd">        &gt;&gt;&gt;                           InternalMultiples=True)</span>
+<span class="sd">        &gt;&gt;&gt; GPP = G[&#39;GPP&#39;]</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Transform all fields to the space-time domain</span>
+<span class="sd">        &gt;&gt;&gt; gPP   = np.fft.fftshift(gain*F.K1W2X1T(FK*Wav*GPP)          ,axes=(0,1))</span>
+<span class="sd">        &gt;&gt;&gt; fPc   = np.fft.fftshift(gain*F.K1W2X1T(FK*Wav*FP.conj())    ,axes=(0,1))</span>
+<span class="sd">        &gt;&gt;&gt; rPfMc = np.fft.fftshift(gain*F.K1W2X1T(FK*Wav*RP*FM.conj()) ,axes=(0,1))</span>
+<span class="sd">        &gt;&gt;&gt; # We plot the resulting fields below.</span>
+
+<span class="sd">        </span>
+<span class="sd">        .. image:: ../pictures/cropped/RecipCorr.png</span>
+<span class="sd">           :width: 700px</span>
+<span class="sd">           :height: 200px</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="c1"># Check if normalisation is set correctly</span>
         <span class="k">if</span> <span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;flux&#39;</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_p_w: This function only models the focusing function for flux-normalisation. (For pressure-normalistiont the required equations have to be derived.)&#39;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_k1_w: This function only models the &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;focusing function for flux-normalisation. (For &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;pressure-normalistiont the required equations have to &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;be derived.)&#39;</span><span class="p">)</span>
+            
+        <span class="c1"># Eigenvalues: To ensure that the eigenvalues are defined as &#39;self&#39;</span>
+        <span class="c1"># parameters</span>
+        <span class="n">Eig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
         
         <span class="c1"># Insert transparent interfaces at the focusing depth level.</span>
         <span class="c1"># The insertion implicitly checks that x3F is non-negative </span>
@@ -2616,45 +2774,51 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">Tmp_medium</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         
-        <span class="n">X3vec</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;x3vec&#39;</span><span class="p">]</span>
-        <span class="n">Bvec</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;bvec&#39;</span><span class="p">]</span>
-        <span class="n">G3vec</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;g3vec&#39;</span><span class="p">]</span>
-        <span class="n">P3</span>    <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;p3&#39;</span><span class="p">]</span>
-        <span class="n">P3n</span>   <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;p3n&#39;</span><span class="p">]</span>
+        
+        
+        <span class="n">X3</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;x3vec&#39;</span><span class="p">]</span>
+        <span class="n">A</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;avec&#39;</span><span class="p">]</span>
+        <span class="n">B11</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;b11vec&#39;</span><span class="p">]</span>
+        <span class="n">B13</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;b13vec&#39;</span><span class="p">]</span>
+        <span class="n">B33</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;b33vec&#39;</span><span class="p">]</span>
+        <span class="n">G1</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;g1vec&#39;</span><span class="p">]</span>
+        <span class="n">G3</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;g3vec&#39;</span><span class="p">]</span>
+        <span class="n">K3</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;K3&#39;</span><span class="p">]</span>
+        <span class="n">K3n</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;K3n&#39;</span><span class="p">]</span>
+        <span class="n">LP</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;LP&#39;</span><span class="p">]</span>
+        <span class="n">LPn</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;LPn&#39;</span><span class="p">]</span>
+        <span class="n">LM</span>  <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;LM&#39;</span><span class="p">]</span>
+        <span class="n">LMn</span> <span class="o">=</span> <span class="n">Tmp_medium</span><span class="p">[</span><span class="s1">&#39;LMn&#39;</span><span class="p">]</span>
         
         <span class="c1"># Index of the focusing depth</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">X3vec</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x3F</span><span class="p">)</span>
-        
-        <span class="c1"># Only allow propagating waves to model the focusing function</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplex</span><span class="p">(</span><span class="n">P3</span><span class="p">[:</span><span class="n">f</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">iscomplex</span><span class="p">(</span><span class="n">P3n</span><span class="p">[:</span><span class="n">f</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_p_w: (Here,) We only define the focusing function for propagating waves, i.e. not evanescent waves.&#39;</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">X3</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x3F</span><span class="p">)</span>
         
         <span class="c1"># Vector with layer thicknesses</span>
-        <span class="n">dx3vec</span> <span class="o">=</span> <span class="n">X3vec</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">dx3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">X3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">X3vec</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">dx3vec</span> <span class="o">=</span> <span class="n">X3</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">dx3vec</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">X3</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">-</span><span class="n">X3</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
         
         <span class="c1"># Down- and upgoing focusing functions: Initial value</span>
         <span class="c1"># Here every frequency component has an amplitude equal to one. Hence,</span>
         <span class="c1"># the total wavefield has a strength of sqrt(nt)</span>
         <span class="c1"># When an ifft is applied the wavefield is scaled by 1/sqrt(nt).</span>
         <span class="c1"># Hence in the time domain the wavefield has an amplitude equal to one.</span>
-        <span class="n">FP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">FM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">FP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">FM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         
         <span class="c1"># Reflection responses: Initial value</span>
-        <span class="n">RP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">RM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">RP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">RM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         
         <span class="c1"># Here every frequency component has an amplitude equal to one. Hence,</span>
         <span class="c1"># the total wavefield has a strength of sqrt(nt)</span>
         <span class="c1"># When an ifft is applied the wavefield is scaled by 1/sqrt(nt).</span>
         <span class="c1"># Hence in the time domain the wavefield has an amplitude equal to one.</span>
-        <span class="n">TP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">TM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">TP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">TM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         
         <span class="c1"># Internal multiple operator: Initial value</span>
-        <span class="n">M1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">M2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">M1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">M2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">FPa</span> <span class="o">=</span> <span class="n">FP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -2677,9 +2841,13 @@
         <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">f</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
             
             <span class="c1"># Scattering coefficients</span>
-            <span class="n">ScatCoeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RT_p_w</span><span class="p">(</span><span class="n">beta_u</span><span class="o">=</span><span class="n">Bvec</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>  <span class="p">,</span><span class="n">g3_u</span><span class="o">=</span><span class="n">G3vec</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>  <span class="p">,</span><span class="n">p3_u</span><span class="o">=</span><span class="n">P3</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>  <span class="p">,</span><span class="n">p3n_u</span><span class="o">=</span><span class="n">P3n</span><span class="p">[</span><span class="n">n</span><span class="p">],</span>
-                                     <span class="n">beta_l</span><span class="o">=</span><span class="n">Bvec</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">g3_l</span><span class="o">=</span><span class="n">G3vec</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">p3_l</span><span class="o">=</span><span class="n">P3</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">p3n_l</span><span class="o">=</span><span class="n">P3n</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
-                                     <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">)</span>
+            <span class="n">ScatCoeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RT_k1_w</span><span class="p">(</span><span class="n">beta11_u</span><span class="o">=</span><span class="n">B11</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">beta13_u</span><span class="o">=</span><span class="n">B13</span><span class="p">[</span><span class="n">n</span><span class="p">],</span>
+                                      <span class="n">beta33_u</span><span class="o">=</span><span class="n">B33</span><span class="p">[</span><span class="n">n</span><span class="p">],</span>
+                                      <span class="n">K3_u</span><span class="o">=</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">K3n_u</span><span class="o">=</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                      <span class="n">beta11_l</span><span class="o">=</span><span class="n">B11</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">beta13_l</span><span class="o">=</span><span class="n">B13</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                      <span class="n">beta33_l</span><span class="o">=</span><span class="n">B33</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                      <span class="n">K3_l</span><span class="o">=</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">K3n_l</span><span class="o">=</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                      <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">)</span>
             
             <span class="n">rP</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rP&#39;</span><span class="p">]</span>
             <span class="n">tP</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tP&#39;</span><span class="p">]</span>
@@ -2687,7 +2855,9 @@
             <span class="n">tM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tM&#39;</span><span class="p">]</span>
             
             <span class="c1"># Propagators</span>
-            <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_propagators_p_w</span><span class="p">(</span><span class="n">p3</span><span class="o">=</span><span class="n">P3</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">p3n</span><span class="o">=</span><span class="n">P3n</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">g3</span><span class="o">=</span><span class="n">G3vec</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                        <span class="n">LM</span><span class="o">=</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LMn</span><span class="o">=</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                        <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
             <span class="n">WP</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wP&#39;</span><span class="p">]</span>
             <span class="n">WM</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wM&#39;</span><span class="p">]</span>
         
@@ -2726,88 +2896,149 @@
                 
         <span class="c1"># Verbose: Inform the user if any wavefield contains NaNs of Infs.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            
-            <span class="k">if</span> <span class="p">(</span>   <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> 
-                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> 
-                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> 
-                <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_p_w:&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;One of the modelled wavefields in the true medium contains a NaN (Not a Number) or an Inf (infinite) element.&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FP contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FP</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FP contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FP</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RP contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RP</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RP contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RP</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TP contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TP</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TP</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TP contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TP</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FM contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FM</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FM contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FM</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RM contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RM</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RM contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RM</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TM contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TM</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TM</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TM contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TM</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Contains_Nan_Inf</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_k1_w&#39;</span><span class="p">,(</span><span class="n">FP</span><span class="p">,</span><span class="s1">&#39;FP&#39;</span><span class="p">),(</span><span class="n">FM</span><span class="p">,</span><span class="s1">&#39;FM&#39;</span><span class="p">),</span>
+                                  <span class="p">(</span><span class="n">RP</span><span class="p">,</span><span class="s1">&#39;RP&#39;</span><span class="p">),(</span><span class="n">RM</span><span class="p">,</span><span class="s1">&#39;RM&#39;</span><span class="p">),(</span><span class="n">TP</span><span class="p">,</span><span class="s1">&#39;TP&#39;</span><span class="p">),(</span><span class="n">TM</span><span class="p">,</span><span class="s1">&#39;TM&#39;</span><span class="p">))</span>
             
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                
-                <span class="k">if</span> <span class="p">(</span>   <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> 
-                    <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> 
-                    <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-                    <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
-                    <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> 
-                    <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_p_w:&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span><span class="mi">100</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;One of the modelled wavefields in the adoint medium contains a NaN (Not a Number) or an Inf (infinite) element.&#39;</span><span class="p">)</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                    
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FPa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FPa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FPa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FPa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RPa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RPa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RPa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RPa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TPa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TPa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TPa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TPa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TPa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FMa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">FMa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - FMa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">FMa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RMa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">RMa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - RMa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">RMa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TMa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">TMa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; NaN.&#39;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TMa</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1"> - TMa contains &#39;</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">TMa</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39; Inf.&#39;</span><span class="p">)</span>
-                
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-
+                <span class="bp">self</span><span class="o">.</span><span class="n">Contains_Nan_Inf</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_k1_w&#39;</span><span class="p">,(</span><span class="n">FPa</span><span class="p">,</span><span class="s1">&#39;FPa&#39;</span><span class="p">),</span>
+                                      <span class="p">(</span><span class="n">FMa</span><span class="p">,</span><span class="s1">&#39;FMa&#39;</span><span class="p">),(</span><span class="n">RPa</span><span class="p">,</span><span class="s1">&#39;RPa&#39;</span><span class="p">),(</span><span class="n">RMa</span><span class="p">,</span><span class="s1">&#39;RMa&#39;</span><span class="p">),</span>
+                                      <span class="p">(</span><span class="n">TPa</span><span class="p">,</span><span class="s1">&#39;TPa&#39;</span><span class="p">),(</span><span class="n">TMa</span><span class="p">,</span><span class="s1">&#39;TMa&#39;</span><span class="p">))</span>
                 
         <span class="n">out</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;FP&#39;</span><span class="p">:</span><span class="n">FP</span>  <span class="p">,</span><span class="s1">&#39;RP&#39;</span><span class="p">:</span><span class="n">RP</span>  <span class="p">,</span><span class="s1">&#39;TP&#39;</span><span class="p">:</span><span class="n">TP</span>  <span class="p">,</span><span class="s1">&#39;FM&#39;</span><span class="p">:</span><span class="n">FM</span>  <span class="p">,</span><span class="s1">&#39;RM&#39;</span><span class="p">:</span><span class="n">RM</span>  <span class="p">,</span><span class="s1">&#39;TM&#39;</span><span class="p">:</span><span class="n">TM</span><span class="p">,</span>
-             <span class="s1">&#39;FPa&#39;</span><span class="p">:</span><span class="n">FPa</span><span class="p">,</span><span class="s1">&#39;RPa&#39;</span><span class="p">:</span><span class="n">RPa</span><span class="p">,</span><span class="s1">&#39;TPa&#39;</span><span class="p">:</span><span class="n">TPa</span><span class="p">,</span><span class="s1">&#39;FMa&#39;</span><span class="p">:</span><span class="n">FMa</span><span class="p">,</span><span class="s1">&#39;RMa&#39;</span><span class="p">:</span><span class="n">RMa</span><span class="p">,</span><span class="s1">&#39;TMa&#39;</span><span class="p">:</span><span class="n">TMa</span><span class="p">}</span>
+                 <span class="s1">&#39;FPa&#39;</span><span class="p">:</span><span class="n">FPa</span><span class="p">,</span><span class="s1">&#39;RPa&#39;</span><span class="p">:</span><span class="n">RPa</span><span class="p">,</span><span class="s1">&#39;TPa&#39;</span><span class="p">:</span><span class="n">TPa</span><span class="p">,</span><span class="s1">&#39;FMa&#39;</span><span class="p">:</span><span class="n">FMa</span><span class="p">,</span><span class="s1">&#39;RMa&#39;</span><span class="p">:</span><span class="n">RMa</span><span class="p">,</span><span class="s1">&#39;TMa&#39;</span><span class="p">:</span><span class="n">TMa</span><span class="p">}</span>
+        
+        <span class="c1"># When focusing functions are complex-conjugated the imaginary-part</span>
+        <span class="c1"># of a complex-valued frequency, eps, should be negative.</span>
+        <span class="c1"># If requested the corresponding focusing functions are computed below.</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Negative_eps</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span> <span class="o">=</span> <span class="n">Layered_NRM_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dx1</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span><span class="n">eps</span><span class="o">=-</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">,</span>
+                                            <span class="n">x3vec</span><span class="o">=</span><span class="n">X3</span><span class="p">,</span><span class="n">avec</span><span class="o">=</span><span class="n">A</span><span class="p">,</span>
+                                            <span class="n">b11vec</span><span class="o">=</span><span class="n">B11</span><span class="p">,</span><span class="n">b13vec</span><span class="o">=</span><span class="n">B13</span><span class="p">,</span><span class="n">b33vec</span><span class="o">=</span><span class="n">B33</span><span class="p">,</span>
+                                            <span class="n">g1vec</span><span class="o">=</span><span class="n">G1</span><span class="p">,</span><span class="n">g3vec</span><span class="o">=</span><span class="n">G3</span><span class="p">,</span>
+                                            <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span><span class="p">,</span>
+                                            <span class="n">AdjointMedium</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span><span class="p">)</span>
+                
+            <span class="c1"># Eigenvalues: </span>
+            <span class="n">Eig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
+            <span class="n">LP</span>  <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LP&#39;</span><span class="p">]</span>
+            <span class="n">LM</span>  <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LM&#39;</span><span class="p">]</span>
+            <span class="n">LPn</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LPn&#39;</span><span class="p">]</span>
+            <span class="n">LMn</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LMn&#39;</span><span class="p">]</span>
+            
+            <span class="c1"># Vertical wavenumbers</span>
+            <span class="n">K3</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">K3</span>
+            <span class="n">K3n</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">K3n</span>
+            
+            <span class="c1"># Down- and upgoing focusing functions: Initial value</span>
+            <span class="c1"># Here every frequency component has an amplitude equal to one. Hence,</span>
+            <span class="c1"># the total wavefield has a strength of sqrt(nt)</span>
+            <span class="c1"># When an ifft is applied the wavefield is scaled by 1/sqrt(nt).</span>
+            <span class="c1"># Hence in the time domain the wavefield has an amplitude equal to one.</span>
+            <span class="n">FP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">FM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            
+            <span class="c1"># Reflection responses: Initial value</span>
+            <span class="n">RP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">RM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            
+            <span class="c1"># Here every frequency component has an amplitude equal to one. Hence,</span>
+            <span class="c1"># the total wavefield has a strength of sqrt(nt)</span>
+            <span class="c1"># When an ifft is applied the wavefield is scaled by 1/sqrt(nt).</span>
+            <span class="c1"># Hence in the time domain the wavefield has an amplitude equal to one.</span>
+            <span class="n">TP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">TM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            
+            <span class="c1"># Internal multiple operator: Initial value</span>
+            <span class="n">M1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">M2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">FPa</span> <span class="o">=</span> <span class="n">FP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">FMa</span> <span class="o">=</span> <span class="n">FM</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">RPa</span> <span class="o">=</span> <span class="n">RP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">RMa</span> <span class="o">=</span> <span class="n">RP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">TPa</span> <span class="o">=</span> <span class="n">TP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">TMa</span> <span class="o">=</span> <span class="n">TP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">FPa</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">FMa</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">RPa</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">TPa</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">RMa</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">TMa</span> <span class="o">=</span> <span class="kc">None</span>
+        
+            <span class="c1"># Loop over f+1 interfaces</span>
+            <span class="c1"># Thus, the wavefield propagates to the focusing depth, and scatters</span>
+            <span class="c1"># at the focusing depth.</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">f</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                
+                <span class="c1"># Scattering coefficients</span>
+                <span class="n">ScatCoeffs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">RT_k1_w</span><span class="p">(</span><span class="n">beta11_u</span><span class="o">=</span><span class="n">B11</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="n">beta13_u</span><span class="o">=</span><span class="n">B13</span><span class="p">[</span><span class="n">n</span><span class="p">],</span>
+                                                  <span class="n">beta33_u</span><span class="o">=</span><span class="n">B33</span><span class="p">[</span><span class="n">n</span><span class="p">],</span>
+                                                  <span class="n">K3_u</span><span class="o">=</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">K3n_u</span><span class="o">=</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                                  <span class="n">beta11_l</span><span class="o">=</span><span class="n">B11</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">beta13_l</span><span class="o">=</span><span class="n">B13</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                                  <span class="n">beta33_l</span><span class="o">=</span><span class="n">B33</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                                  <span class="n">K3_l</span><span class="o">=</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">K3n_l</span><span class="o">=</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span>
+                                                  <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">)</span>
+                
+                <span class="n">rP</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rP&#39;</span><span class="p">]</span>
+                <span class="n">tP</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tP&#39;</span><span class="p">]</span>
+                <span class="n">rM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rM&#39;</span><span class="p">]</span>
+                <span class="n">tM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tM&#39;</span><span class="p">]</span>
+                
+                <span class="c1"># Propagators</span>
+                <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                                    <span class="n">LM</span><span class="o">=</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LMn</span><span class="o">=</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                                    <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                <span class="n">WP</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wP&#39;</span><span class="p">]</span>
+                <span class="n">WM</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wM&#39;</span><span class="p">]</span>
+            
+                <span class="k">if</span> <span class="n">InternalMultiples</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">M1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="p">)</span>
+                    <span class="n">M2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="p">)</span>
+                
+                <span class="c1"># Update focusing functions and reflection / transmission responses</span>
+                <span class="n">FP</span> <span class="o">=</span> <span class="n">FP</span><span class="o">/</span><span class="n">WP</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="p">)</span><span class="o">/</span><span class="n">tP</span>
+                <span class="n">RP</span> <span class="o">=</span> <span class="n">RP</span> <span class="o">+</span> <span class="n">TM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TP</span>
+                <span class="n">RM</span> <span class="o">=</span> <span class="n">rM</span> <span class="o">+</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">M2</span><span class="o">*</span><span class="n">tM</span>
+                <span class="n">TP</span> <span class="o">=</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TP</span>
+                <span class="n">TM</span> <span class="o">=</span> <span class="n">TM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">M2</span><span class="o">*</span><span class="n">tM</span>  
+                <span class="n">FM</span> <span class="o">=</span> <span class="n">RP</span><span class="o">*</span><span class="n">FP</span>
+                
+                <span class="c1"># Model focusing functions in the adjoint medium</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">rP</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rPa&#39;</span><span class="p">]</span>
+                    <span class="n">tP</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tPa&#39;</span><span class="p">]</span>
+                    <span class="n">rM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;rMa&#39;</span><span class="p">]</span>
+                    <span class="n">tM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tMa&#39;</span><span class="p">]</span>
+                    <span class="n">WP</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wPa&#39;</span><span class="p">]</span>
+                    <span class="n">WM</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wMa&#39;</span><span class="p">]</span>
+                
+                    <span class="k">if</span> <span class="n">InternalMultiples</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="n">M1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="p">)</span>
+                        <span class="n">M2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="p">)</span>
+                    
+                    <span class="c1"># Update focusing functions and reflection / transmission responses</span>
+                    <span class="n">FPa</span> <span class="o">=</span> <span class="n">FPa</span><span class="o">/</span><span class="n">WP</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="p">)</span><span class="o">/</span><span class="n">tP</span>
+                    <span class="n">RPa</span> <span class="o">=</span> <span class="n">RPa</span> <span class="o">+</span> <span class="n">TMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TPa</span>
+                    <span class="n">RMa</span> <span class="o">=</span> <span class="n">rM</span> <span class="o">+</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">M2</span><span class="o">*</span><span class="n">tM</span>
+                    <span class="n">TPa</span> <span class="o">=</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TPa</span>
+                    <span class="n">TMa</span> <span class="o">=</span> <span class="n">TMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">M2</span><span class="o">*</span><span class="n">tM</span>  
+                    <span class="n">FMa</span> <span class="o">=</span> <span class="n">RPa</span><span class="o">*</span><span class="n">FPa</span>
+                    
+            <span class="c1"># Verbose: Inform the user if any wavefield contains NaNs of Infs.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">Contains_Nan_Inf</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_k1_w&#39;</span><span class="p">,(</span><span class="n">FP</span><span class="p">,</span><span class="s1">&#39;FP&#39;</span><span class="p">),(</span><span class="n">FM</span><span class="p">,</span><span class="s1">&#39;FM&#39;</span><span class="p">),</span>
+                                      <span class="p">(</span><span class="n">RP</span><span class="p">,</span><span class="s1">&#39;RP&#39;</span><span class="p">),(</span><span class="n">RM</span><span class="p">,</span><span class="s1">&#39;RM&#39;</span><span class="p">),(</span><span class="n">TP</span><span class="p">,</span><span class="s1">&#39;TP&#39;</span><span class="p">),(</span><span class="n">TM</span><span class="p">,</span><span class="s1">&#39;TM&#39;</span><span class="p">))</span>
+                
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">Contains_Nan_Inf</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_k1_w&#39;</span><span class="p">,(</span><span class="n">FPa</span><span class="p">,</span><span class="s1">&#39;FPa&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="n">FMa</span><span class="p">,</span><span class="s1">&#39;FMa&#39;</span><span class="p">),(</span><span class="n">RPa</span><span class="p">,</span><span class="s1">&#39;RPa&#39;</span><span class="p">),(</span><span class="n">RMa</span><span class="p">,</span><span class="s1">&#39;RMa&#39;</span><span class="p">),</span>
+                                          <span class="p">(</span><span class="n">TPa</span><span class="p">,</span><span class="s1">&#39;TPa&#39;</span><span class="p">),(</span><span class="n">TMa</span><span class="p">,</span><span class="s1">&#39;TMa&#39;</span><span class="p">))</span>
+                    
+            <span class="n">out</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;FP_neps&#39;</span><span class="p">:</span><span class="n">FP</span>   <span class="p">,</span><span class="s1">&#39;FM_neps&#39;</span><span class="p">:</span><span class="n">FM</span>  <span class="p">,</span><span class="s1">&#39;RP_neps&#39;</span><span class="p">:</span><span class="n">RP</span> <span class="p">,</span>
+                        <span class="s1">&#39;FPa_neps&#39;</span><span class="p">:</span><span class="n">FPa</span> <span class="p">,</span><span class="s1">&#39;FMa_neps&#39;</span><span class="p">:</span><span class="n">FMa</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
