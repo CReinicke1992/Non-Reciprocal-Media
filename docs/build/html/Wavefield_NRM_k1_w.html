@@ -16,7 +16,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Layered_NRM_k1_w module" href="Layered_NRM_k1_w.html" /> 
+    <link rel="prev" title="Marchenko_NRM_k1_w module" href="Marchenko_NRM_k1_w.html" /> 
   </head><body>
     <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
@@ -28,7 +28,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Layered_NRM_k1_w.html" title="Layered_NRM_k1_w module"
+          <a href="Marchenko_NRM_k1_w.html" title="Marchenko_NRM_k1_w module"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">k1-w-domain</a> &#187;</li> 
@@ -37,8 +37,8 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
   <h4>Previous topic</h4>
-  <p class="topless"><a href="Layered_NRM_k1_w.html"
-                        title="previous chapter">Layered_NRM_k1_w module</a></p>
+  <p class="topless"><a href="Marchenko_NRM_k1_w.html"
+                        title="previous chapter">Marchenko_NRM_k1_w module</a></p>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
     <ul class="this-page-menu">
@@ -69,7 +69,7 @@
   <div class="section" id="module-Wavefield_NRM_k1_w">
 <span id="wavefield-nrm-k1-w-module"></span><h1>Wavefield_NRM_k1_w module<a class="headerlink" href="#module-Wavefield_NRM_k1_w" title="Permalink to this headline">¶</a></h1>
 <p>Routines for modelling wavefields in 1.5D non-reciprocal media.</p>
-<span class="target" id="module-Wavefield_NRM_k1_w-v2.0"></span><table class="docutils field-list" frame="void" rules="none">
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -563,7 +563,7 @@ and nr/2 negative offset samples.</p>
 
 <dl class="method">
 <dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w">
-<code class="descname">RickerWavelet_w</code><span class="sig-paren">(</span><em>f0=None</em>, <em>w0=None</em>, <em>NormalisationToOne=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.RickerWavelet_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w" title="Permalink to this definition">¶</a></dt>
+<code class="descname">RickerWavelet_w</code><span class="sig-paren">(</span><em>f0=None</em>, <em>w0=None</em>, <em>NormalisationToOne=True</em>, <em>eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.RickerWavelet_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes a Ricker wavelet in the frequency domain.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -583,6 +583,11 @@ and nr/2 negative offset samples.</p>
 Ricker wavelet.  For ‘NormalisationToOne=True’ the Ricker wavelet 
 is scaled by the inverse of the amplitude of the peak frequency 
 <span class="math notranslate">\(\frac{2}{\mathrm{e}\sqrt{\pi}\omega_0}\)</span>.</p>
+</div></blockquote>
+<p><strong>eps</strong> : int, float, optional</p>
+<blockquote>
+<div><p>The input variable eps can be defined to compute the wavelet for an 
+‘eps’ value different than the ‘self.eps’ parameter.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -613,7 +618,7 @@ along the second dimension.</p>
 
 <dl class="method">
 <dt id="Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t">
-<code class="descname">Gain_t</code><span class="sig-paren">(</span><em>RelativeTaperLength=0.03125</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Gain_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t" title="Permalink to this definition">¶</a></dt>
+<code class="descname">Gain_t</code><span class="sig-paren">(</span><em>RelativeTaperLength=0.03125</em>, <em>eps=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Gain_t"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes a gain function in the time domain to compensate for the 
 imaginary constant <span class="math notranslate">\(\epsilon\)</span> added to the frequencies
 <span class="math notranslate">\(\omega' = \omega + \mathrm{j}\epsilon\)</span>.</p>
@@ -626,6 +631,11 @@ imaginary constant <span class="math notranslate">\(\epsilon\)</span> added to t
 <div><p>The product of ‘RelativeTaperLength’ and the number of temporal 
 samples ‘nt’ determines the taper length. The default value is 
 ‘RelativeTaperLength’<span class="math notranslate">\(=2^{-5}.\)</span></p>
+</div></blockquote>
+<p><strong>eps</strong> : int, float, optional</p>
+<blockquote>
+<div><p>To compute the gain for an ‘eps’ value different than the ‘self.eps’ 
+parameter the input variable eps can be defined.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -662,7 +672,7 @@ time samples).</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="Layered_NRM_k1_w.html" title="Layered_NRM_k1_w module"
+          <a href="Marchenko_NRM_k1_w.html" title="Marchenko_NRM_k1_w module"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">Non-reciprocal wavefields (1.5 D) 28-03-2018 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >k1-w-domain</a> &#187;</li> 

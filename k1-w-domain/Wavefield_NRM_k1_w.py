@@ -3,7 +3,7 @@
 """
 Routines for modelling wavefields in 1.5D non-reciprocal media.
 
-.. module:: Wavefield_NRM_k1_w-v2.0
+.. module:: Wavefield_NRM_k1_w 2\.0
 
 :Authors:
     Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()
@@ -515,7 +515,7 @@ class Wavefield_NRM_k1_w:
         
         return array_k1w
     
-    def RickerWavelet_w(self,f0=None,w0=None,NormalisationToOne=True):
+    def RickerWavelet_w(self,f0=None,w0=None,NormalisationToOne=True,eps=None):
         """computes a Ricker wavelet in the frequency domain. 
         
         Parameters
@@ -532,6 +532,11 @@ class Wavefield_NRM_k1_w:
             Ricker wavelet.  For 'NormalisationToOne=True' the Ricker wavelet 
             is scaled by the inverse of the amplitude of the peak frequency 
             :math:`\\frac{2}{\mathrm{e}\sqrt{\pi}\omega_0}`.
+            
+        eps : int, float, optional
+            The input variable eps can be defined to compute the wavelet for an 
+            'eps' value different than the 'self.eps' parameter.
+            
             
         Returns
         -------
@@ -572,8 +577,15 @@ class Wavefield_NRM_k1_w:
  
             # Transform to circular frequency               
             w0 = 2*np.pi*f0
-                
-        wvec  = self.Wvec()           
+        
+        # Frequency vector
+        if eps is None:        
+            wvec  = self.Wvec()   
+        else:
+            if not ( isinstance(eps,int) or isinstance(eps,float) ):
+                sys.exit('RickerWavelet_w: \'eps\' must be of the type int or '
+                         +'float.')
+            wvec = self.Wvec().real + 1j*eps
         
         # Compute wavelet according to Wang 2015
         Wav = 2*wvec**2/(np.sqrt(np.pi)*w0**3)*np.exp(-(wvec/w0)**2)
@@ -588,7 +600,7 @@ class Wavefield_NRM_k1_w:
         
         return Wav
     
-    def Gain_t(self,RelativeTaperLength=2**(-5)):
+    def Gain_t(self,RelativeTaperLength=2**(-5),eps=None):
         """computes a gain function in the time domain to compensate for the 
         imaginary constant :math:`\epsilon` added to the frequencies
         :math:`\omega' = \omega + \mathrm{j}\epsilon`.
@@ -601,6 +613,11 @@ class Wavefield_NRM_k1_w:
             samples \'nt\' determines the taper length. The default value is 
             \'RelativeTaperLength\':math:`=2^{-5}.`
             
+        eps : int, float, optional
+            To compute the gain for an 'eps' value different than the 'self.eps' 
+            parameter the input variable eps can be defined.
+            
+            
         Returns
         -------
         
@@ -610,8 +627,6 @@ class Wavefield_NRM_k1_w:
             (time zero element followed by positive time samples, then negative 
             time samples).
             
-        
-        
         
         """
         
@@ -623,8 +638,15 @@ class Wavefield_NRM_k1_w:
         if RelativeTaperLength < 0:
             sys.exit('Gain_t: \'RelativeTaperLength\' must be greater than, or equal to zero.')
         
+        if eps is None:
+            subeps = self.eps
+        else:
+            if not ( isinstance(eps,int) or isinstance(eps,float) ):
+                sys.exit('Gain_t: \'eps\' must be of the type int or float.')
+            subeps = eps    
+    
         # Compute gain
-        gain = np.exp( self.eps*self.Tvec()['tvecfft'] )
+        gain = np.exp( subeps*self.Tvec()['tvecfft'] )
         
         # Apply taper
         taperlen = int(RelativeTaperLength*self.nt)

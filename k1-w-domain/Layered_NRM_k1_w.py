@@ -3,7 +3,7 @@
 """
 Routines for modelling wavefields in 1.5D non-reciprocal media.
 
-.. module:: Wavefield_NRM_k1_w-v2.0
+.. module:: Layered_NRM_k1_w 2\.0
 
 :Authors:
     Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()
@@ -1575,7 +1575,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             
     
     def RT_response_k1_w(self,x3vec=None,avec=None,b11vec=None,b13vec=None,
-                         b33vec=None,g1vec=None,g3vec=None,
+                         b33vec=None,g1vec=None,g3vec=None,eps=None,
                          normalisation='flux',InternalMultiples=True):
         """computes the reflection and transmission responses from above and 
         from below. The medium parameters defined in **Layered_NRM_k1_w** are 
@@ -1624,6 +1624,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             Medium parameter :math:`\gamma_3` (real-valued for non-reciprocal 
             media or imaginary-valued for reciprocal media), for n layers 
             'g3vec' must have the shape (n,).
+            
+        eps : int, float, optional
+            A real-valued scalar can be assigned to 'eps' to reduce the wrap-
+            around effect of wavefields in the time domain. The parameter 'eps' 
+            (:math:`=\epsilon`) should be positive to the suppress wrap-around 
+            effect from positive to negative time (Recommended value eps = 
+            :math:`\\frac{3}{n_f dt}`). If not defined, the value 'self.eps' is
+            used.
             
         normalisation : str, optional
             For pressure-normalisation set normalisation='pressure', for 
@@ -1721,11 +1729,16 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         and isinstance(b33vec,np.ndarray) and isinstance(g1vec,np.ndarray) 
         and isinstance(g3vec,np.ndarray)):
             
+            if eps is None:
+                subeps = self.eps
+            else:
+                subeps = eps
+            
             # Create a wavefield in a sub-medium
             # I do this because when the sub-wavefield is initialised all 
             # parameters are automatically tested for correctness
             self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
-                                            self.verbose,eps=self.eps,
+                                            self.verbose,eps=subeps,
                                             x3vec=x3vec,avec=avec,
                                             b11vec=b11vec,b13vec=b13vec,
                                             b33vec=b33vec,
@@ -1808,9 +1821,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             tM = ScatCoeffs['tM']
             
             # Propagators
-            W = self.W_propagators_k1_w(LP=LP[:,:,n],LM=LM[:,:,n],
-                                        LPn=LPn[:,:,n],LMn=LMn[:,:,n],
-                                        dx3=dx3vec[n])
+            if self.AdjointMedium is True:
+                W = self.W_propagators_k1_w(LP=LP[:,:,n],LM=LM[:,:,n],
+                                            LPn=LPn[:,:,n],LMn=LMn[:,:,n],
+                                            dx3=dx3vec[n])
+            else:
+                W = self.W_propagators_k1_w(LP=LP[:,:,n],LM=LM[:,:,n],
+                                            dx3=dx3vec[n])
+                
             WP = W['wP']
             WM = W['wM']
             
@@ -2644,14 +2662,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
 
         >>> # Initialise wavefield
         >>> F = LM(nt=1024,dt=5e-3,nr=4096,dx1=12.5,
-                   x3vec=np.array([1.1,2.2,3.7])*1e3,eps=3/(513*5e-3),
-                   avec=np.array([1,2,3])*1e-3,
-                   b11vec=np.array([1.4,3.14,2])*1e-4,
-                   b13vec=np.array([0.4,2.4,1.2])*1e-4,
-                   b33vec=np.array([1.4,3.14,2])*1e-4,
-                   g1vec=np.array([0.8,2,1.3])*1e-4,
-                   g3vec=np.array([1.8,0.7,2.3])*1e-4,
-                   ReciprocalMedium=False,AdjointMedium=True)
+        >>>        x3vec=np.array([1.1,2.2,3.7])*1e3,eps=3/(513*5e-3),
+        >>>        avec=np.array([1,2,3])*1e-3,
+        >>>        b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>        b13vec=np.array([0.4,2.4,1.2])*1e-4,
+        >>>        b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>        g1vec=np.array([0.8,2,1.3])*1e-4,
+        >>>        g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>        ReciprocalMedium=False,AdjointMedium=True)
         
         >>> # Compute Ricker wavelet
         >>> Wav = F.RickerWavelet_w(f0=30)
@@ -2722,7 +2740,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         
         
         X3  = Tmp_medium['x3vec']
-        A  = Tmp_medium['avec']
+        A   = Tmp_medium['avec']
         B11 = Tmp_medium['b11vec']
         B13 = Tmp_medium['b13vec']
         B33 = Tmp_medium['b33vec']

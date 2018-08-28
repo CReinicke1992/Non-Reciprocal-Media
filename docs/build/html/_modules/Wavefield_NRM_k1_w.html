@@ -58,7 +58,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Routines for modelling wavefields in 1.5D non-reciprocal media.</span>
 
-<span class="sd">.. module:: Wavefield_NRM_k1_w-v2.0</span>
+<span class="sd">.. module:: Wavefield_NRM_k1_w 2\.0</span>
 
 <span class="sd">:Authors:</span>
 <span class="sd">    Christian Reinicke (c.reinicke@tudelft.nl), Kees Wapenaar (), and Evert Slob ()</span>
@@ -570,7 +570,7 @@
         
         <span class="k">return</span> <span class="n">array_k1w</span></div>
     
-<div class="viewcode-block" id="Wavefield_NRM_k1_w.RickerWavelet_w"><a class="viewcode-back" href="../Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w">[docs]</a>    <span class="k">def</span> <span class="nf">RickerWavelet_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">w0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">NormalisationToOne</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Wavefield_NRM_k1_w.RickerWavelet_w"><a class="viewcode-back" href="../Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.RickerWavelet_w">[docs]</a>    <span class="k">def</span> <span class="nf">RickerWavelet_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">w0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">NormalisationToOne</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes a Ricker wavelet in the frequency domain. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
@@ -587,6 +587,11 @@
 <span class="sd">            Ricker wavelet.  For &#39;NormalisationToOne=True&#39; the Ricker wavelet </span>
 <span class="sd">            is scaled by the inverse of the amplitude of the peak frequency </span>
 <span class="sd">            :math:`\\frac{2}{\mathrm{e}\sqrt{\pi}\omega_0}`.</span>
+<span class="sd">            </span>
+<span class="sd">        eps : int, float, optional</span>
+<span class="sd">            The input variable eps can be defined to compute the wavelet for an </span>
+<span class="sd">            &#39;eps&#39; value different than the &#39;self.eps&#39; parameter.</span>
+<span class="sd">            </span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -627,8 +632,15 @@
  
             <span class="c1"># Transform to circular frequency               </span>
             <span class="n">w0</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f0</span>
-                
-        <span class="n">wvec</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Wvec</span><span class="p">()</span>           
+        
+        <span class="c1"># Frequency vector</span>
+        <span class="k">if</span> <span class="n">eps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>        
+            <span class="n">wvec</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Wvec</span><span class="p">()</span>   
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span><span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span><span class="nb">float</span><span class="p">)</span> <span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;RickerWavelet_w: </span><span class="se">\&#39;</span><span class="s1">eps</span><span class="se">\&#39;</span><span class="s1"> must be of the type int or &#39;</span>
+                         <span class="o">+</span><span class="s1">&#39;float.&#39;</span><span class="p">)</span>
+            <span class="n">wvec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Wvec</span><span class="p">()</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">eps</span>
         
         <span class="c1"># Compute wavelet according to Wang 2015</span>
         <span class="n">Wav</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">wvec</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">w0</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">wvec</span><span class="o">/</span><span class="n">w0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
@@ -643,7 +655,7 @@
         
         <span class="k">return</span> <span class="n">Wav</span></div>
     
-<div class="viewcode-block" id="Wavefield_NRM_k1_w.Gain_t"><a class="viewcode-back" href="../Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t">[docs]</a>    <span class="k">def</span> <span class="nf">Gain_t</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">)):</span>
+<div class="viewcode-block" id="Wavefield_NRM_k1_w.Gain_t"><a class="viewcode-back" href="../Wavefield_NRM_k1_w.html#Wavefield_NRM_k1_w.Wavefield_NRM_k1_w.Gain_t">[docs]</a>    <span class="k">def</span> <span class="nf">Gain_t</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">),</span><span class="n">eps</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes a gain function in the time domain to compensate for the </span>
 <span class="sd">        imaginary constant :math:`\epsilon` added to the frequencies</span>
 <span class="sd">        :math:`\omega&#39; = \omega + \mathrm{j}\epsilon`.</span>
@@ -656,6 +668,11 @@
 <span class="sd">            samples \&#39;nt\&#39; determines the taper length. The default value is </span>
 <span class="sd">            \&#39;RelativeTaperLength\&#39;:math:`=2^{-5}.`</span>
 <span class="sd">            </span>
+<span class="sd">        eps : int, float, optional</span>
+<span class="sd">            To compute the gain for an &#39;eps&#39; value different than the &#39;self.eps&#39; </span>
+<span class="sd">            parameter the input variable eps can be defined.</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        </span>
@@ -665,8 +682,6 @@
 <span class="sd">            (time zero element followed by positive time samples, then negative </span>
 <span class="sd">            time samples).</span>
 <span class="sd">            </span>
-<span class="sd">        </span>
-<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
@@ -678,8 +693,15 @@
         <span class="k">if</span> <span class="n">RelativeTaperLength</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Gain_t: </span><span class="se">\&#39;</span><span class="s1">RelativeTaperLength</span><span class="se">\&#39;</span><span class="s1"> must be greater than, or equal to zero.&#39;</span><span class="p">)</span>
         
+        <span class="k">if</span> <span class="n">eps</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">subeps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span><span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span><span class="nb">float</span><span class="p">)</span> <span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Gain_t: </span><span class="se">\&#39;</span><span class="s1">eps</span><span class="se">\&#39;</span><span class="s1"> must be of the type int or float.&#39;</span><span class="p">)</span>
+            <span class="n">subeps</span> <span class="o">=</span> <span class="n">eps</span>    
+    
         <span class="c1"># Compute gain</span>
-        <span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Tvec</span><span class="p">()[</span><span class="s1">&#39;tvecfft&#39;</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">gain</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span> <span class="n">subeps</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Tvec</span><span class="p">()[</span><span class="s1">&#39;tvecfft&#39;</span><span class="p">]</span> <span class="p">)</span>
         
         <span class="c1"># Apply taper</span>
         <span class="n">taperlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">RelativeTaperLength</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">)</span>
