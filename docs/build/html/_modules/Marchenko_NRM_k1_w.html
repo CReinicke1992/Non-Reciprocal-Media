@@ -72,18 +72,19 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <div class="viewcode-block" id="Marchenko_NRM_k1_w"><a class="viewcode-back" href="../Marchenko_NRM_k1_w.html#Marchenko_NRM_k1_w.Marchenko_NRM_k1_w">[docs]</a><span class="k">class</span> <span class="nc">Marchenko_NRM_k1_w</span><span class="p">(</span><span class="n">Layered_NRM_k1_w</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;is a class to apply the Marchenko method to wavefields in 1.5D (non-)</span>
-<span class="sd">    reciprocal media.</span>
+    <span class="sd">&quot;&quot;&quot;is a class to apply the Marchenko method to scalar wavefields in 1.5D </span>
+<span class="sd">    (non-)reciprocal media.</span>
 <span class="sd">    </span>
 <span class="sd">    The class Marchenko_NRM_k1_w operates on scalar wavefields in 1.5D (non-)</span>
-<span class="sd">    reciprocal media, ideally defined by the class Layered_NRM_k1_w. We </span>
-<span class="sd">    consider all horizontal-wavenumbers and all frequencies, that are sampled </span>
-<span class="sd">    by the given number of samples and by the given sample intervals, in space </span>
-<span class="sd">    (&#39;nr&#39;, &#39;dx1&#39;) as well as in time (&#39;nt&#39;, &#39;dt&#39;). Note that the separation of </span>
-<span class="sd">    focusing and Green&#39;s functions requires a transformation to the space-time</span>
-<span class="sd">    domain. The forward- and backward-transformations between domains introduce</span>
-<span class="sd">    small artefacts due to finite sampling. Thus, the focusing </span>
-<span class="sd">    functions cannot be retrieved within double-precision.</span>
+<span class="sd">    reciprocal media, defined by the class Layered_NRM_k1_w. We consider all </span>
+<span class="sd">    horizontal-wavenumbers and all frequencies, that are sampled by the given </span>
+<span class="sd">    number of samples and by the given sample intervals, in space (&#39;nr&#39;, &#39;dx1&#39;) </span>
+<span class="sd">    as well as in time (&#39;nt&#39;, &#39;dt&#39;). Note that the separation of the focusing </span>
+<span class="sd">    and Green&#39;s functions requires an inverse Fourier transformation to the </span>
+<span class="sd">    space-time domain. By applying an inverse Fourier transformation, followed </span>
+<span class="sd">    by a truncation in the space-time domain and a forward Fourier </span>
+<span class="sd">    transformation we introduce small artefacts due to finite sampling. Thus, </span>
+<span class="sd">    the focusing functions cannot be retrieved within double-precision.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
@@ -156,8 +157,7 @@
 <span class="sd">    AdjointMedium : bool, optional</span>
 <span class="sd">        Set &#39;AdjointMedium=True&#39; to compute scattering coefficients and </span>
 <span class="sd">        propagators in an adjoint medium :math:`^{(a)}`. We have defined the </span>
-<span class="sd">        scattering and propagation in the adjoint medium only for </span>
-<span class="sd">        flux-normalisation.</span>
+<span class="sd">        eigenvectors in the adjoint medium only for flux-normalisation.</span>
 <span class="sd">        </span>
 <span class="sd">    x3F : int, float, optional</span>
 <span class="sd">        Focusing depth.</span>
@@ -205,7 +205,7 @@
                                   <span class="n">ReciprocalMedium</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="p">)</span>
         
         <span class="c1"># Set Marchenko parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x3F</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x3F</span> <span class="o">=</span> <span class="n">x3F</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">P</span>   <span class="o">=</span> <span class="kc">None</span>
         
 <div class="viewcode-block" id="Marchenko_NRM_k1_w.TruncateMedium"><a class="viewcode-back" href="../Marchenko_NRM_k1_w.html#Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.TruncateMedium">[docs]</a>    <span class="k">def</span> <span class="nf">TruncateMedium</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -328,17 +328,15 @@
         <span class="n">K3n</span> <span class="o">=</span> <span class="n">TruncatedMedium</span><span class="p">[</span><span class="s1">&#39;K3n&#39;</span><span class="p">][:,:,:</span><span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
         
         <span class="n">LP</span>  <span class="o">=</span> <span class="n">TruncatedMedium</span><span class="p">[</span><span class="s1">&#39;LP&#39;</span><span class="p">]</span> 
-        <span class="n">LPn</span> <span class="o">=</span> <span class="n">TruncatedMedium</span><span class="p">[</span><span class="s1">&#39;LPn&#39;</span><span class="p">]</span> 
         <span class="n">LM</span>  <span class="o">=</span> <span class="n">TruncatedMedium</span><span class="p">[</span><span class="s1">&#39;LM&#39;</span><span class="p">]</span> 
+        <span class="n">LPn</span> <span class="o">=</span> <span class="n">TruncatedMedium</span><span class="p">[</span><span class="s1">&#39;LPn&#39;</span><span class="p">]</span> 
         <span class="n">LMn</span> <span class="o">=</span> <span class="n">TruncatedMedium</span><span class="p">[</span><span class="s1">&#39;LMn&#39;</span><span class="p">]</span> 
         
         <span class="k">if</span> <span class="n">LP</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">LP</span> <span class="o">=</span> <span class="n">LP</span><span class="p">[:,:,:</span><span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">LM</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">LM</span> <span class="o">=</span> <span class="n">LM</span><span class="p">[:,:,:</span><span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">LPn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">LPn</span> <span class="o">=</span> <span class="n">LPn</span><span class="p">[:,:,:</span><span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">LMn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">LMn</span> <span class="o">=</span> <span class="n">LMn</span><span class="p">[:,:,:</span><span class="n">f</span><span class="o">+</span><span class="mi">2</span><span class="p">]</span>
         
         <span class="c1"># Update medium parameters</span>
@@ -356,7 +354,7 @@
         <span class="sd">&quot;&quot;&quot;computes a projector that separates the focusing and Green&#39;s </span>
 <span class="sd">        functions in the space-time domain.</span>
 <span class="sd">        </span>
-<span class="sd">        The projector mutes all arrival before the direct transmission </span>
+<span class="sd">        The projector mutes all arrivals before the direct transmission </span>
 <span class="sd">        :math:`T_d^+(x_{3,f},x_{3,0},t)` associated with sources at the </span>
 <span class="sd">        surface :math:`x_{3,0}` and a receiver at the focusing point </span>
 <span class="sd">        :math:`x_{3,f}`. The direct transmission itself is also muted.</span>
@@ -371,7 +369,7 @@
 <span class="sd">        f0 : int, float</span>
 <span class="sd">            Central frequency of a Ricker wavelet in Hz to compute the width of</span>
 <span class="sd">            the taper of the projector according to,</span>
-<span class="sd">            :math:`\\frac{\sqrt{6}}{\pi f_0}`,</span>
+<span class="sd">            :math:`\\frac{\sqrt{6}}{\pi f_0}`</span>
 <span class="sd">            (trough-to-trough time).</span>
 <span class="sd">            </span>
 <span class="sd">        delta : int, float</span>
@@ -391,7 +389,7 @@
 <span class="sd">            </span>
 <span class="sd">        normalisation : str, optional</span>
 <span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for </span>
-<span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;.</span>
+<span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;. </span>
 <span class="sd">            </span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
@@ -406,6 +404,42 @@
 <span class="sd">            The outputs are in the space-time domain. They are stored in arrays </span>
 <span class="sd">            of shape (nt,nr).</span>
 
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; from Marchenko_NRM_k1_w import Marchenko_NRM_k1_w as Marchenko</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Initialise wavefield</span>
+<span class="sd">        &gt;&gt;&gt; F = LM(nt=1024,dt=5e-3,nr=4096,dx1=12.5,</span>
+<span class="sd">        &gt;&gt;&gt;        x3vec=np.array([1.1,2.2,3.7])*1e3,eps=0,</span>
+<span class="sd">        &gt;&gt;&gt;        avec=np.array([1,2,3])*1e-3,</span>
+<span class="sd">        &gt;&gt;&gt;        b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;        b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;        b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;        g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;        g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;        ReciprocalMedium=False,AdjointMedium=True)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute projector for focusing at 1500m depth</span>
+<span class="sd">        &gt;&gt;&gt; x3F=1500</span>
+<span class="sd">        &gt;&gt;&gt; out=F.Projector_x1_t(x3F,f0=30,RelativeTaperLength=2**(-5),</span>
+<span class="sd">        &gt;&gt;&gt;                      UpdateSelf=False,normalisation=&#39;flux&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; P = out[&#39;P&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; # We plot the projector below.</span>
+<span class="sd">        </span>
+<span class="sd">        .. image:: ../pictures/cropped/Projector.png</span>
+<span class="sd">           :width: 200px</span>
+<span class="sd">           :height: 200px</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # We test how efficiently the projector mutes the direct </span>
+<span class="sd">        &gt;&gt;&gt; # transmission td</span>
+<span class="sd">        &gt;&gt;&gt; td = out[&#39;td&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; np.linalg.norm(P*td)</span>
+<span class="sd">        5.4907520410514596e-05</span>
+<span class="sd">        &gt;&gt;&gt; np.linalg.norm(P*td)/np.linalg.norm(td)</span>
+<span class="sd">        0.0002078217409067099</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check if x3F is a positive scalar.</span>
@@ -435,44 +469,38 @@
                      <span class="o">+</span><span class="s1">&#39;must be set, either to </span><span class="se">\&#39;</span><span class="s1">flux</span><span class="se">\&#39;</span><span class="s1">, or to </span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
             
         <span class="c1"># Determine shift of the projector onset</span>
-     
         <span class="k">if</span> <span class="n">f0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            
-            <span class="c1"># Check the RelativeTaperLength</span>
+            <span class="c1"># Check the peak frequency f0</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span><span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f0</span><span class="p">,</span><span class="nb">float</span><span class="p">)</span> <span class="p">):</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Projector_x1_t: </span><span class="se">\&#39;</span><span class="s1">f0</span><span class="se">\&#39;</span><span class="s1"> must be of the type int or &#39;</span>
                          <span class="o">+</span><span class="s1">&#39;float.&#39;</span><span class="p">)</span>
-                
-            <span class="c1"># Check that RelativeTaperLength is not smaller than zero</span>
+            <span class="c1"># Ensure f0 is not smaller than zero</span>
             <span class="k">if</span> <span class="n">f0</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Projector_x1_t: </span><span class="se">\&#39;</span><span class="s1">f0</span><span class="se">\&#39;</span><span class="s1"> must be greater than, or &#39;</span>
                          <span class="o">+</span><span class="s1">&#39;equal to zero.&#39;</span><span class="p">)</span>     
-                
+            
+            <span class="c1"># Shift of the projector onset in sample-numbers</span>
             <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f0</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">))</span>
             
         <span class="k">else</span><span class="p">:</span>
-            
-            <span class="c1"># Check the RelativeTaperLength</span>
+            <span class="c1"># Check the time shift of the projector onset &#39;delta&#39;</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span><span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span><span class="nb">float</span><span class="p">)</span> <span class="p">):</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Projector_x1_t: </span><span class="se">\&#39;</span><span class="s1">delta</span><span class="se">\&#39;</span><span class="s1"> must be of the type int or &#39;</span>
                          <span class="o">+</span><span class="s1">&#39;float.&#39;</span><span class="p">)</span>
-                
-            <span class="c1"># Check that RelativeTaperLength is not smaller than zero</span>
+            <span class="c1"># Ensure that &#39;delta&#39; is not smaller than zero</span>
             <span class="k">if</span> <span class="n">delta</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Projector_x1_t: </span><span class="se">\&#39;</span><span class="s1">delta</span><span class="se">\&#39;</span><span class="s1"> must be greater than, or &#39;</span>
-                         <span class="o">+</span><span class="s1">&#39;equal to zero.&#39;</span><span class="p">)</span>  
+                         <span class="o">+</span><span class="s1">&#39;equal to zero.&#39;</span><span class="p">)</span> 
+                
+            <span class="c1"># Shift of the projector onset in sample-numbers</span>
             <span class="n">s</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">delta</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
         
-        
         <span class="c1"># Construct the taper of the projector</span>
-        
         <span class="n">taperlen</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">RelativeTaperLength</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">taperlen</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">tap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">taperlen</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="p">(</span><span class="n">taperlen</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
-            
 
         <span class="c1"># Model the direct transmission</span>
-        
         <span class="n">T</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TruncateMedium</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="mi">3</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
         <span class="n">Td</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RT_response_k1_w</span><span class="p">(</span><span class="n">x3vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;x3vec&#39;</span><span class="p">],</span><span class="n">avec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;avec&#39;</span><span class="p">],</span>
@@ -491,41 +519,33 @@
         <span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Gain_t</span><span class="p">(</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
         
         <span class="c1"># Direct transmission in the space-time domain</span>
-        <span class="n">td</span> <span class="o">=</span> <span class="n">gain</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">Td</span><span class="o">*</span><span class="n">Wav</span><span class="p">)</span>
+        <span class="n">td</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">Td</span><span class="o">*</span><span class="n">Wav</span><span class="p">),</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         
         <span class="c1"># Initialise the projector</span>
         <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span>
         
         <span class="c1"># Iterate over offsets and pick first arrivals until the last time </span>
         <span class="c1"># sample is reached</span>
         <span class="k">for</span> <span class="n">x1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">):</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">td</span><span class="p">[:,</span><span class="n">x1</span><span class="p">]))</span><span class="o">-</span><span class="n">s</span>
-
-            <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span> <span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
-                <span class="n">P</span><span class="p">[:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span><span class="p">[</span><span class="n">taperlen</span><span class="o">-</span><span class="n">ind</span><span class="p">:]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span><span class="p">:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span>
-            <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span>
-                <span class="n">nx</span> <span class="o">=</span> <span class="n">ind</span>
+            <span class="k">if</span> <span class="n">ind</span> <span class="o">&lt;</span> <span class="n">cut</span><span class="p">:</span>
                 <span class="k">break</span>
-            
+            <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="p">:,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span><span class="p">:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span>
+        
+        <span class="n">nx</span> <span class="o">=</span> <span class="n">x1</span>    
+        
         <span class="c1"># Iterate over negative offsets (x1&gt;=0) and search for first arrival</span>
         <span class="k">for</span> <span class="n">x1</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">td</span><span class="p">[:,</span><span class="n">x1</span><span class="p">]))</span> <span class="o">-</span> <span class="n">s</span>
-            
-            <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span> <span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
-                <span class="n">P</span><span class="p">[:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span><span class="p">[</span><span class="n">taperlen</span><span class="o">-</span><span class="n">ind</span><span class="p">:]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span><span class="p">:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span>
-            
-            <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">-</span><span class="mi">2</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ind</span> <span class="o">&lt;</span> <span class="n">cut</span><span class="p">:</span>
                 <span class="k">break</span>
-            
-        <span class="c1"># Fix the projector for negative times, in case the taper leaked into</span>
-        <span class="c1"># negative times</span>
-        <span class="n">P</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">-</span><span class="mi">1</span><span class="p">:,:]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="p">:,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">P</span><span class="p">[</span><span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span><span class="p">:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span>
+        
+        <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">td</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">td</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="n">UpdateSelf</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x3F</span> <span class="o">=</span> <span class="n">x3F</span>

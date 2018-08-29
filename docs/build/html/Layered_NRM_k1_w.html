@@ -187,8 +187,7 @@ media set ‘ReciprocalMedium=True’.</p>
 <blockquote>
 <div><p>Set ‘AdjointMedium=True’ to compute scattering coefficients and 
 propagators in an adjoint medium <span class="math notranslate">\(^{(a)}\)</span>. We have defined the 
-scattering and propagation in the adjoint medium only for 
-flux-normalisation.</p>
+eigenvectors in the adjoint medium only for flux-normalisation.</p>
 </div></blockquote>
 </td>
 </tr>
@@ -589,8 +588,8 @@ defined at initialisation of the wavefield.</p>
 <div><ul class="simple">
 <li><strong>LP</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{+}\)</span>.</li>
 <li><strong>LM</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{-}\)</span>.</li>
-<li><strong>LPn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{+}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</li>
-<li><strong>LMn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{-}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>.</li>
+<li><strong>LPn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{+}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (for adjoint medium).</li>
+<li><strong>LMn</strong>: The eigenvalue <span class="math notranslate">\(\lambda^{-}\)</span> with sign-inverted horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span> (for adjoint medium).</li>
 </ul>
 </div></blockquote>
 <p>All eigenvalue matrices are stored in a in a (nf,nr,n)-array. The 
@@ -642,11 +641,12 @@ holds in general.</p>
 <code class="descname">L_eigenvectors_k1_w</code><span class="sig-paren">(</span><em>beta11=None</em>, <em>beta13=None</em>, <em>beta33=None</em>, <em>K3=None</em>, <em>K3n=None</em>, <em>normalisation='flux'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.L_eigenvectors_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.L_eigenvectors_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the eigenvector matrix ‘L’ and its inverse ‘Linv’, either 
 in flux- or in pressure-normalisation for the vertical-wavenumber ‘K3’ 
-inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid 
-that contains all combinations of frequencies <span class="math notranslate">\(\omega\)</span> and 
-horizontal-wavenumbers <span class="math notranslate">\(k_1\)</span>. If ‘AdjointMedium=True’, 
-<strong>L_eigenvectors_k1_w</strong> also computes the eigenvector matrix in the 
-adjoint medium ‘La’ and its inverse ‘Lainv’.</p>
+inside a homogeneous layer.</p>
+<p>Here, the vertical-wavenumber is a meshgrid that contains all 
+combinations of frequencies <span class="math notranslate">\(\omega\)</span> and horizontal-wavenumbers 
+<span class="math notranslate">\(k_1\)</span>. If ‘AdjointMedium=True’, <strong>L_eigenvectors_k1_w</strong> also 
+computes the eigenvector matrix in the adjoint medium ‘La’ and its 
+inverse ‘Lainv’.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -850,7 +850,6 @@ computation of the scattering coefficients. I have fixed that, however, I believ
 <p class="rubric">Notes</p>
 <ul class="simple">
 <li>For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium. (To be checked)</li>
-<li>We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</li>
 </ul>
 <p class="rubric">References</p>
 <p>Kees document as soon as it is published.</p>
@@ -1404,7 +1403,8 @@ one sets ‘AdjointMedium=True’.</p>
 <code class="descname">FocusingFunction_k1_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em>, <em>Negative_eps=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.FocusingFunction_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the focusing functions between the top surface 
 (<span class="math notranslate">\(x_3=0\)</span>) and the focusing depth defined by the input variable 
-‘x3F’. We define the focusing depth just below ‘x3F’. Hence, if the 
+‘x3F’.</p>
+<p>We define the focusing depth just below ‘x3F’. Hence, if the 
 focusing depth coincides with an interface the focusing function 
 focuses below that interface.</p>
 <table class="docutils field-list" frame="void" rules="none">

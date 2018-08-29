@@ -17,18 +17,19 @@ import numpy as np
 import sys
 
 class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
-    """is a class to apply the Marchenko method to wavefields in 1.5D (non-)
-    reciprocal media.
+    """is a class to apply the Marchenko method to scalar wavefields in 1.5D 
+    (non-)reciprocal media.
     
     The class Marchenko_NRM_k1_w operates on scalar wavefields in 1.5D (non-)
-    reciprocal media, ideally defined by the class Layered_NRM_k1_w. We 
-    consider all horizontal-wavenumbers and all frequencies, that are sampled 
-    by the given number of samples and by the given sample intervals, in space 
-    ('nr', 'dx1') as well as in time ('nt', 'dt'). Note that the separation of 
-    focusing and Green's functions requires a transformation to the space-time
-    domain. The forward- and backward-transformations between domains introduce
-    small artefacts due to finite sampling. Thus, the focusing 
-    functions cannot be retrieved within double-precision.
+    reciprocal media, defined by the class Layered_NRM_k1_w. We consider all 
+    horizontal-wavenumbers and all frequencies, that are sampled by the given 
+    number of samples and by the given sample intervals, in space ('nr', 'dx1') 
+    as well as in time ('nt', 'dt'). Note that the separation of the focusing 
+    and Green's functions requires an inverse Fourier transformation to the 
+    space-time domain. By applying an inverse Fourier transformation, followed 
+    by a truncation in the space-time domain and a forward Fourier 
+    transformation we introduce small artefacts due to finite sampling. Thus, 
+    the focusing functions cannot be retrieved within double-precision.
     
     
     Parameters
@@ -101,8 +102,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
     AdjointMedium : bool, optional
         Set 'AdjointMedium=True' to compute scattering coefficients and 
         propagators in an adjoint medium :math:`^{(a)}`. We have defined the 
-        scattering and propagation in the adjoint medium only for 
-        flux-normalisation.
+        eigenvectors in the adjoint medium only for flux-normalisation.
         
     x3F : int, float, optional
         Focusing depth.
@@ -150,7 +150,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                                   ReciprocalMedium,AdjointMedium)
         
         # Set Marchenko parameters
-        self.x3F = None
+        self.x3F = x3F
         self.P   = None
         
     def TruncateMedium(self,x3F,UpdateSelf=False):
@@ -273,17 +273,15 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         K3n = TruncatedMedium['K3n'][:,:,:f+2]
         
         LP  = TruncatedMedium['LP'] 
-        LPn = TruncatedMedium['LPn'] 
         LM  = TruncatedMedium['LM'] 
+        LPn = TruncatedMedium['LPn'] 
         LMn = TruncatedMedium['LMn'] 
         
         if LP is not None:
             LP = LP[:,:,:f+2]
-        if LM is not None:
             LM = LM[:,:,:f+2]
         if LPn is not None:
             LPn = LPn[:,:,:f+2]
-        if LMn is not None:
             LMn = LMn[:,:,:f+2]
         
         # Update medium parameters
@@ -301,7 +299,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         """computes a projector that separates the focusing and Green's 
         functions in the space-time domain.
         
-        The projector mutes all arrival before the direct transmission 
+        The projector mutes all arrivals before the direct transmission 
         :math:`T_d^+(x_{3,f},x_{3,0},t)` associated with sources at the 
         surface :math:`x_{3,0}` and a receiver at the focusing point 
         :math:`x_{3,f}`. The direct transmission itself is also muted.
@@ -316,7 +314,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         f0 : int, float
             Central frequency of a Ricker wavelet in Hz to compute the width of
             the taper of the projector according to,
-            :math:`\\frac{\sqrt{6}}{\pi f_0}`,
+            :math:`\\frac{\sqrt{6}}{\pi f_0}`
             (trough-to-trough time).
             
         delta : int, float
@@ -336,7 +334,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             
         normalisation : str, optional
             For pressure-normalisation set normalisation='pressure', for 
-            flux-normalisation set normalisation='flux'.
+            flux-normalisation set normalisation='flux'. 
             
             
         Returns
@@ -351,6 +349,42 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             The outputs are in the space-time domain. They are stored in arrays 
             of shape (nt,nr).
 
+
+        Examples
+        --------
+        
+        >>> from Marchenko_NRM_k1_w import Marchenko_NRM_k1_w as Marchenko
+        >>> import numpy as np
+        
+        >>> # Initialise wavefield
+        >>> F = LM(nt=1024,dt=5e-3,nr=4096,dx1=12.5,
+        >>>        x3vec=np.array([1.1,2.2,3.7])*1e3,eps=0,
+        >>>        avec=np.array([1,2,3])*1e-3,
+        >>>        b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>        b13vec=np.array([0.4,2.4,1.2])*1e-4,
+        >>>        b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>        g1vec=np.array([0.8,2,1.3])*1e-4,
+        >>>        g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>        ReciprocalMedium=False,AdjointMedium=True)
+        
+        >>> # Compute projector for focusing at 1500m depth
+        >>> x3F=1500
+        >>> out=F.Projector_x1_t(x3F,f0=30,RelativeTaperLength=2**(-5),
+        >>>                      UpdateSelf=False,normalisation='flux')
+        >>> P = out['P']
+        >>> # We plot the projector below.
+        
+        .. image:: ../pictures/cropped/Projector.png
+           :width: 200px
+           :height: 200px
+        
+        >>> # We test how efficiently the projector mutes the direct 
+        >>> # transmission td
+        >>> td = out['td']
+        >>> np.linalg.norm(P*td)
+        5.4907520410514596e-05
+        >>> np.linalg.norm(P*td)/np.linalg.norm(td)
+        0.0002078217409067099
         
         """
         # Check if x3F is a positive scalar.
@@ -380,44 +414,38 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                      +'must be set, either to \'flux\', or to \'pressure\'.')
             
         # Determine shift of the projector onset
-     
         if f0 is not None:
-            
-            # Check the RelativeTaperLength
+            # Check the peak frequency f0
             if not ( isinstance(f0,int) or isinstance(f0,float) ):
                 sys.exit('Projector_x1_t: \'f0\' must be of the type int or '
                          +'float.')
-                
-            # Check that RelativeTaperLength is not smaller than zero
+            # Ensure f0 is not smaller than zero
             if f0 < 0:
                 sys.exit('Projector_x1_t: \'f0\' must be greater than, or '
                          +'equal to zero.')     
-                
+            
+            # Shift of the projector onset in sample-numbers
             s = int(np.sqrt(6)/(np.pi*f0*self.dt))
             
         else:
-            
-            # Check the RelativeTaperLength
+            # Check the time shift of the projector onset 'delta'
             if not ( isinstance(delta,int) or isinstance(delta,float) ):
                 sys.exit('Projector_x1_t: \'delta\' must be of the type int or '
                          +'float.')
-                
-            # Check that RelativeTaperLength is not smaller than zero
+            # Ensure that 'delta' is not smaller than zero
             if delta < 0:
                 sys.exit('Projector_x1_t: \'delta\' must be greater than, or '
-                         +'equal to zero.')  
+                         +'equal to zero.') 
+                
+            # Shift of the projector onset in sample-numbers
             s = int(delta/self.dt)
         
-        
         # Construct the taper of the projector
-        
         taperlen = int(RelativeTaperLength*self.nt)
         if taperlen != 0:
             tap = np.cos(np.arange(0,taperlen)*0.5*np.pi/(taperlen-1))**2
-            
 
         # Model the direct transmission
-        
         T  = self.TruncateMedium(x3F=x3F,UpdateSelf=UpdateSelf)
         eps = 3/(self.nf*self.dt)
         Td = self.RT_response_k1_w(x3vec=T['x3vec'],avec=T['avec'],
@@ -436,41 +464,33 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         gain = self.Gain_t(RelativeTaperLength=0,eps=eps)
         
         # Direct transmission in the space-time domain
-        td = gain*self.K1W2X1T(Td*Wav)
+        td = np.fft.fftshift(gain*self.K1W2X1T(Td*Wav),axes=0)
         
         # Initialise the projector
         P = np.ones((self.nt,self.nr))
+        cut = int(self.nf/4)
         
         # Iterate over offsets and pick first arrivals until the last time 
         # sample is reached
         for x1 in range(self.nr):
             ind = np.argmax(np.abs(td[:,x1]))-s
-
-            P[ind:self.nf-1,x1] = 0
-            if ind-taperlen <0:
-                P[:ind,x1] = tap[taperlen-ind:]
-            else:
-                P[ind-taperlen:ind,x1] = tap
-            if ind >= self.nf-2:
-                nx = ind
+            if ind < cut:
                 break
-            
+            P[ind:,x1] = 0
+            P[ind-taperlen:ind,x1] = tap
+        
+        nx = x1    
+        
         # Iterate over negative offsets (x1>=0) and search for first arrival
         for x1 in np.arange(self.nr-1,nx,-1):
             ind = np.argmax(np.abs(td[:,x1])) - s
-            
-            P[ind:self.nf-1,x1] = 0
-            if ind-taperlen <0:
-                P[:ind,x1] = tap[taperlen-ind:]
-            else:
-                P[ind-taperlen:ind,x1] = tap
-            
-            if ind >= self.nf-2:
+            if ind < cut:
                 break
-            
-        # Fix the projector for negative times, in case the taper leaked into
-        # negative times
-        P[self.nf-1:,:] = 0
+            P[ind:,x1] = 0
+            P[ind-taperlen:ind,x1] = tap
+        
+        P = np.fft.ifftshift(P,axes=0)
+        td = np.fft.ifftshift(td,axes=0)
         
         if UpdateSelf is True:
             self.x3F = x3F

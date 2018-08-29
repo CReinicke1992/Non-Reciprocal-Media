@@ -534,8 +534,8 @@ class Wavefield_NRM_k1_w:
             :math:`\\frac{2}{\mathrm{e}\sqrt{\pi}\omega_0}`.
             
         eps : int, float, optional
-            The input variable eps can be defined to compute the wavelet for an 
-            'eps' value different than the 'self.eps' parameter.
+            The input variable 'eps' can be defined to compute the wavelet for 
+            an 'eps' value different than the 'self.eps' parameter.
             
             
         Returns
@@ -614,8 +614,8 @@ class Wavefield_NRM_k1_w:
             \'RelativeTaperLength\':math:`=2^{-5}.`
             
         eps : int, float, optional
-            To compute the gain for an 'eps' value different than the 'self.eps' 
-            parameter the input variable eps can be defined.
+            The input variable 'eps' can be defined to compute the wavelet for 
+            an 'eps' value different than the 'self.eps' parameter.
             
             
         Returns

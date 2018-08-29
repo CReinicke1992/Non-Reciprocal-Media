@@ -151,8 +151,8 @@
 <span class="sd">    AdjointMedium : bool, optional</span>
 <span class="sd">        Set &#39;AdjointMedium=True&#39; to compute scattering coefficients and </span>
 <span class="sd">        propagators in an adjoint medium :math:`^{(a)}`. We have defined the </span>
-<span class="sd">        scattering and propagation in the adjoint medium only for </span>
-<span class="sd">        flux-normalisation.</span>
+<span class="sd">        eigenvectors in the adjoint medium only for flux-normalisation.</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -383,6 +383,7 @@
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;Layered_NRM_k1_w: In lossless non-reciprocal media &#39;</span>
                          <span class="s1">&#39;avec, b11vec, b13vec, b33vec, g1vec and g3vec have &#39;</span>
                          <span class="o">+</span><span class="s1">&#39;to be real-valued.&#39;</span><span class="p">)</span>
+                
         <span class="c1"># The updated equations do not address reciprocal media. Therefore,</span>
         <span class="c1"># I am not making any assumptions about their real- and imaginary</span>
         <span class="c1"># parts before Kees confirms the missing expressions.</span>
@@ -418,8 +419,9 @@
                   <span class="o">+</span><span class="s1">&#39;negative </span><span class="se">\&#39;</span><span class="s1">eps</span><span class="se">\&#39;</span><span class="s1"> value to handle the wrap-around correctly&#39;</span>
                   <span class="o">+</span><span class="s1">&#39; in case of complex-conjugated focusing functions.&#39;</span><span class="p">)</span>
         
-        <span class="c1"># Calculate vertical ray-parameter p3=p3(+p1) p3n=p3(-p1) </span>
-        <span class="c1"># Note: By default python uses opposite sign convention for evanescent waves as Kees: (-1)**0.5=1j</span>
+        <span class="c1"># Calculate vertical wavenumber K3=K3(+k1) K3n=K3(-k1) </span>
+        <span class="c1"># Note: By default python uses opposite sign convention for evanescent </span>
+        <span class="c1"># waves as Kees: (-1)**0.5=1j</span>
         <span class="n">K3</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         <span class="n">K3n</span> <span class="o">=</span> <span class="n">K3</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">W</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
@@ -439,13 +441,19 @@
             <span class="c1"># This is a manual fix to avoid exponential growth of the wavefield</span>
             <span class="c1"># I believe this fix sign-inverts epsilon for the unstable</span>
             <span class="c1"># w-k1 components. I am not sure if that is a problem. </span>
+            <span class="c1"># We account for the exceptional case where eps is negative (needed</span>
+            <span class="c1"># for focusing functions) by inserting the signum term</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">size</span><span class="p">):</span>
-                    <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-                    <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> 
+                                      <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">W</span><span class="o">**</span><span class="mi">2</span> 
+                                       <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span><span class="o">*</span><span class="n">K1</span><span class="o">*</span><span class="n">W</span> <span class="o">-</span> <span class="n">K1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     
-                    <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>  <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span>  <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
-                    <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">)</span>
+                    <span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span>  <span class="o">=</span> <span class="p">(</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>  
+                            <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span> <span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
+                    <span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">real</span> 
+                            <span class="o">+</span> <span class="mi">1</span><span class="n">j</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">K3n</span><span class="p">[:,:,</span><span class="n">layer</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eps</span><span class="p">))</span>
                     
         <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>  <span class="o">=</span> <span class="n">K3</span><span class="o">**</span><span class="mf">0.5</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span> <span class="o">=</span> <span class="n">K3n</span><span class="o">**</span><span class="mf">0.5</span>
@@ -723,8 +731,8 @@
 <span class="sd">            </span>
 <span class="sd">                - **LP**: The eigenvalue :math:`\lambda^{+}`.</span>
 <span class="sd">                - **LM**: The eigenvalue :math:`\lambda^{-}`.</span>
-<span class="sd">                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1`. </span>
-<span class="sd">                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1`.   </span>
+<span class="sd">                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1` (for adjoint medium). </span>
+<span class="sd">                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1` (for adjoint medium).   </span>
 <span class="sd">                </span>
 <span class="sd">            All eigenvalue matrices are stored in a in a (nf,nr,n)-array. The </span>
 <span class="sd">            dimensions correspond to the temporal frequencies :math:`\omega`, </span>
@@ -737,9 +745,9 @@
 <span class="sd">            (1) Check if the eigenvalues have to be modified for reciprocal </span>
 <span class="sd">            media.</span>
 <span class="sd">            </span>
-<span class="sd">            </span>
 <span class="sd">            (2) Check if :math:`\\beta_{11} \\beta_{33} - \\beta_{13}^2 \geq 0` </span>
 <span class="sd">            holds in general.</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -778,7 +786,8 @@
         <span class="n">Om</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;Wgrid&#39;</span><span class="p">]</span>
         <span class="n">K1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_K1_grid</span><span class="p">()[</span><span class="s1">&#39;K1gridfft&#39;</span><span class="p">]</span>
         
-        <span class="c1"># Eigenvalues for adjoint medium</span>
+        <span class="c1"># Eigenvalues with sign-inverted horizontal-wavenumbers for adjoint </span>
+        <span class="c1"># medium</span>
         <span class="n">LPn</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">LMn</span> <span class="o">=</span> <span class="kc">None</span>
         
@@ -848,11 +857,13 @@
                             <span class="n">K3</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">K3n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the eigenvector matrix &#39;L&#39; and its inverse &#39;Linv&#39;, either </span>
 <span class="sd">        in flux- or in pressure-normalisation for the vertical-wavenumber &#39;K3&#39; </span>
-<span class="sd">        inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid </span>
-<span class="sd">        that contains all combinations of frequencies :math:`\omega` and </span>
-<span class="sd">        horizontal-wavenumbers :math:`k_1`. If \&#39;AdjointMedium=True\&#39;, </span>
-<span class="sd">        **L_eigenvectors_k1_w** also computes the eigenvector matrix in the </span>
-<span class="sd">        adjoint medium &#39;La&#39; and its inverse &#39;Lainv&#39;. </span>
+<span class="sd">        inside a homogeneous layer. </span>
+<span class="sd">        </span>
+<span class="sd">        Here, the vertical-wavenumber is a meshgrid that contains all </span>
+<span class="sd">        combinations of frequencies :math:`\omega` and horizontal-wavenumbers </span>
+<span class="sd">        :math:`k_1`. If \&#39;AdjointMedium=True\&#39;, **L_eigenvectors_k1_w** also </span>
+<span class="sd">        computes the eigenvector matrix in the adjoint medium &#39;La&#39; and its </span>
+<span class="sd">        inverse &#39;Lainv&#39;. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -878,6 +889,7 @@
 <span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for </span>
 <span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;.</span>
 <span class="sd">            </span>
+<span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
@@ -895,6 +907,7 @@
 <span class="sd">            The last two dimension are the actual eigenvector matrices for all </span>
 <span class="sd">            :math:`\omega`-:math:`k_1` components.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">            </span>
@@ -903,9 +916,11 @@
 <span class="sd">        - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.</span>
 <span class="sd">        - If the frequency :math:`\omega` is real-valued (&#39;eps&#39;=0): At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \&#39;L\&#39; and their inverse \&#39;Linv\&#39; contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
 <span class="sd">        Kees document as soon as it is published.</span>
+
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -963,9 +978,9 @@
                      <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">Lainv</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
             
         <span class="c1"># Initialise L and Linv</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">Linv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
-        <span class="n">La</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">L</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">Linv</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">La</span>    <span class="o">=</span> <span class="kc">None</span>
         <span class="n">Lainv</span> <span class="o">=</span> <span class="kc">None</span>
         
         <span class="c1"># Construct a vertical ray-parameter</span>
@@ -1225,7 +1240,6 @@
 <span class="sd">        -----</span>
 <span class="sd">    </span>
 <span class="sd">        - For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium. (To be checked)</span>
-<span class="sd">        - We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.</span>
 <span class="sd">        </span>
 <span class="sd">            </span>
 <span class="sd">        References</span>
@@ -1289,8 +1303,7 @@
         <span class="c1"># Check if the vertical-wavenumber for a sign-inverted horizontal-</span>
         <span class="c1"># wavenumber is given</span>
         <span class="k">if</span>  <span class="p">(</span>    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> 
-             <span class="ow">and</span> <span class="p">((</span><span class="n">K3n_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">K3n_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span> 
-             <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;flux&#39;</span><span class="p">)</span> 
+             <span class="ow">and</span> <span class="p">((</span><span class="n">K3n_u</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">K3n_l</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">))</span>  
              <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">)):</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;RT_k1_w: The input variables </span><span class="se">\&#39;</span><span class="s1">K3n_u</span><span class="se">\&#39;</span><span class="s1"> and </span><span class="se">\&#39;</span><span class="s1">K3n_l</span><span class="se">\&#39;</span><span class="s1">&#39;</span><span class="o">+</span>
                      <span class="s1">&#39; (vertical-wavenumber :math:`k_3` for a sign-inverted&#39;</span><span class="o">+</span>
@@ -1403,11 +1416,13 @@
             <span class="n">rM</span> <span class="o">=</span> <span class="o">-</span><span class="n">rP</span>
             <span class="n">tM</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">rP</span>
             
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">RT_k1_w: (AdjointMedium is True) and (normalisation=</span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">)&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="mi">72</span><span class="o">*</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;We have defined the scattering coefficients of the &#39;</span>
-                      <span class="o">+</span><span class="s1">&#39;adjoint medium only for flux-normalisation.</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="c1"># Adjoint medium (no need to coorect (w,k1)=(0,0) element)</span>
+                <span class="n">denom</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">+</span> <span class="n">K3n_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span>
+                <span class="n">rPa</span> <span class="o">=</span> <span class="p">(</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">hu</span> <span class="o">-</span> <span class="n">K3n_l</span><span class="o">*</span><span class="n">hl</span><span class="p">)</span> <span class="o">*</span> <span class="n">denom</span>
+                <span class="n">tPa</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">K3n_u</span><span class="o">*</span><span class="n">hu</span><span class="o">*</span><span class="n">denom</span>
+                <span class="n">rMa</span> <span class="o">=</span> <span class="o">-</span><span class="n">rPa</span>
+                <span class="n">tMa</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">rPa</span> 
             
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;rP&#39;</span><span class="p">:</span><span class="n">rP</span><span class="p">,</span><span class="s1">&#39;tP&#39;</span><span class="p">:</span><span class="n">tP</span><span class="p">,</span><span class="s1">&#39;rM&#39;</span><span class="p">:</span><span class="n">rM</span><span class="p">,</span><span class="s1">&#39;tM&#39;</span><span class="p">:</span><span class="n">tM</span><span class="p">,</span><span class="s1">&#39;rPa&#39;</span><span class="p">:</span><span class="n">rPa</span><span class="p">,</span><span class="s1">&#39;tPa&#39;</span><span class="p">:</span><span class="n">tPa</span><span class="p">,</span><span class="s1">&#39;rMa&#39;</span><span class="p">:</span><span class="n">rMa</span><span class="p">,</span><span class="s1">&#39;tMa&#39;</span><span class="p">:</span><span class="n">tMa</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div>
@@ -1464,6 +1479,7 @@
 <span class="sd">            :math:`\omega&#39;=\omega+\mathrm{j}\epsilon` one of the propagators </span>
 <span class="sd">            has an exponentially growing term. Does that cause errors? If yes, </span>
 <span class="sd">            can we fix that manually? (still the case?)</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1582,6 +1598,7 @@
         <span class="sd">&quot;&quot;&quot;checks if the given arrays contain NaN or Inf elements. If an array</span>
 <span class="sd">        contains NaN or Inf elements a command line statement is printed.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        </span>
@@ -1592,6 +1609,7 @@
 <span class="sd">            Undetermined number of input tuples. The first tuple element is an</span>
 <span class="sd">            array, the second tuple element is the name of the array.</span>
 <span class="sd">            </span>
+<span class="sd">            </span>
 <span class="sd">        Yields</span>
 <span class="sd">        ------</span>
 <span class="sd">        </span>
@@ -1599,11 +1617,13 @@
 <span class="sd">            If any of the input arrays contains a NaN or Inf, a message is </span>
 <span class="sd">            printed in the command line.</span>
 <span class="sd">            </span>
+<span class="sd">            </span>
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        </span>
 <span class="sd">        This function is only meant for internal usage. Therefore, there are no</span>
 <span class="sd">        checks of the input variables.</span>
+<span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">keep</span> <span class="o">=</span> <span class="mi">0</span>
         
@@ -1696,6 +1716,7 @@
 <span class="sd">            To model internal multiples set &#39;InternalMultiples=True&#39;. To </span>
 <span class="sd">            ignore internal multiples set &#39;InternalMultiples=False&#39;.</span>
 <span class="sd">            </span>
+<span class="sd">            </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">    </span>
@@ -1715,9 +1736,11 @@
 <span class="sd">            variables &#39;RPa&#39;, &#39;TPa&#39;, &#39;RMa&#39; and &#39;TMa&#39; are computed only if one </span>
 <span class="sd">            sets &#39;AdjointMedium=True&#39;.</span>
 <span class="sd">        </span>
+<span class="sd">        </span>
 <span class="sd">        References</span>
 <span class="sd">        ----------</span>
 <span class="sd">        Kees document as soon as it is published.</span>
+<span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1770,13 +1793,6 @@
         <span class="k">if</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;flux&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;RT_response_k1_w: The input variable </span><span class="se">\&#39;</span><span class="s1">normalisation</span><span class="se">\&#39;</span><span class="s1"> &#39;</span><span class="o">+</span>
                      <span class="s1">&#39;must be set, either to </span><span class="se">\&#39;</span><span class="s1">flux</span><span class="se">\&#39;</span><span class="s1">, or to </span><span class="se">\&#39;</span><span class="s1">pressure</span><span class="se">\&#39;</span><span class="s1">.&#39;</span><span class="p">)</span>
-            
-        <span class="c1"># Medium responses of the adjoint medium can only be computed in </span>
-        <span class="c1"># flux-normalisation</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">normalisation</span> <span class="ow">is</span> <span class="s1">&#39;pressure&#39;</span><span class="p">):</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;RT_response_k1_w: We have defined the scattering &#39;</span><span class="o">+</span>
-                     <span class="s1">&#39;coefficients of the adjoint medium only for &#39;</span>     <span class="o">+</span>
-                     <span class="s1">&#39;flux-normalisation.&#39;</span><span class="p">)</span>
         
         <span class="c1"># Check if a layer stack is given</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">x3vec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">avec</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> 
@@ -1820,8 +1836,8 @@
             <span class="n">Eig</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
         
         <span class="c1"># Eigenvalues</span>
-        <span class="n">LP</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LP&#39;</span><span class="p">]</span>
-        <span class="n">LM</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LM&#39;</span><span class="p">]</span>
+        <span class="n">LP</span>  <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LP&#39;</span><span class="p">]</span>
+        <span class="n">LM</span>  <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LM&#39;</span><span class="p">]</span>
         <span class="n">LPn</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LPn&#39;</span><span class="p">]</span>
         <span class="n">LMn</span> <span class="o">=</span> <span class="n">Eig</span><span class="p">[</span><span class="s1">&#39;LMn&#39;</span><span class="p">]</span>
         <span class="k">del</span> <span class="n">Eig</span>
@@ -2136,13 +2152,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span>  <span class="o">=</span> <span class="n">G3vec</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">K3</span>     <span class="o">=</span> <span class="n">K3</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">K3n</span>    <span class="o">=</span> <span class="n">K3n</span>
-            
-            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>     <span class="p">(</span><span class="n">LP</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LPn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> 
-                        <span class="ow">and</span>  <span class="p">(</span><span class="n">LM</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">(</span><span class="n">LMn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">LP</span>  <span class="o">=</span> <span class="n">LP</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">LPn</span> <span class="o">=</span> <span class="n">LPn</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">LM</span>  <span class="o">=</span> <span class="n">LM</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">LMn</span> <span class="o">=</span> <span class="n">LMn</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LP</span>  <span class="o">=</span> <span class="n">LP</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LPn</span> <span class="o">=</span> <span class="n">LPn</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LM</span>  <span class="o">=</span> <span class="n">LM</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">LMn</span> <span class="o">=</span> <span class="n">LMn</span>
             
             
         <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;x3vec&#39;</span><span class="p">:</span><span class="n">X3vec</span><span class="p">,</span><span class="s1">&#39;avec&#39;</span><span class="p">:</span><span class="n">Avec</span><span class="p">,</span><span class="s1">&#39;b11vec&#39;</span><span class="p">:</span><span class="n">B11vec</span><span class="p">,</span><span class="s1">&#39;b13vec&#39;</span><span class="p">:</span><span class="n">B13vec</span><span class="p">,</span>
@@ -2630,7 +2643,9 @@
                               <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">Negative_eps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the focusing functions between the top surface </span>
 <span class="sd">        (:math:`x_3=0`) and the focusing depth defined by the input variable </span>
-<span class="sd">        \&#39;x3F\&#39;. We define the focusing depth just below \&#39;x3F\&#39;. Hence, if the </span>
+<span class="sd">        \&#39;x3F\&#39;. </span>
+<span class="sd">        </span>
+<span class="sd">        We define the focusing depth just below \&#39;x3F\&#39;. Hence, if the </span>
 <span class="sd">        focusing depth coincides with an interface the focusing function </span>
 <span class="sd">        focuses below that interface.</span>
 <span class="sd">        </span>
@@ -2873,9 +2888,14 @@
             <span class="n">tM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tM&#39;</span><span class="p">]</span>
             
             <span class="c1"># Propagators</span>
-            <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
-                                        <span class="n">LM</span><span class="o">=</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LMn</span><span class="o">=</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
-                                        <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                            <span class="n">LM</span><span class="o">=</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LMn</span><span class="o">=</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                            <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                            <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                
             <span class="n">WP</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wP&#39;</span><span class="p">]</span>
             <span class="n">WM</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wM&#39;</span><span class="p">]</span>
         
@@ -3006,9 +3026,14 @@
                 <span class="n">tM</span> <span class="o">=</span> <span class="n">ScatCoeffs</span><span class="p">[</span><span class="s1">&#39;tM&#39;</span><span class="p">]</span>
                 
                 <span class="c1"># Propagators</span>
-                <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
-                                                    <span class="n">LM</span><span class="o">=</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LMn</span><span class="o">=</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
-                                                    <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                                        <span class="n">LM</span><span class="o">=</span><span class="n">LM</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LMn</span><span class="o">=</span><span class="n">LMn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                                        <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">W</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">W_propagators_k1_w</span><span class="p">(</span><span class="n">LP</span><span class="o">=</span><span class="n">LP</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span><span class="n">LPn</span><span class="o">=</span><span class="n">LPn</span><span class="p">[:,:,</span><span class="n">n</span><span class="p">],</span>
+                                                        <span class="n">dx3</span><span class="o">=</span><span class="n">dx3vec</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+                    
                 <span class="n">WP</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wP&#39;</span><span class="p">]</span>
                 <span class="n">WM</span> <span class="o">=</span> <span class="n">W</span><span class="p">[</span><span class="s1">&#39;wM&#39;</span><span class="p">]</span>
             

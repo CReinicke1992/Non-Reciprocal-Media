@@ -96,8 +96,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
     AdjointMedium : bool, optional
         Set 'AdjointMedium=True' to compute scattering coefficients and 
         propagators in an adjoint medium :math:`^{(a)}`. We have defined the 
-        scattering and propagation in the adjoint medium only for 
-        flux-normalisation.
+        eigenvectors in the adjoint medium only for flux-normalisation.
+        
         
     Returns
     -------
@@ -328,6 +328,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 sys.exit('Layered_NRM_k1_w: In lossless non-reciprocal media '
                          'avec, b11vec, b13vec, b33vec, g1vec and g3vec have '
                          +'to be real-valued.')
+                
         # The updated equations do not address reciprocal media. Therefore,
         # I am not making any assumptions about their real- and imaginary
         # parts before Kees confirms the missing expressions.
@@ -363,8 +364,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                   +'negative \'eps\' value to handle the wrap-around correctly'
                   +' in case of complex-conjugated focusing functions.')
         
-        # Calculate vertical ray-parameter p3=p3(+p1) p3n=p3(-p1) 
-        # Note: By default python uses opposite sign convention for evanescent waves as Kees: (-1)**0.5=1j
+        # Calculate vertical wavenumber K3=K3(+k1) K3n=K3(-k1) 
+        # Note: By default python uses opposite sign convention for evanescent 
+        # waves as Kees: (-1)**0.5=1j
         K3  = np.zeros((self.nf,self.nr,self.x3vec.size),dtype=complex)
         K3n = K3.copy()
         W   = self.W_K1_grid()['Wgrid']
@@ -384,13 +386,19 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             # This is a manual fix to avoid exponential growth of the wavefield
             # I believe this fix sign-inverts epsilon for the unstable
             # w-k1 components. I am not sure if that is a problem. 
+            # We account for the exceptional case where eps is negative (needed
+            # for focusing functions) by inserting the signum term
             else:
                 for layer in range(self.x3vec.size):
-                    K3[:,:,layer]  = (tmp[layer]*W**2 + 2*self.g1vec[layer]*K1*W - K1**2)
-                    K3n[:,:,layer] = (tmp[layer]*W**2 - 2*self.g1vec[layer]*K1*W - K1**2)
+                    K3[:,:,layer]  = (tmp[layer]*W**2 
+                                      + 2*self.g1vec[layer]*K1*W - K1**2)
+                    K3n[:,:,layer] = (tmp[layer]*W**2 
+                                       - 2*self.g1vec[layer]*K1*W - K1**2)
                     
-                    K3[:,:,layer]  = K3[:,:,layer].real  + 1j*np.abs(K3[:,:,layer].imag)  *np.sign(self.eps)
-                    K3n[:,:,layer] = K3n[:,:,layer].real + 1j*np.abs(K3n[:,:,layer].imag) *np.sign(self.eps)
+                    K3[:,:,layer]  = (K3[:,:,layer].real  
+                            + 1j*np.abs(K3[:,:,layer].imag) *np.sign(self.eps))
+                    K3n[:,:,layer] = (K3n[:,:,layer].real 
+                            + 1j*np.abs(K3n[:,:,layer].imag)*np.sign(self.eps))
                     
         self.K3  = K3**0.5
         self.K3n = K3n**0.5
@@ -668,8 +676,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             
                 - **LP**: The eigenvalue :math:`\lambda^{+}`.
                 - **LM**: The eigenvalue :math:`\lambda^{-}`.
-                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1`. 
-                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1`.   
+                - **LPn**: The eigenvalue :math:`\lambda^{+}` with sign-inverted horizontal-wavenumbers :math:`k_1` (for adjoint medium). 
+                - **LMn**: The eigenvalue :math:`\lambda^{-}` with sign-inverted horizontal-wavenumbers :math:`k_1` (for adjoint medium).   
                 
             All eigenvalue matrices are stored in a in a (nf,nr,n)-array. The 
             dimensions correspond to the temporal frequencies :math:`\omega`, 
@@ -682,9 +690,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             (1) Check if the eigenvalues have to be modified for reciprocal 
             media.
             
-            
             (2) Check if :math:`\\beta_{11} \\beta_{33} - \\beta_{13}^2 \geq 0` 
             holds in general.
+        
         
         Notes
         -----
@@ -723,7 +731,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         Om = self.W_K1_grid()['Wgrid']
         K1 = self.W_K1_grid()['K1gridfft']
         
-        # Eigenvalues for adjoint medium
+        # Eigenvalues with sign-inverted horizontal-wavenumbers for adjoint 
+        # medium
         LPn = None
         LMn = None
         
@@ -793,11 +802,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                             K3=None,K3n=None,normalisation='flux'):
         """computes the eigenvector matrix 'L' and its inverse 'Linv', either 
         in flux- or in pressure-normalisation for the vertical-wavenumber 'K3' 
-        inside a homogeneous layer. Here, the vertical-wavenumber is a meshgrid 
-        that contains all combinations of frequencies :math:`\omega` and 
-        horizontal-wavenumbers :math:`k_1`. If \'AdjointMedium=True\', 
-        **L_eigenvectors_k1_w** also computes the eigenvector matrix in the 
-        adjoint medium 'La' and its inverse 'Lainv'. 
+        inside a homogeneous layer. 
+        
+        Here, the vertical-wavenumber is a meshgrid that contains all 
+        combinations of frequencies :math:`\omega` and horizontal-wavenumbers 
+        :math:`k_1`. If \'AdjointMedium=True\', **L_eigenvectors_k1_w** also 
+        computes the eigenvector matrix in the adjoint medium 'La' and its 
+        inverse 'Lainv'. 
         
         Parameters
         ----------
@@ -823,6 +834,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             For pressure-normalisation set normalisation='pressure', for 
             flux-normalisation set normalisation='flux'.
             
+            
         Returns
         -------
     
@@ -840,6 +852,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             The last two dimension are the actual eigenvector matrices for all 
             :math:`\omega`-:math:`k_1` components.
         
+        
         Notes
         -----
             
@@ -848,9 +861,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         - We have defined the eigenvectors of the adjoint medium only for flux-normalisation.
         - If the frequency :math:`\omega` is real-valued ('eps'=0): At zero frequency (:math:`\omega=0 \;\mathrm{s}^{-1}`), the eigenvector matrices \'L\' and their inverse \'Linv\' contain elements with poles. For computational convenience, we set the poles equal to zero. However, the resulting zero frequency component of all outputs is meaningless.
         
+        
         References
         ----------
         Kees document as soon as it is published.
+
 
         Examples
         --------
@@ -908,9 +923,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                      +'\'Lainv\'.')
             
         # Initialise L and Linv
-        L = np.zeros((self.nf,self.nr,2,2),dtype=complex)
-        Linv = np.zeros((self.nf,self.nr,2,2),dtype=complex)
-        La = None
+        L     = np.zeros((self.nf,self.nr,2,2),dtype=complex)
+        Linv  = np.zeros((self.nf,self.nr,2,2),dtype=complex)
+        La    = None
         Lainv = None
         
         # Construct a vertical ray-parameter
@@ -1170,7 +1185,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         -----
     
         - For reciprocal media, the scattering coefficients of the adjoint medium are identical to the scattering coefficients of the true medium. (To be checked)
-        - We have defined the scattering coefficients of the adjoint medium only for flux-normalisation.
         
             
         References
@@ -1234,8 +1248,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         # Check if the vertical-wavenumber for a sign-inverted horizontal-
         # wavenumber is given
         if  (    (self.AdjointMedium is True) 
-             and ((K3n_u is None) or (K3n_l is None)) 
-             and (normalisation is 'flux') 
+             and ((K3n_u is None) or (K3n_l is None))  
              and (self.ReciprocalMedium is False)):
             sys.exit('RT_k1_w: The input variables \'K3n_u\' and \'K3n_l\''+
                      ' (vertical-wavenumber :math:`k_3` for a sign-inverted'+
@@ -1348,11 +1361,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             rM = -rP
             tM = 1 - rP
             
-            if self.verbose is True and self.AdjointMedium is True:
-                print('\nRT_k1_w: (AdjointMedium is True) and (normalisation=\'pressure\')')
-                print(72*'-')
-                print('We have defined the scattering coefficients of the '
-                      +'adjoint medium only for flux-normalisation.\n')
+            if self.AdjointMedium is True:
+                # Adjoint medium (no need to coorect (w,k1)=(0,0) element)
+                denom = 1/(K3n_u*hu + K3n_l*hl)
+                rPa = (K3n_u*hu - K3n_l*hl) * denom
+                tPa = 2*K3n_u*hu*denom
+                rMa = -rPa
+                tMa = 1 - rPa 
             
         out = {'rP':rP,'tP':tP,'rM':rM,'tM':tM,'rPa':rPa,'tPa':tPa,'rMa':rMa,'tMa':tMa}
         return out
@@ -1409,6 +1424,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             :math:`\omega'=\omega+\mathrm{j}\epsilon` one of the propagators 
             has an exponentially growing term. Does that cause errors? If yes, 
             can we fix that manually? (still the case?)
+        
         
         Notes
         -----
@@ -1527,6 +1543,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         """checks if the given arrays contain NaN or Inf elements. If an array
         contains NaN or Inf elements a command line statement is printed.
         
+        
         Parameters
         ----------
         
@@ -1537,6 +1554,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             Undetermined number of input tuples. The first tuple element is an
             array, the second tuple element is the name of the array.
             
+            
         Yields
         ------
         
@@ -1544,11 +1562,13 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             If any of the input arrays contains a NaN or Inf, a message is 
             printed in the command line.
             
+            
         Notes
         -----
         
         This function is only meant for internal usage. Therefore, there are no
         checks of the input variables.
+        
         """
         keep = 0
         
@@ -1641,6 +1661,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             To model internal multiples set 'InternalMultiples=True'. To 
             ignore internal multiples set 'InternalMultiples=False'.
             
+            
         Returns
         -------
     
@@ -1660,9 +1681,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             variables 'RPa', 'TPa', 'RMa' and 'TMa' are computed only if one 
             sets 'AdjointMedium=True'.
         
+        
         References
         ----------
         Kees document as soon as it is published.
+        
         
         Examples
         --------
@@ -1715,13 +1738,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         if (normalisation is not 'flux') and (normalisation is not 'pressure'):
             sys.exit('RT_response_k1_w: The input variable \'normalisation\' '+
                      'must be set, either to \'flux\', or to \'pressure\'.')
-            
-        # Medium responses of the adjoint medium can only be computed in 
-        # flux-normalisation
-        if (self.AdjointMedium is True) and (normalisation is 'pressure'):
-            sys.exit('RT_response_k1_w: We have defined the scattering '+
-                     'coefficients of the adjoint medium only for '     +
-                     'flux-normalisation.')
         
         # Check if a layer stack is given
         if (isinstance(x3vec,np.ndarray) and isinstance(avec,np.ndarray) 
@@ -1765,8 +1781,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             Eig     = self.Eigenvalues_k1_w()
         
         # Eigenvalues
-        LP = Eig['LP']
-        LM = Eig['LM']
+        LP  = Eig['LP']
+        LM  = Eig['LM']
         LPn = Eig['LPn']
         LMn = Eig['LMn']
         del Eig
@@ -2081,13 +2097,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             self.g3vec  = G3vec
             self.K3     = K3
             self.K3n    = K3n
-            
-            if not (     (LP is None) and  (LPn is None) 
-                        and  (LM is None) and  (LMn is None) ):
-                self.LP  = LP
-                self.LPn = LPn
-                self.LM  = LM
-                self.LMn = LMn
+            self.LP  = LP
+            self.LPn = LPn
+            self.LM  = LM
+            self.LMn = LMn
             
             
         out = {'x3vec':X3vec,'avec':Avec,'b11vec':B11vec,'b13vec':B13vec,
@@ -2575,7 +2588,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                               InternalMultiples=True,Negative_eps=False):
         """computes the focusing functions between the top surface 
         (:math:`x_3=0`) and the focusing depth defined by the input variable 
-        \'x3F\'. We define the focusing depth just below \'x3F\'. Hence, if the 
+        \'x3F\'. 
+        
+        We define the focusing depth just below \'x3F\'. Hence, if the 
         focusing depth coincides with an interface the focusing function 
         focuses below that interface.
         
@@ -2818,9 +2833,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             tM = ScatCoeffs['tM']
             
             # Propagators
-            W = self.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
-                                        LM=LM[:,:,n],LMn=LMn[:,:,n],
-                                        dx3=dx3vec[n])
+            if self.AdjointMedium is True:
+                W = self.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                                            LM=LM[:,:,n],LMn=LMn[:,:,n],
+                                            dx3=dx3vec[n])
+            else:
+                W = self.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                                            dx3=dx3vec[n])
+                
             WP = W['wP']
             WM = W['wM']
         
@@ -2951,9 +2971,14 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 tM = ScatCoeffs['tM']
                 
                 # Propagators
-                W = self.SubSelf.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
-                                                    LM=LM[:,:,n],LMn=LMn[:,:,n],
-                                                    dx3=dx3vec[n])
+                if self.AdjointMedium is True:
+                    W = self.SubSelf.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                                                        LM=LM[:,:,n],LMn=LMn[:,:,n],
+                                                        dx3=dx3vec[n])
+                else:
+                    W = self.SubSelf.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                                                        dx3=dx3vec[n])
+                    
                 WP = W['wP']
                 WM = W['wM']
             
