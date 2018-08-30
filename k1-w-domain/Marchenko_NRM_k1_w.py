@@ -343,13 +343,17 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         dict
             Dictionary that contains 
             
-                - **P**:    The projector.
-                - **td**:   The direct transmission.
-                - **Pa**:   The projector (adjoint medium).
-                - **tda**:  The direct transmission (adjoint medium).
+                - **Pa**:   The projector that mutes the direct Green's function in the adjoint medium.
+                - **td**:   The direct transmission in the actual medium.
+                - **P**:    The projector mutes the direct Green's function in the actual medium.
+                - **tda**:  The direct transmission in the adjoint medium.
                 
             The outputs are in the space-time domain. They are stored in arrays 
             of shape (nt,nr).
+            
+            The Green's functions are associated with sources at the surface and a single receiver at the focusing point.
+            
+            The transmission responses are associated with a single source at the focusing point receivers at the surface.
 
 
         Examples
@@ -466,11 +470,11 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         gain = self.Gain_t(RelativeTaperLength=0,eps=eps)
         
         # Direct transmission in the space-time domain
-        Td = Resp['TP']
+        Td = Resp['TM']
         td = np.fft.fftshift(gain*self.K1W2X1T(Td*Wav),axes=0)
         
         # Initialise the projector
-        P = np.ones((self.nt,self.nr))
+        Pa = np.ones((self.nt,self.nr))
         cut = int(self.nf/4)
         
         # Iterate over offsets and pick first arrivals until the last time 
@@ -479,8 +483,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             ind = np.argmax(np.abs(td[:,x1]))-s
             if ind < cut:
                 break
-            P[ind:,x1] = 0
-            P[ind-taperlen:ind,x1] = tap
+            Pa[ind:,x1] = 0
+            Pa[ind-taperlen:ind,x1] = tap
         
         nx = x1    
         
@@ -489,46 +493,48 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             ind = np.argmax(np.abs(td[:,x1])) - s
             if ind < cut:
                 break
-            P[ind:,x1] = 0
-            P[ind-taperlen:ind,x1] = tap
+            Pa[ind:,x1] = 0
+            Pa[ind-taperlen:ind,x1] = tap
         
-        P = np.fft.ifftshift(P,axes=0)
+        Pa = np.fft.ifftshift(Pa,axes=0)
         td = np.fft.ifftshift(td,axes=0)
         
         if self.AdjointMedium is True:
-            Tda = Resp['TPa']
-            tda = np.fft.fftshift(gain*self.K1W2X1T(Tda*Wav),axes=0)
+            Tda = Resp['TMa']
+            Tdan = Tda.copy()
+            Tdan[:,1:] = Tda[:,-1:0:-1]
+            tdan = np.fft.fftshift(gain*self.K1W2X1T(Tdan*Wav),axes=0)
         
             # Initialise the projector
-            Pa = np.ones((self.nt,self.nr))
+            P = np.ones((self.nt,self.nr))
             
             # Iterate over offsets and pick first arrivals until the last time 
             # sample is reached
             for x1 in range(self.nr):
-                ind = np.argmax(np.abs(tda[:,x1]))-s
+                ind = np.argmax(np.abs(tdan[:,x1]))-s
                 if ind < cut:
                     break
-                Pa[ind:,x1] = 0
-                Pa[ind-taperlen:ind,x1] = tap
+                P[ind:,x1] = 0
+                P[ind-taperlen:ind,x1] = tap
             
             nx = x1    
             
             # Iterate over negative offsets (x1>=0) and search for first arrival
             for x1 in np.arange(self.nr-1,nx,-1):
-                ind = np.argmax(np.abs(tda[:,x1])) - s
+                ind = np.argmax(np.abs(tdan[:,x1])) - s
                 if ind < cut:
                     break
-                Pa[ind:,x1] = 0
-                Pa[ind-taperlen:ind,x1] = tap
+                P[ind:,x1] = 0
+                P[ind-taperlen:ind,x1] = tap
             
-            Pa = np.fft.ifftshift(Pa,axes=0)
-            tda = np.fft.ifftshift(tda,axes=0)
+            P = np.fft.ifftshift(P,axes=0)
+            tdan = np.fft.ifftshift(tdan,axes=0)
         
         if UpdateSelf is True:
             self.x3F = x3F
             self.P   = P
         
-        out={'P':P,'td':td,'Pa':Pa,'tda':tda}
+        out={'Pa':Pa,'td':td,'P':P,'tdan':tdan}
         return out
     
     def F_initial_k1_w(self,x3F,f0=None,FK_filter=False,
@@ -691,8 +697,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         out = {'FP0':FP,'FP0a':FPa}
         return out
     
-    def MarchenkoSeries(self,x3F,K,R=None,FP0=None,P=None,f0=None,delta=0,
-                        FK_filter=False,RelativeTaperLength=2**(-5),
+    def MarchenkoSeries(self,x3F,K,R=None,FP0=None,P=None,Pa=None,f0=None,
+                        delta=0,FK_filter=False,RelativeTaperLength=2**(-5),
                         normalisation='flux',UpdateSelf=False,AdjointF=False):
         """computes K iterations of the Marchenko series.
         
@@ -715,7 +721,14 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             (nf,nr).
             
         P : numpy.ndarray, optional
-            Projector in the space-time domain (nt,nr).
+            Projector in the space-time domain (nt,nr) that mutes the direct 
+            transmission from sources at the surface to a single receiver at
+            the focusing point in the actual medium.
+        
+        Pa : numpy.ndarray, optional
+            Projector in the space-time domain (nt,nr) that mutes the direct 
+            transmission from sources at the surface to a single receiver at
+            the focusing point in the adjoint medium.
             
         f0 : int, float, optional
             If 'f0' is defined and 'FP0=None' the initial focusing function is 
@@ -862,22 +875,38 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         
         # Determine the projector P if not given        
         if P is None:
-            P = self.Projector_x1_t(x3F=x3F,f0=f0,delta=delta,
-                                    RelativeTaperLength=RelativeTaperLength,
-                                    UpdateSelf=False,
-                                    normalisation=normalisation)['P'+a]
+            Pro = self.Projector_x1_t(x3F=x3F,f0=f0,delta=delta,
+                                      RelativeTaperLength=RelativeTaperLength,
+                                      UpdateSelf=False,
+                                      normalisation=normalisation)
+            P  = Pro['P']
+            Pa = Pro['Pa']
+            del Pro
         else:
-            if np.shape(P) != (self.nt,self.nr):
-                sys.exit('MarchenkoSeries: The initial focusing function '
-                         +'\'FP0\' must have the shape (nf,nr).')
+            if np.shape(P) != (self.nt,self.nr) or np.shape(Pa) != (self.nt,self.nr):
+                sys.exit('MarchenkoSeries: The projectors \'P\' and \'Pa\' must '
+                         +'have the shape (nt,nr).')
       
-        # Marchenko series
-        FP = FP0.copy()
-        FM = self.X1T2K1W(P*self.K1W2X1T(R*FP))
-
-        for k in range(K):
-            FP = FP0 + self.X1T2K1W( P*self.K1W2X1T(R*FM.conj()) ).conj()
-            FM = self.X1T2K1W( P*self.K1W2X1T(R*FP) )
+        # Select the set of Marchenko equation to be solved
+        if AdjointF is True:
+            
+            # Marchenko series
+            FP = FP0.copy()
+            FM = self.X1T2K1W(P*self.K1W2X1T(R*FP))
+    
+            for k in range(K):
+                FP = FP0 + self.X1T2K1W( Pa*self.K1W2X1T(R*FM.conj()) ).conj()
+                FM = self.X1T2K1W( P*self.K1W2X1T(R*FP) )
+                
+        else:
+            
+            # Marchenko series
+            FP = FP0.copy()
+            FM = self.X1T2K1W(Pa*self.K1W2X1T(R*FP))
+    
+            for k in range(K):
+                FP = FP0 + self.X1T2K1W( P*self.K1W2X1T(R*FM.conj()) ).conj()
+                FM = self.X1T2K1W( Pa*self.K1W2X1T(R*FP) )
             
         # Update self
         if UpdateSelf is True:
