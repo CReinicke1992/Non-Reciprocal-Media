@@ -651,12 +651,19 @@ class Wavefield_NRM_k1_w:
         # Apply taper
         taperlen = int(RelativeTaperLength*self.nt)
         if taperlen != 0:
-            tap = np.cos(np.linspace(0,np.pi/2,taperlen))**2
             
-            gain_max = gain[self.nf-1-taperlen,0]
-            gain_min = gain[self.nf-1,0]
-            gain[self.nf-1-taperlen:self.nf-1,0] = ( (gain_max - gain_min)*tap 
-                                                    + gain_min                )
+            if subeps >= 0:
+                tap = np.cos(np.linspace(0,np.pi/2,taperlen))**2
+                gain_max = gain[self.nf-1-taperlen,0]
+                gain_min = gain[self.nf-1,0]
+                gain[self.nf-1-taperlen:
+                    self.nf-1,0] = (gain_max - gain_min)*tap + gain_min
+            else:
+                tap = np.sin(np.linspace(0,np.pi/2,taperlen))**2
+                gain_max = gain[self.nf-2+taperlen,0]
+                gain_min = gain[self.nf-2,0]
+                gain[self.nf-2:self.nf-2
+                     +taperlen,0] = (gain_max - gain_min)*tap + gain_min
             
         gain = np.tile(gain,self.nr)
         

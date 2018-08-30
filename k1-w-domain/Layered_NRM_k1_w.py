@@ -2585,7 +2585,8 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         return out
     
     def FocusingFunction_k1_w(self,x3F,normalisation='flux',
-                              InternalMultiples=True,Negative_eps=False):
+                              InternalMultiples=True,Negative_eps=False,
+                              UpdateSelf=False):
         """computes the focusing functions between the top surface 
         (:math:`x_3=0`) and the focusing depth defined by the input variable 
         \'x3F\'. 
@@ -2621,6 +2622,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             computed with a negative 'eps' parameter, whereas all other 
             qunatities (Green's functions and reflection response) must be 
             computed using a positive 'eps' parameter.
+            
+        UpdateSelf : bool, optional
+            If 'UpdateSelf=True' the focusing depth level 'x3F' is inserted in 
+            the model.
             
             
         Returns
@@ -2735,6 +2740,11 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                      +'pressure-normalistiont the required equations have to '
                      +'be derived.)')
             
+        # Check if UpdateSelf is a bool    
+        if not isinstance(UpdateSelf,bool):
+            sys.exit('FocusingFunction_k1_w: The input variable \'UpdateSelf\''
+                     +' must be a bool.')
+            
         # Eigenvalues: To ensure that the eigenvalues are defined as 'self'
         # parameters
         Eig = self.Eigenvalues_k1_w()
@@ -2748,9 +2758,9 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         # depth without getting an index error.
         if x3F >= self.x3vec[-1]:
             Tmp_medium = self.Insert_layer(x3=np.array([x3F,x3F+1]),
-                                           UpdateSelf=False)
+                                           UpdateSelf=UpdateSelf)
         else:
-            Tmp_medium = self.Insert_layer(x3=x3F,UpdateSelf=False)
+            Tmp_medium = self.Insert_layer(x3=x3F,UpdateSelf=UpdateSelf)
         
         
         
@@ -2797,6 +2807,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
         # Internal multiple operator: Initial value
         M1 = np.ones((self.nf,self.nr),dtype=complex)
         M2 = np.ones((self.nf,self.nr),dtype=complex)
+        M3 = np.ones((self.nf,self.nr),dtype=complex)
         
         if self.AdjointMedium is True:
             FPa = FP.copy()
@@ -2847,9 +2858,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             if InternalMultiples is True:
                 M1 = 1 / (1 - RM*WM*rP*WP)
                 M2 = 1 / (1 - rP*WP*RM*WM)
+                M3 = (1-WP*RM*WM*rP)
             
             # Update focusing functions and reflection / transmission responses
-            FP = FP/WP*(1-WP*RM*WM*rP)/tP
+            FP = FP/WP*M3/tP
             RP = RP + TM*WM*rP*WP*M1*TP
             RM = rM + tP*WP*RM*WM*M2*tM
             TP = tP*WP*M1*TP
@@ -2868,9 +2880,10 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                 if InternalMultiples is True:
                     M1 = 1 / (1 - RMa*WM*rP*WP)
                     M2 = 1 / (1 - rP*WP*RMa*WM)
+                    M3 = (1-WP*RMa*WM*rP)
                 
                 # Update focusing functions and reflection / transmission responses
-                FPa = FPa/WP*(1-WP*RMa*WM*rP)/tP
+                FPa = FPa/WP*M3/tP
                 RPa = RPa + TMa*WM*rP*WP*M1*TPa
                 RMa = rM + tP*WP*RMa*WM*M2*tM
                 TPa = tP*WP*M1*TPa

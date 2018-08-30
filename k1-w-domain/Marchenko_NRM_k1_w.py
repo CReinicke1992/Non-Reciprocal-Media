@@ -345,6 +345,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             
                 - **P**:    The projector.
                 - **td**:   The direct transmission.
+                - **Pa**:   The projector (adjoint medium).
+                - **tda**:  The direct transmission (adjoint medium).
                 
             The outputs are in the space-time domain. They are stored in arrays 
             of shape (nt,nr).
@@ -448,12 +450,12 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         # Model the direct transmission
         T  = self.TruncateMedium(x3F=x3F,UpdateSelf=UpdateSelf)
         eps = 3/(self.nf*self.dt)
-        Td = self.RT_response_k1_w(x3vec=T['x3vec'],avec=T['avec'],
-                                   b11vec=T['b11vec'],b13vec=T['b13vec'],
-                                   b33vec=T['b33vec'],g1vec=T['g1vec'],
-                                   g3vec=T['g3vec'],eps=eps,
-                                   normalisation=normalisation,
-                                   InternalMultiples=False)['TP']
+        Resp = self.RT_response_k1_w(x3vec=T['x3vec'],avec=T['avec'],
+                                     b11vec=T['b11vec'],b13vec=T['b13vec'],
+                                     b33vec=T['b33vec'],g1vec=T['g1vec'],
+                                     g3vec=T['g3vec'],eps=eps,
+                                     normalisation=normalisation,
+                                     InternalMultiples=False)
         
         # Make a zero-phase wavelet for a more coherent projector
         if f0 is None:
@@ -464,6 +466,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         gain = self.Gain_t(RelativeTaperLength=0,eps=eps)
         
         # Direct transmission in the space-time domain
+        Td = Resp['TP']
         td = np.fft.fftshift(gain*self.K1W2X1T(Td*Wav),axes=0)
         
         # Initialise the projector
@@ -492,9 +495,399 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         P = np.fft.ifftshift(P,axes=0)
         td = np.fft.ifftshift(td,axes=0)
         
+        if self.AdjointMedium is True:
+            Tda = Resp['TPa']
+            tda = np.fft.fftshift(gain*self.K1W2X1T(Tda*Wav),axes=0)
+        
+            # Initialise the projector
+            Pa = np.ones((self.nt,self.nr))
+            
+            # Iterate over offsets and pick first arrivals until the last time 
+            # sample is reached
+            for x1 in range(self.nr):
+                ind = np.argmax(np.abs(tda[:,x1]))-s
+                if ind < cut:
+                    break
+                Pa[ind:,x1] = 0
+                Pa[ind-taperlen:ind,x1] = tap
+            
+            nx = x1    
+            
+            # Iterate over negative offsets (x1>=0) and search for first arrival
+            for x1 in np.arange(self.nr-1,nx,-1):
+                ind = np.argmax(np.abs(tda[:,x1])) - s
+                if ind < cut:
+                    break
+                Pa[ind:,x1] = 0
+                Pa[ind-taperlen:ind,x1] = tap
+            
+            Pa = np.fft.ifftshift(Pa,axes=0)
+            tda = np.fft.ifftshift(tda,axes=0)
+        
         if UpdateSelf is True:
             self.x3F = x3F
             self.P   = P
         
-        out={'P':P,'td':td}
+        out={'P':P,'td':td,'Pa':Pa,'tda':tda}
+        return out
+    
+    def F_initial_k1_w(self,x3F,f0=None,FK_filter=False,
+                       RelativeTaperLength=2**(-5),normalisation='flux',
+                       UpdateSelf=False):
+        """computes the initial downgoing focusing function 
+        :math:`F_1^+(k_1,x_{3,0},x_{3,f},\omega)`. The temporal wrap-around 
+        is already reduced to provide a good initial focusing function.
+        
+        
+        Parameters
+        ----------
+        
+        x3F : int, float
+            Focusing depth.
+            
+        f0 : int, float, optional
+            Central frequency of a Ricker wavelet in Hz. If not defined the 
+            initial focusing function is not multiplied by a wavelet.
+            
+        FK_filter : bool, optional
+            Set 'FK_filter=True' to apply a :math:`k_1-\omega` filter to the 
+            intial focusing function. The :math:`k_1-\omega` filter is defined
+            by the fastest propagation velocity of the truncated medium.
+            
+        RelativeTaperLength : int, float, optional
+            The :math:`k_1-\omega` filter can be tapered to avoid sharp edges.
+            To this end, define the \'RelativeTaperLength\' which is the 
+            quotient of the number of time samples of the taper and the number 
+            of temporal samples \'nt\'. The default value is 
+            \'RelativeTaperLength\':math:`=2^{-5}.`
+            
+        normalisation : str, optional
+            For pressure-normalisation set normalisation='pressure', for 
+            flux-normalisation set normalisation='flux'. We use the function
+            'FocusingFunction_k1_w' which until now only works for flux-
+            normalisation.
+            
+        UpdateSelf : bool, optional
+            If 'UpdateSelf=True' the focusing depth level 'x3F' is inserted in 
+            the model and the focusing depth is saved as self-parameter.
+            
+            
+        Returns
+        -------
+        
+        dict
+            Dictionary that contains 
+            
+                - **FP0**:    Downgoing focusing function.
+                - **FP0a**    Downgoing focusing function in the adjoint medium.
+                
+            The outputs are in the wavenumber-frequency domain. They are stored 
+            in arrays of shape (nf,nr).
+
+
+        Examples
+        --------
+        
+        >>> from Marchenko_NRM_k1_w import Marchenko_NRM_k1_w as Marchenko
+        >>> import numpy as np
+        
+        >>> # Initialise wavefield
+        >>> F = Marchenko(nt=1024,dt=5e-3,nr=4096,dx1=12.5,
+        >>>              x3vec=np.array([1.1,2.2,3.7])*1e3,
+        >>>              avec=np.array([1,2,3])*1e-3,
+        >>>              b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>              b13vec=np.array([0.4,2.4,1.2])*1e-4,
+        >>>              b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>              g1vec=np.array([0.8,2,1.3])*1e-4,
+        >>>              g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>              ReciprocalMedium=False,AdjointMedium=True)
+        
+        >>> # Compute initial focusing function for a focusing depth at 1500m
+        >>> Focus=F.F_initial_k1_w(x3F=1500,f0=30,FK_filter=True,
+        >>>                        RelativeTaperLength=0,
+        >>>                        normalisation='flux')
+        >>>                      UpdateSelf=False,normalisation='flux')
+        >>> FP0 = Focus['FP0']
+        >>> # We plot the initial focusing function below.
+        
+        .. image:: ../pictures/cropped/InitialF1plus_k1_w.png
+           :width: 200px
+           :height: 200px
+        
+        >>> # We transform the initial focusing function to the space-time 
+        >>> # domain
+        >>> fP0 = F.K1W2X1T(FP0)
+        >>> # We plot the initial focusing function below.
+           
+        .. image:: ../pictures/cropped/InitialF1plus_x1_t.png
+            :width: 200px
+            :height: 200px
+        
+        """
+        # Check if FK_filter is bool
+        if not isinstance(FK_filter,bool):
+            sys.exit('F_initial_k1_w: The variable F_filter must be a bool.')
+            
+        # Ensure to suppress wrap-around effects for the initial estimate
+        eps = -3/(self.nf*self.dt)
+        self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
+                                        self.verbose,eps=eps,
+                                        x3vec=self.x3vec,avec=self.avec,
+                                        b11vec=self.b11vec,
+                                        b13vec=self.b13vec,
+                                        b33vec=self.b33vec,
+                                        g1vec=self.g1vec,g3vec=self.g3vec,
+                                        ReciprocalMedium=self.ReciprocalMedium,
+                                        AdjointMedium=self.AdjointMedium)
+        
+        # Compute direct downgoing focusing function
+        Focus = self.SubSelf.FocusingFunction_k1_w(x3F, normalisation='flux',
+                                                   InternalMultiples=False,
+                                                   UpdateSelf=True)
+        FP  = Focus['FP']
+        FPa = Focus['FPa']
+
+        # If f0 is given make Ricker wavelet if f0
+        if f0 is not None:
+            Wav = self.SubSelf.RickerWavelet_w(f0=f0)
+        else:
+            Wav = np.ones_like(FP)
+            
+        # If FK_filter is true make FK filter based on highest velocity of
+        # the truncated medium
+        if FK_filter is True:    
+            f = self.SubSelf.x3vec.tolist().index(x3F)
+            Mask = self.SubSelf.FK1_mask_k1_w(RelativeTaperLength=
+                                              RelativeTaperLength)
+            ind = np.argmin(np.linalg.norm(Mask['FK'][:,:,:f+1],axis=(0,1)))
+            FK  = Mask['FK_tap'][:,:,ind]
+            FKn = Mask['FKn_tap'][:,:,ind]
+            del Mask
+        else:
+            FK  = np.ones_like(FP)
+            FKn = np.ones_like(FP)
+        
+        # Apply wavelet and FK filter to the focusing function
+        FP  = Wav*FK*FP
+        FPa = Wav*FKn*FPa
+        
+        # Compute correction for complex-valued frequency
+        gain = self.SubSelf.Gain_t()
+    
+        # Apply correction
+        FP = self.X1T2K1W(gain*self.K1W2X1T(FP))
+        FPa = self.X1T2K1W(gain*self.K1W2X1T(FPa))
+        
+        # Update self
+        if UpdateSelf is True:
+            if x3F >= self.x3vec[-1]:
+                Tmp_medium = self.Insert_layer(x3=np.array([x3F,x3F+1]),
+                                               UpdateSelf=UpdateSelf)
+            else:
+                Tmp_medium = self.Insert_layer(x3=x3F,UpdateSelf=UpdateSelf)
+        
+            self.x3F = x3F
+            
+        out = {'FP0':FP,'FP0a':FPa}
+        return out
+    
+    def MarchenkoSeries(self,x3F,K,R=None,FP0=None,P=None,f0=None,delta=0,
+                        FK_filter=False,RelativeTaperLength=2**(-5),
+                        normalisation='flux',UpdateSelf=False,AdjointF=False):
+        """computes K iterations of the Marchenko series.
+        
+        
+        Parameters
+        ----------
+        
+        x3F : int, float
+            Focusing depth.
+            
+        K : int, float
+            Number of iterations of the Marchenko series.
+            
+        R : numpy.ndarray, optional
+            Reflection response of the actual medium in the wavenumber-
+            frequency domain (nf,nr).
+        
+        FP0 : numpy.ndarray, optional
+            Initial focusing function in the wavenumber-frequency domain 
+            (nf,nr).
+            
+        P : numpy.ndarray, optional
+            Projector in the space-time domain (nt,nr).
+            
+        f0 : int, float, optional
+            If 'f0' is defined and 'FP0=None' the initial focusing function is 
+            multiplied by a Ricker wavelet with peak frequency f0. If 'f0' is 
+            defined and 'P=None' the projector onset is shifted by the width of 
+            a Ricker wavelet with peak frequency f0.
+            
+        delta : int, float, optional
+            If 'P=None' and 'f0=None', the width of the wavelet in seconds that 
+            the projector should take into account can be given by 'delta'.
+            
+        FK_filter : bool, optional
+            If 'FP0=None' and 'FK_filter=True' an :math:`k_1-\omega` filter is 
+            applied to the intial focusing function. The :math:`k_1-\omega` 
+            filter is defined by the fastest propagation velocity of the 
+            truncated medium.
+            
+        RelativeTaperLength : int, float, optional
+            The product of the RelativeTaperLength and the number of time 
+            samples 'nt' determines the lenght of the taper that is applied
+            to the :math:`k_1-\omega` if 'FP0=None' and 'FK_filter=True', to 
+            the projector onset if 'P=None', and the amplitude correction of 
+            the initial focusing function if 'FP0=None'.
+            
+        normalisation : str, optional
+            For pressure-normalisation set normalisation='pressure', for 
+            flux-normalisation set normalisation='flux'. If 'FP0=None' the 
+            initial focusing function is modelled by 'FocusingFunction_k1_w' 
+            which until now only works for flux-normalisation.
+            
+        UpdateSelf : bool, optional
+            If 'UpdateSelf=True' the focusing depth level 'x3F' is inserted in 
+            the model and the focusing depth is saved as self-parameter.
+            
+        AdjointF : bool, optional
+            For non-reciprocal media there are two sets of Marchenko equations:
+            Set 'AdjointF=True' to solve the Marchenko equations associated
+            with the focusing functions in the adjoint medium.
+            Set 'AdjointF=False' to solve the Marchenko equations associated
+            with the focusing functions in the actual medium.
+            
+            
+        Returns
+        -------
+        
+        dict
+            Dictionary that contains 
+            
+                - **FP**:    Downgoing focusing function.
+                - **FM**:    Downgoing focusing function in the adjoint medium.
+                - **FP0**    Initial focusing function.
+                _ **P**      Projector that mutes the Green's functions.
+                - **R**      Reflection response.
+                
+                 
+            The outputs are associated with the actual medium if 'AdjointF=
+            False' or with the adjoint medium if 'AdjointF=True'. All outputs,
+            except the projector **P**, are in the wavenumber-frequency domain. 
+            They are stored in arrays of shape (nf,nr). The projector is stored
+            in an array of shape (nt,nr).
+
+
+        Examples
+        --------
+        
+        >>> from Marchenko_NRM_k1_w import Marchenko_NRM_k1_w as Marchenko
+        >>> import numpy as np
+        
+        >>> # Initialise wavefield
+        >>> F = Marchenko(nt=4096,dt=5e-3,nr=2048,dx1=12.5,
+        >>>              x3vec=np.array([1.1,2.2,3.7])*1e3,
+        >>>              avec=np.array([2,4,6])*1e-3,
+        >>>              b11vec=np.array([1.4,3.14,2])*1e-4,
+        >>>              b13vec=np.array([0.4,2.4,1.2])*1e-4,
+        >>>              b33vec=np.array([1.4,3.14,2])*1e-4,
+        >>>              g1vec=np.array([0.8,2,1.3])*1e-4,
+        >>>              g3vec=np.array([1.8,0.7,2.3])*1e-4,
+        >>>              ReciprocalMedium=False,AdjointMedium=True)
+        
+        >>> # Compute initial focusing function for a focusing depth at 3000m
+        >>> Focus=F.MarchenkoSeries(x3F=3000,K=5,R=None,FP0=None,P=None,f0=30,
+        >>>                         delta=0,
+        >>>                         FK_filter=True,RelativeTaperLength=2**(-6),
+        >>>                         normalisation='flux',UpdateSelf=False,
+        >>>                         AdjointF=False)
+        >>> FP = Focus['FP']
+        >>> fP = F.K1W2X1T(FP)
+        
+        >>> # Reference focusing function
+        >>> Modelled = F.FocusingFunction_k1_w(x3F,normalisation='flux',
+                                   InternalMultiples=True,Negative_eps=False,
+                                   UpdateSelf=False)
+        >>> FPmod = Modelled['FP']
+        >>> Wav  = F.RickerWavelet_w(f0=30)
+        >>> Mask = F.FK1_mask_k1_w(RelativeTaperLength=2**(-6))
+        >>> ind  = np.argmin(np.linalg.norm(Mask['FK'][:,:,:3],axis=(0,1)))
+        >>> FK   = Mask['FK_tap'][:,:,ind]
+        >>> fPmod = F.K1W2X1T(FPmod*FK*Wav)
+        
+        >>> # We plot the retrieved focusing function and the difference below.
+        
+        .. image:: ../pictures/cropped/RetrievedF1plus_x1_t.png
+           :width: 300px
+           :height: 200px
+        
+        
+        """
+        # Check if K is an integer larger than or equal to zero
+        if (not isinstance(K,int)) or K <0:
+            sys.exit('MarchenkoSeries: \'K\' must be an integer greater than, '
+                     +'or equal to, zero.')
+        
+        # Check if AdjointF is a boolean
+        if not isinstance(AdjointF,bool):
+            sys.exit('MarchenkoSeries: \'AdjointF\' must be a boolean.')
+        
+        # Select the set of Marchenko equation to be solved
+        if AdjointF is True:
+            a = 'a'
+        else:
+            a = ''
+            
+        # Model reflection response if not given    
+        if R is None:
+            R = self.RT_response_k1_w(normalisation=normalisation)['RP'+a]
+        else:
+            if np.shape(R) != (self.nf,self.nr):
+                sys.exit('MarchenkoSeries: The reflection response \'R\' must '
+                         +'have the shape (nf,nr).')
+        
+        # Model initial focusing function if not given    
+        # The initial focusing function is multiplied by a k1-omega filter
+        # and by a wavelet.
+        if FP0 is None:
+            FP0 = self.F_initial_k1_w(x3F=x3F,f0=f0,FK_filter=FK_filter,
+                                      RelativeTaperLength=RelativeTaperLength,
+                                      normalisation=normalisation,
+                                      UpdateSelf=False)['FP0'+a]
+            
+        else:
+            if np.shape(FP0) != (self.nf,self.nr):
+                sys.exit('MarchenkoSeries: The initial focusing function '
+                         +'\'FP0\' must have the shape (nf,nr).')
+        
+        # Determine the projector P if not given        
+        if P is None:
+            P = self.Projector_x1_t(x3F=x3F,f0=f0,delta=delta,
+                                    RelativeTaperLength=RelativeTaperLength,
+                                    UpdateSelf=False,
+                                    normalisation=normalisation)['P'+a]
+        else:
+            if np.shape(P) != (self.nt,self.nr):
+                sys.exit('MarchenkoSeries: The initial focusing function '
+                         +'\'FP0\' must have the shape (nf,nr).')
+      
+        # Marchenko series
+        FP = FP0.copy()
+        FM = self.X1T2K1W(P*self.K1W2X1T(R*FP))
+
+        for k in range(K):
+            FP = FP0 + self.X1T2K1W( P*self.K1W2X1T(R*FM.conj()) ).conj()
+            FM = self.X1T2K1W( P*self.K1W2X1T(R*FP) )
+            
+        # Update self
+        if UpdateSelf is True:
+            if x3F >= self.x3vec[-1]:
+                _ = self.Insert_layer(x3=np.array([x3F,x3F+1]),
+                                               UpdateSelf=UpdateSelf)
+            else:
+                _ = self.Insert_layer(x3=x3F,UpdateSelf=UpdateSelf)
+        
+            self.x3F = x3F
+            
+        out = {'FP':FP,'FM':FM,'FP0':FP0,'P':P,'R':R}
         return out
