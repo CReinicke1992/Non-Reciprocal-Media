@@ -479,22 +479,26 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         
         # Iterate over offsets and pick first arrivals until the last time 
         # sample is reached
+        ind0 = np.argmax(np.abs(td[:,0]))-s
         for x1 in range(self.nr):
             ind = np.argmax(np.abs(td[:,x1]))-s
-            if ind < cut:
+            if ind < cut or np.abs(ind0-ind) > 10:
                 break
             Pa[ind:,x1] = 0
             Pa[ind-taperlen:ind,x1] = tap
+            ind0 = ind
         
         nx = x1    
         
         # Iterate over negative offsets (x1>=0) and search for first arrival
+        ind0 = np.argmax(np.abs(td[:,self.nr-1]))-s
         for x1 in np.arange(self.nr-1,nx,-1):
             ind = np.argmax(np.abs(td[:,x1])) - s
-            if ind < cut:
+            if ind < cut or np.abs(ind0-ind) > 10:
                 break
             Pa[ind:,x1] = 0
             Pa[ind-taperlen:ind,x1] = tap
+            ind0 = ind
         
         Pa = np.fft.ifftshift(Pa,axes=0)
         td = np.fft.ifftshift(td,axes=0)
@@ -510,22 +514,26 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             
             # Iterate over offsets and pick first arrivals until the last time 
             # sample is reached
+            ind0 = np.argmax(np.abs(tdan[:,0]))-s
             for x1 in range(self.nr):
                 ind = np.argmax(np.abs(tdan[:,x1]))-s
-                if ind < cut:
+                if ind < cut or np.abs(ind0-ind) > 10:
                     break
                 P[ind:,x1] = 0
                 P[ind-taperlen:ind,x1] = tap
+                ind0 = ind
             
             nx = x1    
             
             # Iterate over negative offsets (x1>=0) and search for first arrival
+            ind0 = np.argmax(np.abs(tdan[:,self.nr-1]))-s
             for x1 in np.arange(self.nr-1,nx,-1):
                 ind = np.argmax(np.abs(tdan[:,x1])) - s
-                if ind < cut:
+                if ind < cut or np.abs(ind0-ind) > 10:
                     break
                 P[ind:,x1] = 0
                 P[ind-taperlen:ind,x1] = tap
+                ind0 = ind
             
             P = np.fft.ifftshift(P,axes=0)
             tdan = np.fft.ifftshift(tdan,axes=0)
@@ -668,6 +676,13 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             ind = np.argmin(np.linalg.norm(Mask['FK'][:,:,:f+1],axis=(0,1)))
             FK  = Mask['FK_tap'][:,:,ind]
             FKn = Mask['FKn_tap'][:,:,ind]
+            
+#            # Experiment....
+#            FK  = Mask['FK_global_tap']
+#            FKn = Mask['FKn_global_tap']
+            FKhard  = Mask['FK'][:,:,ind]
+            FKhardn = Mask['FKn'][:,:,ind]
+            
             del Mask
         else:
             FK  = np.ones_like(FP)
@@ -694,7 +709,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         
             self.x3F = x3F
             
-        out = {'FP0':FP,'FP0a':FPa}
+        out = {'FP0':FP,'FP0a':FPa,'FKhard':FKhard,'FKhardn':FKhardn}
         return out
     
     def MarchenkoSeries(self,x3F,K,R=None,FP0=None,P=None,Pa=None,f0=None,
@@ -780,7 +795,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                 - **FP**:    Downgoing focusing function.
                 - **FM**:    Downgoing focusing function in the adjoint medium.
                 - **FP0**    Initial focusing function.
-                _ **P**      Projector that mutes the Green's functions.
+                - **P**      Projector that mutes the Green's functions.
+                - **Pa**     Projector that mutes the Green's functions in the adjoint medium.
                 - **R**      Reflection response.
                 
                  
@@ -848,8 +864,10 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         # Select the set of Marchenko equation to be solved
         if AdjointF is True:
             a = 'a'
+            n = 'n'
         else:
             a = ''
+            n = ''
             
         # Model reflection response if not given    
         if R is None:
@@ -863,15 +881,18 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         # The initial focusing function is multiplied by a k1-omega filter
         # and by a wavelet.
         if FP0 is None:
-            FP0 = self.F_initial_k1_w(x3F=x3F,f0=f0,FK_filter=FK_filter,
+            out = self.F_initial_k1_w(x3F=x3F,f0=f0,FK_filter=FK_filter,
                                       RelativeTaperLength=RelativeTaperLength,
                                       normalisation=normalisation,
-                                      UpdateSelf=False)['FP0'+a]
+                                      UpdateSelf=False)
+            FP0 = out['FP0'+a]
+            FK = out['FKhard'+n]
             
         else:
             if np.shape(FP0) != (self.nf,self.nr):
                 sys.exit('MarchenkoSeries: The initial focusing function '
                          +'\'FP0\' must have the shape (nf,nr).')
+            FK = np.ones_like(FP0)
         
         # Determine the projector P if not given        
         if P is None:
@@ -890,6 +911,11 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         # Select the set of Marchenko equation to be solved
         if AdjointF is True:
             
+            P  = P.copy()
+            Pa = Pa.copy()
+            P[:,1:]  = P[:,-1:0:-1]
+            Pa[:,1:] = Pa[:,-1:0:-1]
+            
             # Marchenko series
             FP = FP0.copy()
             FM = self.X1T2K1W(P*self.K1W2X1T(R*FP))
@@ -902,11 +928,11 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             
             # Marchenko series
             FP = FP0.copy()
-            FM = self.X1T2K1W(Pa*self.K1W2X1T(R*FP))
+            FM = self.X1T2K1W(Pa*self.K1W2X1T(FK*R*FP))
     
             for k in range(K):
-                FP = FP0 + self.X1T2K1W( P*self.K1W2X1T(R*FM.conj()) ).conj()
-                FM = self.X1T2K1W( Pa*self.K1W2X1T(R*FP) )
+                FP = FP0 + self.X1T2K1W( P*self.K1W2X1T(FK*R*FM.conj()) ).conj()
+                FM = self.X1T2K1W( Pa*self.K1W2X1T(FK*R*FP) )
             
         # Update self
         if UpdateSelf is True:
@@ -918,5 +944,5 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         
             self.x3F = x3F
             
-        out = {'FP':FP,'FM':FM,'FP0':FP0,'P':P,'R':R}
+        out = {'FP':FP,'FM':FM,'FP0':FP0,'P':P,'Pa':Pa,'R':R,'FK':FK}
         return out
