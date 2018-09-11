@@ -2823,6 +2823,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             TPa = None
             RMa = None
             TMa = None
+        
     
         # Loop over f+1 interfaces
         # Thus, the wavefield propagates to the focusing depth, and scatters
@@ -2849,41 +2850,43 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                                             LM=LM[:,:,n],LMn=LMn[:,:,n],
                                             dx3=dx3vec[n])
             else:
-                W = self.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                W = self.W_propagators_k1_w(LP=LP[:,:,n],LM=LM[:,:,n],
                                             dx3=dx3vec[n])
                 
-            WP = W['wP']
-            WM = W['wM']
+            WP  = W['wP']
+            WM  = W['wM']
         
             if InternalMultiples is True:
                 M1 = 1 / (1 - RM*WM*rP*WP)
                 M2 = 1 / (1 - rP*WP*RM*WM)
-                M3 = (1-WP*RM*WM*rP)
+                M3 = (1 - RM*WM*rP*WP)
             
             # Update focusing functions and reflection / transmission responses
-            FP = FP/WP*M3/tP
+            FP = FP*M3/WP/tP
             RP = RP + TM*WM*rP*WP*M1*TP
             RM = rM + tP*WP*RM*WM*M2*tM
             TP = tP*WP*M1*TP
             TM = TM*WM*M2*tM  
             FM = RP*FP
             
-            # Model focusing functions in the adjoint medium
             if self.AdjointMedium is True:
+                
                 rP = ScatCoeffs['rPa']
                 tP = ScatCoeffs['tPa']
                 rM = ScatCoeffs['rMa']
                 tM = ScatCoeffs['tMa']
+                
                 WP = W['wPa']
                 WM = W['wMa']
-            
+                
                 if InternalMultiples is True:
                     M1 = 1 / (1 - RMa*WM*rP*WP)
                     M2 = 1 / (1 - rP*WP*RMa*WM)
-                    M3 = (1-WP*RMa*WM*rP)
-                
+                    M3 = (1 - RMa*WM*rP*WP)      
+            
+                # Model focusing functions in the adjoint medium
                 # Update focusing functions and reflection / transmission responses
-                FPa = FPa/WP*M3/tP
+                FPa = FPa*M3/WP/tP
                 RPa = RPa + TMa*WM*rP*WP*M1*TPa
                 RMa = rM + tP*WP*RMa*WM*M2*tM
                 TPa = tP*WP*M1*TPa
@@ -2949,6 +2952,7 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
             M1 = np.ones((self.nf,self.nr),dtype=complex)
             M2 = np.ones((self.nf,self.nr),dtype=complex)
             
+            # Adjoint medium
             if self.AdjointMedium is True:
                 FPa = FP.copy()
                 FMa = FM.copy()
@@ -2977,7 +2981,6 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                                                   beta33_l=B33[n+1],
                                                   K3_l=K3[:,:,n+1],K3n_l=K3n[:,:,n+1],
                                                   normalisation=normalisation)
-                
                 rP = ScatCoeffs['rP']
                 tP = ScatCoeffs['tP']
                 rM = ScatCoeffs['rM']
@@ -2989,39 +2992,43 @@ class Layered_NRM_k1_w(Wavefield_NRM_k1_w):
                                                         LM=LM[:,:,n],LMn=LMn[:,:,n],
                                                         dx3=dx3vec[n])
                 else:
-                    W = self.SubSelf.W_propagators_k1_w(LP=LP[:,:,n],LPn=LPn[:,:,n],
+                    W = self.SubSelf.W_propagators_k1_w(LP=LP[:,:,n],LM=LM[:,:,n],
                                                         dx3=dx3vec[n])
                     
-                WP = W['wP']
-                WM = W['wM']
+                WP  = W['wP']
+                WM  = W['wM']
             
                 if InternalMultiples is True:
                     M1 = 1 / (1 - RM*WM*rP*WP)
                     M2 = 1 / (1 - rP*WP*RM*WM)
+                    M3 = (1 - RM*WM*rP*WP)
                 
                 # Update focusing functions and reflection / transmission responses
-                FP = FP/WP*(1-WP*RM*WM*rP)/tP
+                FP = FP*M3/WP/tP
                 RP = RP + TM*WM*rP*WP*M1*TP
                 RM = rM + tP*WP*RM*WM*M2*tM
                 TP = tP*WP*M1*TP
                 TM = TM*WM*M2*tM  
                 FM = RP*FP
                 
-                # Model focusing functions in the adjoint medium
                 if self.AdjointMedium is True:
+                    
                     rP = ScatCoeffs['rPa']
                     tP = ScatCoeffs['tPa']
                     rM = ScatCoeffs['rMa']
                     tM = ScatCoeffs['tMa']
+                    
                     WP = W['wPa']
                     WM = W['wMa']
                 
                     if InternalMultiples is True:
                         M1 = 1 / (1 - RMa*WM*rP*WP)
                         M2 = 1 / (1 - rP*WP*RMa*WM)
+                        M3 = (1 - RMa*WM*rP*WP)  
                     
+                    # Model focusing functions in the adjoint medium
                     # Update focusing functions and reflection / transmission responses
-                    FPa = FPa/WP*(1-WP*RMa*WM*rP)/tP
+                    FPa = FPa*M3/WP/tP
                     RPa = RPa + TMa*WM*rP*WP*M1*TPa
                     RMa = rM + tP*WP*RMa*WM*M2*tM
                     TPa = tP*WP*M1*TPa

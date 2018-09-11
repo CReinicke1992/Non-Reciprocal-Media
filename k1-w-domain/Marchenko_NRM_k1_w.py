@@ -295,7 +295,7 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         return out
         
     def Projector_x1_t(self,x3F,f0=None,delta=0,RelativeTaperLength=2**(-6),
-                       UpdateSelf=False,normalisation='flux'):
+                       UpdateSelf=False,normalisation='flux',td=None,tdan=None):
         """computes a projector that separates the focusing and Green's 
         functions in the space-time domain.
         
@@ -343,10 +343,10 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         dict
             Dictionary that contains 
             
-                - **Pa**:   The projector that mutes the direct Green's function in the adjoint medium.
+                - **Pa**:   The projector that mutes the direct transmission with reversed :math:`x_1`-axis in the adjoint medium.
                 - **td**:   The direct transmission in the actual medium.
-                - **P**:    The projector mutes the direct Green's function in the actual medium.
-                - **tda**:  The direct transmission in the adjoint medium.
+                - **P**:    The projector mutes the direct transmission in the actual medium.
+                - **tda**:  The direct transmission with reversed :math:`x_1`-axis in the adjoint medium.
                 
             The outputs are in the space-time domain. They are stored in arrays 
             of shape (nt,nr).
@@ -431,7 +431,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                          +'equal to zero.')     
             
             # Shift of the projector onset in sample-numbers
-            s = int(np.sqrt(6)/(np.pi*f0*self.dt))
+#            s = int(0.5*np.sqrt(6)/(np.pi*f0*self.dt))
+            s = int(0.25*np.sqrt(6)/(np.pi*f0*self.dt))
             
         else:
             # Check the time shift of the projector onset 'delta'
@@ -451,30 +452,31 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         if taperlen != 0:
             tap = np.cos(np.arange(0,taperlen)*0.5*np.pi/(taperlen-1))**2
 
-        # Model the direct transmission
-        T  = self.TruncateMedium(x3F=x3F,UpdateSelf=UpdateSelf)
-        eps = 3/(self.nf*self.dt)
-        Resp = self.RT_response_k1_w(x3vec=T['x3vec'],avec=T['avec'],
-                                     b11vec=T['b11vec'],b13vec=T['b13vec'],
-                                     b33vec=T['b33vec'],g1vec=T['g1vec'],
-                                     g3vec=T['g3vec'],eps=eps,
-                                     normalisation=normalisation,
-                                     InternalMultiples=False)
-        
-        # Make a zero-phase wavelet for a more coherent projector
-        if f0 is None:
-            f0 = self.Dw()*self.nf/(2*np.pi*5)
-        Wav = self.RickerWavelet_w(f0=f0,eps=eps)
-        
-        # Gain function to correct for complex-valued frequency
-        gain = self.Gain_t(RelativeTaperLength=0,eps=eps)
-        
-        # Direct transmission in the space-time domain
-        Td = Resp['TM']
-        td = np.fft.fftshift(gain*self.K1W2X1T(Td*Wav),axes=0)
-        
+        if (td is None) or (tdan is None):
+            # Model the direct transmission
+            T  = self.TruncateMedium(x3F=x3F,UpdateSelf=UpdateSelf)
+            eps = 3/(self.nf*self.dt)
+            Resp = self.RT_response_k1_w(x3vec=T['x3vec'],avec=T['avec'],
+                                         b11vec=T['b11vec'],b13vec=T['b13vec'],
+                                         b33vec=T['b33vec'],g1vec=T['g1vec'],
+                                         g3vec=T['g3vec'],eps=eps,
+                                         normalisation=normalisation,
+                                         InternalMultiples=False)
+            
+            # Make a zero-phase wavelet for a more coherent projector
+            if f0 is None:
+                f0 = self.Dw()*self.nf/(2*np.pi*5)
+            Wav = self.RickerWavelet_w(f0=f0,eps=eps)
+            
+            # Gain function to correct for complex-valued frequency
+            gain = self.Gain_t(RelativeTaperLength=0,eps=eps)
+            
+            # Direct transmission in the space-time domain
+            Td = Resp['TP']
+            td = np.fft.fftshift(gain*self.K1W2X1T(Td*Wav),axes=0)
+            
         # Initialise the projector
-        Pa = np.ones((self.nt,self.nr))
+        P = np.ones((self.nt,self.nr))
         cut = int(self.nf/4)
         
         # Iterate over offsets and pick first arrivals until the last time 
@@ -484,8 +486,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             ind = np.argmax(np.abs(td[:,x1]))-s
             if ind < cut or np.abs(ind0-ind) > 10:
                 break
-            Pa[ind:,x1] = 0
-            Pa[ind-taperlen:ind,x1] = tap
+            P[ind:,x1] = 0
+            P[ind-taperlen:ind,x1] = tap
             ind0 = ind
         
         nx = x1    
@@ -496,21 +498,22 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             ind = np.argmax(np.abs(td[:,x1])) - s
             if ind < cut or np.abs(ind0-ind) > 10:
                 break
-            Pa[ind:,x1] = 0
-            Pa[ind-taperlen:ind,x1] = tap
+            P[ind:,x1] = 0
+            P[ind-taperlen:ind,x1] = tap
             ind0 = ind
         
-        Pa = np.fft.ifftshift(Pa,axes=0)
+        P = np.fft.ifftshift(P,axes=0)
         td = np.fft.ifftshift(td,axes=0)
         
         if self.AdjointMedium is True:
-            Tda = Resp['TMa']
-            Tdan = Tda.copy()
-            Tdan[:,1:] = Tda[:,-1:0:-1]
-            tdan = np.fft.fftshift(gain*self.K1W2X1T(Tdan*Wav),axes=0)
+            if tdan is None:
+                Tda = Resp['TPa']
+                Tdan = Tda.copy()
+                Tdan[:,1:] = Tda[:,-1:0:-1]
+                tdan = np.fft.fftshift(gain*self.K1W2X1T(Tdan*Wav),axes=0)
         
             # Initialise the projector
-            P = np.ones((self.nt,self.nr))
+            Pa = np.ones((self.nt,self.nr))
             
             # Iterate over offsets and pick first arrivals until the last time 
             # sample is reached
@@ -519,8 +522,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                 ind = np.argmax(np.abs(tdan[:,x1]))-s
                 if ind < cut or np.abs(ind0-ind) > 10:
                     break
-                P[ind:,x1] = 0
-                P[ind-taperlen:ind,x1] = tap
+                Pa[ind:,x1] = 0
+                Pa[ind-taperlen:ind,x1] = tap
                 ind0 = ind
             
             nx = x1    
@@ -531,11 +534,11 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                 ind = np.argmax(np.abs(tdan[:,x1])) - s
                 if ind < cut or np.abs(ind0-ind) > 10:
                     break
-                P[ind:,x1] = 0
-                P[ind-taperlen:ind,x1] = tap
+                Pa[ind:,x1] = 0
+                Pa[ind-taperlen:ind,x1] = tap
                 ind0 = ind
             
-            P = np.fft.ifftshift(P,axes=0)
+            Pa = np.fft.ifftshift(Pa,axes=0)
             tdan = np.fft.ifftshift(tdan,axes=0)
         
         if UpdateSelf is True:
@@ -547,7 +550,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
     
     def F_initial_k1_w(self,x3F,f0=None,FK_filter=False,
                        RelativeTaperLength=2**(-5),normalisation='flux',
-                       UpdateSelf=False):
+                       UpdateSelf=False,Create_Self=True,Wav=None,Mask=None,
+                       gain=None):
         """computes the initial downgoing focusing function 
         :math:`F_1^+(k_1,x_{3,0},x_{3,f},\omega)`. The temporal wrap-around 
         is already reduced to provide a good initial focusing function.
@@ -642,17 +646,37 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         if not isinstance(FK_filter,bool):
             sys.exit('F_initial_k1_w: The variable F_filter must be a bool.')
             
-        # Ensure to suppress wrap-around effects for the initial estimate
-        eps = -3/(self.nf*self.dt)
-        self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
-                                        self.verbose,eps=eps,
-                                        x3vec=self.x3vec,avec=self.avec,
-                                        b11vec=self.b11vec,
-                                        b13vec=self.b13vec,
-                                        b33vec=self.b33vec,
-                                        g1vec=self.g1vec,g3vec=self.g3vec,
-                                        ReciprocalMedium=self.ReciprocalMedium,
-                                        AdjointMedium=self.AdjointMedium)
+#        eps =  3/(self.nf*self.dt)  
+#        self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
+#                                        self.verbose,eps=eps,
+#                                        x3vec=self.x3vec,avec=self.avec,
+#                                        b11vec=self.b11vec,
+#                                        b13vec=self.b13vec,
+#                                        b33vec=self.b33vec,
+#                                        g1vec=self.g1vec,g3vec=self.g3vec,
+#                                        ReciprocalMedium=self.ReciprocalMedium,
+#                                        AdjointMedium=self.AdjointMedium)
+#        
+#        # Compute direct downgoing focusing function
+#        Focus = self.FocusingFunction_k1_w(x3F, normalisation='flux',
+#                                           InternalMultiples=False,
+#                                           UpdateSelf=True,Negative_eps=True)   
+#        
+        
+        if Create_Self is True:
+            # Ensure to suppress wrap-around effects for the initial estimate
+            eps = -3/(self.nf*self.dt)
+            self.SubSelf = Layered_NRM_k1_w(self.nt,self.dt,self.nr,self.dx1,
+                                            self.verbose,eps=eps,
+                                            x3vec=self.x3vec,avec=self.avec,
+                                            b11vec=self.b11vec,
+                                            b13vec=self.b13vec,
+                                            b33vec=self.b33vec,
+                                            g1vec=self.g1vec,g3vec=self.g3vec,
+                                            ReciprocalMedium=self.ReciprocalMedium,
+                                            AdjointMedium=self.AdjointMedium)
+        else:
+            self.SubSelf = self
         
         # Compute direct downgoing focusing function
         Focus = self.SubSelf.FocusingFunction_k1_w(x3F, normalisation='flux',
@@ -662,41 +686,50 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
         FPa = Focus['FPa']
 
         # If f0 is given make Ricker wavelet if f0
-        if f0 is not None:
-            Wav = self.SubSelf.RickerWavelet_w(f0=f0)
-        else:
-            Wav = np.ones_like(FP)
+        if Wav is None:
+            if f0 is not None:
+                Wav = self.SubSelf.RickerWavelet_w(f0=f0)
+            else:
+                Wav = np.ones_like(FP)
             
         # If FK_filter is true make FK filter based on highest velocity of
         # the truncated medium
         if FK_filter is True:    
+            
+            if Mask is None:
+                Mask = self.SubSelf.FK1_mask_k1_w(RelativeTaperLength=
+                                                  RelativeTaperLength)
+                
             f = self.SubSelf.x3vec.tolist().index(x3F)
-            Mask = self.SubSelf.FK1_mask_k1_w(RelativeTaperLength=
-                                              RelativeTaperLength)
             ind = np.argmin(np.linalg.norm(Mask['FK'][:,:,:f+1],axis=(0,1)))
             FK  = Mask['FK_tap'][:,:,ind]
             FKn = Mask['FKn_tap'][:,:,ind]
             
+            FKhard  = Mask['FK'][:,:,ind]
+            FKhardn = Mask['FKn'][:,:,ind]
+            
 #            # Experiment....
 #            FK  = Mask['FK_global_tap']
 #            FKn = Mask['FKn_global_tap']
-            FKhard  = Mask['FK'][:,:,ind]
-            FKhardn = Mask['FKn'][:,:,ind]
+#            FKhard  = Mask['FK_global']
+#            FKhardn = Mask['FKn_global']
             
             del Mask
         else:
             FK  = np.ones_like(FP)
             FKn = np.ones_like(FP)
         
+        
         # Apply wavelet and FK filter to the focusing function
         FP  = Wav*FK*FP
         FPa = Wav*FKn*FPa
-        
+            
         # Compute correction for complex-valued frequency
-        gain = self.SubSelf.Gain_t()
+        if gain is None:
+            gain = self.SubSelf.Gain_t()
     
         # Apply correction
-        FP = self.X1T2K1W(gain*self.K1W2X1T(FP))
+        FP  = self.X1T2K1W(gain*self.K1W2X1T(FP))
         FPa = self.X1T2K1W(gain*self.K1W2X1T(FPa))
         
         # Update self
@@ -714,7 +747,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
     
     def MarchenkoSeries(self,x3F,K,R=None,FP0=None,P=None,Pa=None,f0=None,
                         delta=0,FK_filter=False,RelativeTaperLength=2**(-5),
-                        normalisation='flux',UpdateSelf=False,AdjointF=False):
+                        normalisation='flux',UpdateSelf=False,AdjointF=False,
+                        FK=None):
         """computes K iterations of the Marchenko series.
         
         
@@ -886,13 +920,14 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                                       normalisation=normalisation,
                                       UpdateSelf=False)
             FP0 = out['FP0'+a]
-            FK = out['FKhard'+n]
+            FK = out['FKhard'+n]#np.ones_like(FP0)#
             
         else:
             if np.shape(FP0) != (self.nf,self.nr):
                 sys.exit('MarchenkoSeries: The initial focusing function '
                          +'\'FP0\' must have the shape (nf,nr).')
-            FK = np.ones_like(FP0)
+            if FK is None:
+                FK = np.ones_like(FP0)
         
         # Determine the projector P if not given        
         if P is None:
@@ -900,8 +935,8 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
                                       RelativeTaperLength=RelativeTaperLength,
                                       UpdateSelf=False,
                                       normalisation=normalisation)
-            P  = Pro['P']
-            Pa = Pro['Pa']
+            P  = Pro['P'].copy()
+            Pa = Pro['Pa'].copy()
             del Pro
         else:
             if np.shape(P) != (self.nt,self.nr) or np.shape(Pa) != (self.nt,self.nr):
@@ -918,11 +953,11 @@ class Marchenko_NRM_k1_w(Layered_NRM_k1_w):
             
             # Marchenko series
             FP = FP0.copy()
-            FM = self.X1T2K1W(P*self.K1W2X1T(R*FP))
+            FM = self.X1T2K1W(P*self.K1W2X1T(FK*R*FP))
     
             for k in range(K):
-                FP = FP0 + self.X1T2K1W( Pa*self.K1W2X1T(R*FM.conj()) ).conj()
-                FM = self.X1T2K1W( P*self.K1W2X1T(R*FP) )
+                FP = FP0 + self.X1T2K1W( Pa*self.K1W2X1T(FK*R*FM.conj()) ).conj()
+                FM = self.X1T2K1W( P*self.K1W2X1T(FK*R*FP) )
                 
         else:
             
