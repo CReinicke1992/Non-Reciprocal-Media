@@ -2640,7 +2640,8 @@
         <span class="k">return</span> <span class="n">out</span></div>
     
 <div class="viewcode-block" id="Layered_NRM_k1_w.FocusingFunction_k1_w"><a class="viewcode-back" href="../Layered_NRM_k1_w.html#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">FocusingFunction_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x3F</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
-                              <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">Negative_eps</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                              <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">Negative_eps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                              <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;computes the focusing functions between the top surface </span>
 <span class="sd">        (:math:`x_3=0`) and the focusing depth defined by the input variable </span>
 <span class="sd">        \&#39;x3F\&#39;. </span>
@@ -2676,6 +2677,10 @@
 <span class="sd">            computed with a negative &#39;eps&#39; parameter, whereas all other </span>
 <span class="sd">            qunatities (Green&#39;s functions and reflection response) must be </span>
 <span class="sd">            computed using a positive &#39;eps&#39; parameter.</span>
+<span class="sd">            </span>
+<span class="sd">        UpdateSelf : bool, optional</span>
+<span class="sd">            If &#39;UpdateSelf=True&#39; the focusing depth level &#39;x3F&#39; is inserted in </span>
+<span class="sd">            the model.</span>
 <span class="sd">            </span>
 <span class="sd">            </span>
 <span class="sd">        Returns</span>
@@ -2790,6 +2795,11 @@
                      <span class="o">+</span><span class="s1">&#39;pressure-normalistiont the required equations have to &#39;</span>
                      <span class="o">+</span><span class="s1">&#39;be derived.)&#39;</span><span class="p">)</span>
             
+        <span class="c1"># Check if UpdateSelf is a bool    </span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">UpdateSelf</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;FocusingFunction_k1_w: The input variable </span><span class="se">\&#39;</span><span class="s1">UpdateSelf</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+                     <span class="o">+</span><span class="s1">&#39; must be a bool.&#39;</span><span class="p">)</span>
+            
         <span class="c1"># Eigenvalues: To ensure that the eigenvalues are defined as &#39;self&#39;</span>
         <span class="c1"># parameters</span>
         <span class="n">Eig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Eigenvalues_k1_w</span><span class="p">()</span>
@@ -2803,9 +2813,9 @@
         <span class="c1"># depth without getting an index error.</span>
         <span class="k">if</span> <span class="n">x3F</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
             <span class="n">Tmp_medium</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x3F</span><span class="p">,</span><span class="n">x3F</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
-                                           <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                                           <span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">Tmp_medium</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">Tmp_medium</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
         
         
         
@@ -2852,6 +2862,7 @@
         <span class="c1"># Internal multiple operator: Initial value</span>
         <span class="n">M1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         <span class="n">M2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">M3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
         
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="n">FPa</span> <span class="o">=</span> <span class="n">FP</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -2902,9 +2913,10 @@
             <span class="k">if</span> <span class="n">InternalMultiples</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">M1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="p">)</span>
                 <span class="n">M2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="p">)</span>
+                <span class="n">M3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="p">)</span>
             
             <span class="c1"># Update focusing functions and reflection / transmission responses</span>
-            <span class="n">FP</span> <span class="o">=</span> <span class="n">FP</span><span class="o">/</span><span class="n">WP</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="p">)</span><span class="o">/</span><span class="n">tP</span>
+            <span class="n">FP</span> <span class="o">=</span> <span class="n">FP</span><span class="o">/</span><span class="n">WP</span><span class="o">*</span><span class="n">M3</span><span class="o">/</span><span class="n">tP</span>
             <span class="n">RP</span> <span class="o">=</span> <span class="n">RP</span> <span class="o">+</span> <span class="n">TM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TP</span>
             <span class="n">RM</span> <span class="o">=</span> <span class="n">rM</span> <span class="o">+</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RM</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">M2</span><span class="o">*</span><span class="n">tM</span>
             <span class="n">TP</span> <span class="o">=</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TP</span>
@@ -2923,9 +2935,10 @@
                 <span class="k">if</span> <span class="n">InternalMultiples</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">M1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="p">)</span>
                     <span class="n">M2</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="p">)</span>
+                    <span class="n">M3</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="p">)</span>
                 
                 <span class="c1"># Update focusing functions and reflection / transmission responses</span>
-                <span class="n">FPa</span> <span class="o">=</span> <span class="n">FPa</span><span class="o">/</span><span class="n">WP</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="p">)</span><span class="o">/</span><span class="n">tP</span>
+                <span class="n">FPa</span> <span class="o">=</span> <span class="n">FPa</span><span class="o">/</span><span class="n">WP</span><span class="o">*</span><span class="n">M3</span><span class="o">/</span><span class="n">tP</span>
                 <span class="n">RPa</span> <span class="o">=</span> <span class="n">RPa</span> <span class="o">+</span> <span class="n">TMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">rP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TPa</span>
                 <span class="n">RMa</span> <span class="o">=</span> <span class="n">rM</span> <span class="o">+</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">RMa</span><span class="o">*</span><span class="n">WM</span><span class="o">*</span><span class="n">M2</span><span class="o">*</span><span class="n">tM</span>
                 <span class="n">TPa</span> <span class="o">=</span> <span class="n">tP</span><span class="o">*</span><span class="n">WP</span><span class="o">*</span><span class="n">M1</span><span class="o">*</span><span class="n">TPa</span>

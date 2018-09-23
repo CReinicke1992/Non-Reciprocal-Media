@@ -376,6 +376,8 @@ flux-normalisation set normalisation=’flux’.</p>
 <div><ul class="simple">
 <li><strong>P</strong>:    The projector.</li>
 <li><strong>td</strong>:   The direct transmission.</li>
+<li><strong>Pa</strong>:   The projector (adjoint medium).</li>
+<li><strong>tda</strong>:  The direct transmission (adjoint medium).</li>
 </ul>
 </div></blockquote>
 <p>The outputs are in the space-time domain. They are stored in arrays 
@@ -420,6 +422,251 @@ of shape (nt,nr).</p>
 <span class="go">0.0002078217409067099</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="method">
+<dt id="Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.F_initial_k1_w">
+<code class="descname">F_initial_k1_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>f0=None</em>, <em>FK_filter=False</em>, <em>RelativeTaperLength=0.03125</em>, <em>normalisation='flux'</em>, <em>UpdateSelf=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Marchenko_NRM_k1_w.html#Marchenko_NRM_k1_w.F_initial_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.F_initial_k1_w" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes the initial downgoing focusing function 
+<span class="math notranslate">\(F_1^+(k_1,x_{3,0},x_{3,f},\omega)\)</span>. The temporal wrap-around 
+is already reduced to provide a good initial focusing function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x3F</strong> : int, float</p>
+<blockquote>
+<div><p>Focusing depth.</p>
+</div></blockquote>
+<p><strong>f0</strong> : int, float, optional</p>
+<blockquote>
+<div><p>Central frequency of a Ricker wavelet in Hz. If not defined the 
+initial focusing function is not multiplied by a wavelet.</p>
+</div></blockquote>
+<p><strong>FK_filter</strong> : bool, optional</p>
+<blockquote>
+<div><p>Set ‘FK_filter=True’ to apply a <span class="math notranslate">\(k_1-\omega\)</span> filter to the 
+intial focusing function. The <span class="math notranslate">\(k_1-\omega\)</span> filter is defined
+by the fastest propagation velocity of the truncated medium.</p>
+</div></blockquote>
+<p><strong>RelativeTaperLength</strong> : int, float, optional</p>
+<blockquote>
+<div><p>The <span class="math notranslate">\(k_1-\omega\)</span> filter can be tapered to avoid sharp edges.
+To this end, define the ‘RelativeTaperLength’ which is the 
+quotient of the number of time samples of the taper and the number 
+of temporal samples ‘nt’. The default value is 
+‘RelativeTaperLength’<span class="math notranslate">\(=2^{-5}.\)</span></p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for 
+flux-normalisation set normalisation=’flux’. We use the function
+‘FocusingFunction_k1_w’ which until now only works for flux-
+normalisation.</p>
+</div></blockquote>
+<p><strong>UpdateSelf</strong> : bool, optional</p>
+<blockquote>
+<div><p>If ‘UpdateSelf=True’ the focusing depth level ‘x3F’ is inserted in 
+the model and the focusing depth is saved as self-parameter.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>FP0</strong>:    Downgoing focusing function.</li>
+<li><strong>FP0a</strong>    Downgoing focusing function in the adjoint medium.</li>
+</ul>
+</div></blockquote>
+<p>The outputs are in the wavenumber-frequency domain. They are stored 
+in arrays of shape (nf,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Marchenko_NRM_k1_w</span> <span class="k">import</span> <span class="n">Marchenko_NRM_k1_w</span> <span class="k">as</span> <span class="n">Marchenko</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">Marchenko</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">5e-3</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">])</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">b11vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">b13vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">2.4</span><span class="p">,</span><span class="mf">1.2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">b33vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute initial focusing function for a focusing depth at 1500m</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Focus</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">F_initial_k1_w</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span><span class="n">FK_filter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                       <span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                       <span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>                     <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FP0</span> <span class="o">=</span> <span class="n">Focus</span><span class="p">[</span><span class="s1">&#39;FP0&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># We plot the initial focusing function below.</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/InitialF1plus_k1_w.png"><img alt="_images/InitialF1plus_k1_w.png" src="_images/InitialF1plus_k1_w.png" style="width: 200px; height: 200px;" /></a>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># We transform the initial focusing function to the space-time </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># domain</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fP0</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FP0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># We plot the initial focusing function below.</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/InitialF1plus_x1_t.png"><img alt="_images/InitialF1plus_x1_t.png" src="_images/InitialF1plus_x1_t.png" style="width: 200px; height: 200px;" /></a>
+</dd></dl>
+
+<dl class="method">
+<dt id="Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.MarchenkoSeries">
+<code class="descname">MarchenkoSeries</code><span class="sig-paren">(</span><em>x3F</em>, <em>K</em>, <em>R=None</em>, <em>FP0=None</em>, <em>P=None</em>, <em>f0=None</em>, <em>delta=0</em>, <em>FK_filter=False</em>, <em>RelativeTaperLength=0.03125</em>, <em>normalisation='flux'</em>, <em>UpdateSelf=False</em>, <em>AdjointF=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Marchenko_NRM_k1_w.html#Marchenko_NRM_k1_w.MarchenkoSeries"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.MarchenkoSeries" title="Permalink to this definition">¶</a></dt>
+<dd><p>computes K iterations of the Marchenko series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>x3F</strong> : int, float</p>
+<blockquote>
+<div><p>Focusing depth.</p>
+</div></blockquote>
+<p><strong>K</strong> : int, float</p>
+<blockquote>
+<div><p>Number of iterations of the Marchenko series.</p>
+</div></blockquote>
+<p><strong>R</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Reflection response of the actual medium in the wavenumber-
+frequency domain (nf,nr).</p>
+</div></blockquote>
+<p><strong>FP0</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Initial focusing function in the wavenumber-frequency domain 
+(nf,nr).</p>
+</div></blockquote>
+<p><strong>P</strong> : numpy.ndarray, optional</p>
+<blockquote>
+<div><p>Projector in the space-time domain (nt,nr).</p>
+</div></blockquote>
+<p><strong>f0</strong> : int, float, optional</p>
+<blockquote>
+<div><p>If ‘f0’ is defined and ‘FP0=None’ the initial focusing function is 
+multiplied by a Ricker wavelet with peak frequency f0. If ‘f0’ is 
+defined and ‘P=None’ the projector onset is shifted by the width of 
+a Ricker wavelet with peak frequency f0.</p>
+</div></blockquote>
+<p><strong>delta</strong> : int, float, optional</p>
+<blockquote>
+<div><p>If ‘P=None’ and ‘f0=None’, the width of the wavelet in seconds that 
+the projector should take into account can be given by ‘delta’.</p>
+</div></blockquote>
+<p><strong>FK_filter</strong> : bool, optional</p>
+<blockquote>
+<div><p>If ‘FP0=None’ and ‘FK_filter=True’ an <span class="math notranslate">\(k_1-\omega\)</span> filter is 
+applied to the intial focusing function. The <span class="math notranslate">\(k_1-\omega\)</span> 
+filter is defined by the fastest propagation velocity of the 
+truncated medium.</p>
+</div></blockquote>
+<p><strong>RelativeTaperLength</strong> : int, float, optional</p>
+<blockquote>
+<div><p>The product of the RelativeTaperLength and the number of time 
+samples ‘nt’ determines the lenght of the taper that is applied
+to the <span class="math notranslate">\(k_1-\omega\)</span> if ‘FP0=None’ and ‘FK_filter=True’, to 
+the projector onset if ‘P=None’, and the amplitude correction of 
+the initial focusing function if ‘FP0=None’.</p>
+</div></blockquote>
+<p><strong>normalisation</strong> : str, optional</p>
+<blockquote>
+<div><p>For pressure-normalisation set normalisation=’pressure’, for 
+flux-normalisation set normalisation=’flux’. If ‘FP0=None’ the 
+initial focusing function is modelled by ‘FocusingFunction_k1_w’ 
+which until now only works for flux-normalisation.</p>
+</div></blockquote>
+<p><strong>UpdateSelf</strong> : bool, optional</p>
+<blockquote>
+<div><p>If ‘UpdateSelf=True’ the focusing depth level ‘x3F’ is inserted in 
+the model and the focusing depth is saved as self-parameter.</p>
+</div></blockquote>
+<p><strong>AdjointF</strong> : bool, optional</p>
+<blockquote>
+<div><p>For non-reciprocal media there are two sets of Marchenko equations:
+Set ‘AdjointF=True’ to solve the Marchenko equations associated
+with the focusing functions in the adjoint medium.
+Set ‘AdjointF=False’ to solve the Marchenko equations associated
+with the focusing functions in the actual medium.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">dict</p>
+<blockquote class="last">
+<div><p>Dictionary that contains</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>FP</strong>:    Downgoing focusing function.</li>
+<li><strong>FM</strong>:    Downgoing focusing function in the adjoint medium.</li>
+<li><strong>FP0</strong>    Initial focusing function.</li>
+</ul>
+<p>_ <strong>P</strong>      Projector that mutes the Green’s functions.
+- <strong>R</strong>      Reflection response.</p>
+</div></blockquote>
+<p>The outputs are associated with the actual medium if ‘AdjointF=
+False’ or with the adjoint medium if ‘AdjointF=True’. All outputs,
+except the projector <strong>P</strong>, are in the wavenumber-frequency domain. 
+They are stored in arrays of shape (nf,nr). The projector is stored
+in an array of shape (nt,nr).</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">Marchenko_NRM_k1_w</span> <span class="k">import</span> <span class="n">Marchenko_NRM_k1_w</span> <span class="k">as</span> <span class="n">Marchenko</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialise wavefield</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">F</span> <span class="o">=</span> <span class="n">Marchenko</span><span class="p">(</span><span class="n">nt</span><span class="o">=</span><span class="mi">4096</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">5e-3</span><span class="p">,</span><span class="n">nr</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span><span class="n">dx1</span><span class="o">=</span><span class="mf">12.5</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">x3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.1</span><span class="p">,</span><span class="mf">2.2</span><span class="p">,</span><span class="mf">3.7</span><span class="p">])</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">avec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-3</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">b11vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">b13vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span><span class="mf">2.4</span><span class="p">,</span><span class="mf">1.2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">b33vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4</span><span class="p">,</span><span class="mf">3.14</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">g1vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mf">1.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">g3vec</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.8</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">2.3</span><span class="p">])</span><span class="o">*</span><span class="mf">1e-4</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>             <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointMedium</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Compute initial focusing function for a focusing depth at 3000m</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Focus</span><span class="o">=</span><span class="n">F</span><span class="o">.</span><span class="n">MarchenkoSeries</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="mi">3000</span><span class="p">,</span><span class="n">K</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">R</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">FP0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                        <span class="n">delta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                        <span class="n">FK_filter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">),</span>
+<span class="gp">&gt;&gt;&gt; </span>                        <span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>                        <span class="n">AdjointF</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FP</span> <span class="o">=</span> <span class="n">Focus</span><span class="p">[</span><span class="s1">&#39;FP&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fP</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Reference focusing function</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Modelled</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">FocusingFunction_k1_w</span><span class="p">(</span><span class="n">x3F</span><span class="p">,</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
+<span class="go">                           InternalMultiples=True,Negative_eps=False,</span>
+<span class="go">                           UpdateSelf=False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FPmod</span> <span class="o">=</span> <span class="n">Modelled</span><span class="p">[</span><span class="s1">&#39;FP&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Wav</span>  <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">RickerWavelet_w</span><span class="p">(</span><span class="n">f0</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Mask</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">FK1_mask_k1_w</span><span class="p">(</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">6</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ind</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FK&#39;</span><span class="p">][:,:,:</span><span class="mi">3</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">FK</span>   <span class="o">=</span> <span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FK_tap&#39;</span><span class="p">][:,:,</span><span class="n">ind</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fPmod</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FPmod</span><span class="o">*</span><span class="n">FK</span><span class="o">*</span><span class="n">Wav</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># We plot the retrieved focusing function and the difference below.</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/RetrievedF1plus_x1_t.png"><img alt="_images/RetrievedF1plus_x1_t.png" src="_images/RetrievedF1plus_x1_t.png" style="width: 300px; height: 200px;" /></a>
 </dd></dl>
 
 </dd></dl>

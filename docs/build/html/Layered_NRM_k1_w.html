@@ -1400,7 +1400,7 @@ one sets ‘AdjointMedium=True’.</p>
 
 <dl class="method">
 <dt id="Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w">
-<code class="descname">FocusingFunction_k1_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em>, <em>Negative_eps=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.FocusingFunction_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w" title="Permalink to this definition">¶</a></dt>
+<code class="descname">FocusingFunction_k1_w</code><span class="sig-paren">(</span><em>x3F</em>, <em>normalisation='flux'</em>, <em>InternalMultiples=True</em>, <em>Negative_eps=False</em>, <em>UpdateSelf=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/Layered_NRM_k1_w.html#Layered_NRM_k1_w.FocusingFunction_k1_w"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Layered_NRM_k1_w.Layered_NRM_k1_w.FocusingFunction_k1_w" title="Permalink to this definition">¶</a></dt>
 <dd><p>computes the focusing functions between the top surface 
 (<span class="math notranslate">\(x_3=0\)</span>) and the focusing depth defined by the input variable 
 ‘x3F’.</p>
@@ -1439,6 +1439,11 @@ accurately if the complex-conjugated focusing functions are
 computed with a negative ‘eps’ parameter, whereas all other 
 qunatities (Green’s functions and reflection response) must be 
 computed using a positive ‘eps’ parameter.</p>
+</div></blockquote>
+<p><strong>UpdateSelf</strong> : bool, optional</p>
+<blockquote>
+<div><p>If ‘UpdateSelf=True’ the focusing depth level ‘x3F’ is inserted in 
+the model.</p>
 </div></blockquote>
 </td>
 </tr>

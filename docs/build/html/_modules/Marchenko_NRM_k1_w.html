@@ -400,6 +400,8 @@
 <span class="sd">            </span>
 <span class="sd">                - **P**:    The projector.</span>
 <span class="sd">                - **td**:   The direct transmission.</span>
+<span class="sd">                - **Pa**:   The projector (adjoint medium).</span>
+<span class="sd">                - **tda**:  The direct transmission (adjoint medium).</span>
 <span class="sd">                </span>
 <span class="sd">            The outputs are in the space-time domain. They are stored in arrays </span>
 <span class="sd">            of shape (nt,nr).</span>
@@ -503,12 +505,12 @@
         <span class="c1"># Model the direct transmission</span>
         <span class="n">T</span>  <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">TruncateMedium</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
         <span class="n">eps</span> <span class="o">=</span> <span class="mi">3</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
-        <span class="n">Td</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RT_response_k1_w</span><span class="p">(</span><span class="n">x3vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;x3vec&#39;</span><span class="p">],</span><span class="n">avec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;avec&#39;</span><span class="p">],</span>
-                                   <span class="n">b11vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;b11vec&#39;</span><span class="p">],</span><span class="n">b13vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;b13vec&#39;</span><span class="p">],</span>
-                                   <span class="n">b33vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;b33vec&#39;</span><span class="p">],</span><span class="n">g1vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;g1vec&#39;</span><span class="p">],</span>
-                                   <span class="n">g3vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;g3vec&#39;</span><span class="p">],</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
-                                   <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">,</span>
-                                   <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s1">&#39;TP&#39;</span><span class="p">]</span>
+        <span class="n">Resp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RT_response_k1_w</span><span class="p">(</span><span class="n">x3vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;x3vec&#39;</span><span class="p">],</span><span class="n">avec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;avec&#39;</span><span class="p">],</span>
+                                     <span class="n">b11vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;b11vec&#39;</span><span class="p">],</span><span class="n">b13vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;b13vec&#39;</span><span class="p">],</span>
+                                     <span class="n">b33vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;b33vec&#39;</span><span class="p">],</span><span class="n">g1vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;g1vec&#39;</span><span class="p">],</span>
+                                     <span class="n">g3vec</span><span class="o">=</span><span class="n">T</span><span class="p">[</span><span class="s1">&#39;g3vec&#39;</span><span class="p">],</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+                                     <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">,</span>
+                                     <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         
         <span class="c1"># Make a zero-phase wavelet for a more coherent projector</span>
         <span class="k">if</span> <span class="n">f0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -519,6 +521,7 @@
         <span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Gain_t</span><span class="p">(</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">)</span>
         
         <span class="c1"># Direct transmission in the space-time domain</span>
+        <span class="n">Td</span> <span class="o">=</span> <span class="n">Resp</span><span class="p">[</span><span class="s1">&#39;TP&#39;</span><span class="p">]</span>
         <span class="n">td</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">Td</span><span class="o">*</span><span class="n">Wav</span><span class="p">),</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         
         <span class="c1"># Initialise the projector</span>
@@ -547,11 +550,401 @@
         <span class="n">P</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">td</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">td</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">Tda</span> <span class="o">=</span> <span class="n">Resp</span><span class="p">[</span><span class="s1">&#39;TPa&#39;</span><span class="p">]</span>
+            <span class="n">tda</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fftshift</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">Tda</span><span class="o">*</span><span class="n">Wav</span><span class="p">),</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
+            <span class="c1"># Initialise the projector</span>
+            <span class="n">Pa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">))</span>
+            
+            <span class="c1"># Iterate over offsets and pick first arrivals until the last time </span>
+            <span class="c1"># sample is reached</span>
+            <span class="k">for</span> <span class="n">x1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">):</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tda</span><span class="p">[:,</span><span class="n">x1</span><span class="p">]))</span><span class="o">-</span><span class="n">s</span>
+                <span class="k">if</span> <span class="n">ind</span> <span class="o">&lt;</span> <span class="n">cut</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">Pa</span><span class="p">[</span><span class="n">ind</span><span class="p">:,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">Pa</span><span class="p">[</span><span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span><span class="p">:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span>
+            
+            <span class="n">nx</span> <span class="o">=</span> <span class="n">x1</span>    
+            
+            <span class="c1"># Iterate over negative offsets (x1&gt;=0) and search for first arrival</span>
+            <span class="k">for</span> <span class="n">x1</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">nx</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">tda</span><span class="p">[:,</span><span class="n">x1</span><span class="p">]))</span> <span class="o">-</span> <span class="n">s</span>
+                <span class="k">if</span> <span class="n">ind</span> <span class="o">&lt;</span> <span class="n">cut</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">Pa</span><span class="p">[</span><span class="n">ind</span><span class="p">:,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">Pa</span><span class="p">[</span><span class="n">ind</span><span class="o">-</span><span class="n">taperlen</span><span class="p">:</span><span class="n">ind</span><span class="p">,</span><span class="n">x1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tap</span>
+            
+            <span class="n">Pa</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">Pa</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">tda</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">ifftshift</span><span class="p">(</span><span class="n">tda</span><span class="p">,</span><span class="n">axes</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        
         <span class="k">if</span> <span class="n">UpdateSelf</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">x3F</span> <span class="o">=</span> <span class="n">x3F</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">P</span>   <span class="o">=</span> <span class="n">P</span>
         
-        <span class="n">out</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span><span class="s1">&#39;td&#39;</span><span class="p">:</span><span class="n">td</span><span class="p">}</span>
+        <span class="n">out</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span><span class="s1">&#39;td&#39;</span><span class="p">:</span><span class="n">td</span><span class="p">,</span><span class="s1">&#39;Pa&#39;</span><span class="p">:</span><span class="n">Pa</span><span class="p">,</span><span class="s1">&#39;tda&#39;</span><span class="p">:</span><span class="n">tda</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
+<div class="viewcode-block" id="Marchenko_NRM_k1_w.F_initial_k1_w"><a class="viewcode-back" href="../Marchenko_NRM_k1_w.html#Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.F_initial_k1_w">[docs]</a>    <span class="k">def</span> <span class="nf">F_initial_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x3F</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">FK_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                       <span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">),</span><span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
+                       <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes the initial downgoing focusing function </span>
+<span class="sd">        :math:`F_1^+(k_1,x_{3,0},x_{3,f},\omega)`. The temporal wrap-around </span>
+<span class="sd">        is already reduced to provide a good initial focusing function.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        </span>
+<span class="sd">        x3F : int, float</span>
+<span class="sd">            Focusing depth.</span>
+<span class="sd">            </span>
+<span class="sd">        f0 : int, float, optional</span>
+<span class="sd">            Central frequency of a Ricker wavelet in Hz. If not defined the </span>
+<span class="sd">            initial focusing function is not multiplied by a wavelet.</span>
+<span class="sd">            </span>
+<span class="sd">        FK_filter : bool, optional</span>
+<span class="sd">            Set &#39;FK_filter=True&#39; to apply a :math:`k_1-\omega` filter to the </span>
+<span class="sd">            intial focusing function. The :math:`k_1-\omega` filter is defined</span>
+<span class="sd">            by the fastest propagation velocity of the truncated medium.</span>
+<span class="sd">            </span>
+<span class="sd">        RelativeTaperLength : int, float, optional</span>
+<span class="sd">            The :math:`k_1-\omega` filter can be tapered to avoid sharp edges.</span>
+<span class="sd">            To this end, define the \&#39;RelativeTaperLength\&#39; which is the </span>
+<span class="sd">            quotient of the number of time samples of the taper and the number </span>
+<span class="sd">            of temporal samples \&#39;nt\&#39;. The default value is </span>
+<span class="sd">            \&#39;RelativeTaperLength\&#39;:math:`=2^{-5}.`</span>
+<span class="sd">            </span>
+<span class="sd">        normalisation : str, optional</span>
+<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for </span>
+<span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;. We use the function</span>
+<span class="sd">            &#39;FocusingFunction_k1_w&#39; which until now only works for flux-</span>
+<span class="sd">            normalisation.</span>
+<span class="sd">            </span>
+<span class="sd">        UpdateSelf : bool, optional</span>
+<span class="sd">            If &#39;UpdateSelf=True&#39; the focusing depth level &#39;x3F&#39; is inserted in </span>
+<span class="sd">            the model and the focusing depth is saved as self-parameter.</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        </span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
+<span class="sd">                - **FP0**:    Downgoing focusing function.</span>
+<span class="sd">                - **FP0a**    Downgoing focusing function in the adjoint medium.</span>
+<span class="sd">                </span>
+<span class="sd">            The outputs are in the wavenumber-frequency domain. They are stored </span>
+<span class="sd">            in arrays of shape (nf,nr).</span>
+
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; from Marchenko_NRM_k1_w import Marchenko_NRM_k1_w as Marchenko</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Initialise wavefield</span>
+<span class="sd">        &gt;&gt;&gt; F = Marchenko(nt=1024,dt=5e-3,nr=4096,dx1=12.5,</span>
+<span class="sd">        &gt;&gt;&gt;              x3vec=np.array([1.1,2.2,3.7])*1e3,</span>
+<span class="sd">        &gt;&gt;&gt;              avec=np.array([1,2,3])*1e-3,</span>
+<span class="sd">        &gt;&gt;&gt;              b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              ReciprocalMedium=False,AdjointMedium=True)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute initial focusing function for a focusing depth at 1500m</span>
+<span class="sd">        &gt;&gt;&gt; Focus=F.F_initial_k1_w(x3F=1500,f0=30,FK_filter=True,</span>
+<span class="sd">        &gt;&gt;&gt;                        RelativeTaperLength=0,</span>
+<span class="sd">        &gt;&gt;&gt;                        normalisation=&#39;flux&#39;)</span>
+<span class="sd">        &gt;&gt;&gt;                      UpdateSelf=False,normalisation=&#39;flux&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; FP0 = Focus[&#39;FP0&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; # We plot the initial focusing function below.</span>
+<span class="sd">        </span>
+<span class="sd">        .. image:: ../pictures/cropped/InitialF1plus_k1_w.png</span>
+<span class="sd">           :width: 200px</span>
+<span class="sd">           :height: 200px</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # We transform the initial focusing function to the space-time </span>
+<span class="sd">        &gt;&gt;&gt; # domain</span>
+<span class="sd">        &gt;&gt;&gt; fP0 = F.K1W2X1T(FP0)</span>
+<span class="sd">        &gt;&gt;&gt; # We plot the initial focusing function below.</span>
+<span class="sd">           </span>
+<span class="sd">        .. image:: ../pictures/cropped/InitialF1plus_x1_t.png</span>
+<span class="sd">            :width: 200px</span>
+<span class="sd">            :height: 200px</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if FK_filter is bool</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">FK_filter</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;F_initial_k1_w: The variable F_filter must be a bool.&#39;</span><span class="p">)</span>
+            
+        <span class="c1"># Ensure to suppress wrap-around effects for the initial estimate</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="o">-</span><span class="mi">3</span><span class="o">/</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span> <span class="o">=</span> <span class="n">Layered_NRM_k1_w</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dx1</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="n">eps</span><span class="p">,</span>
+                                        <span class="n">x3vec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="p">,</span><span class="n">avec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">avec</span><span class="p">,</span>
+                                        <span class="n">b11vec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b11vec</span><span class="p">,</span>
+                                        <span class="n">b13vec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b13vec</span><span class="p">,</span>
+                                        <span class="n">b33vec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">b33vec</span><span class="p">,</span>
+                                        <span class="n">g1vec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">g1vec</span><span class="p">,</span><span class="n">g3vec</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">g3vec</span><span class="p">,</span>
+                                        <span class="n">ReciprocalMedium</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ReciprocalMedium</span><span class="p">,</span>
+                                        <span class="n">AdjointMedium</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">AdjointMedium</span><span class="p">)</span>
+        
+        <span class="c1"># Compute direct downgoing focusing function</span>
+        <span class="n">Focus</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">FocusingFunction_k1_w</span><span class="p">(</span><span class="n">x3F</span><span class="p">,</span> <span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span>
+                                                   <span class="n">InternalMultiples</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                                   <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">FP</span>  <span class="o">=</span> <span class="n">Focus</span><span class="p">[</span><span class="s1">&#39;FP&#39;</span><span class="p">]</span>
+        <span class="n">FPa</span> <span class="o">=</span> <span class="n">Focus</span><span class="p">[</span><span class="s1">&#39;FPa&#39;</span><span class="p">]</span>
+
+        <span class="c1"># If f0 is given make Ricker wavelet if f0</span>
+        <span class="k">if</span> <span class="n">f0</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Wav</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">RickerWavelet_w</span><span class="p">(</span><span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Wav</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span>
+            
+        <span class="c1"># If FK_filter is true make FK filter based on highest velocity of</span>
+        <span class="c1"># the truncated medium</span>
+        <span class="k">if</span> <span class="n">FK_filter</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>    
+            <span class="n">f</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">x3vec</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x3F</span><span class="p">)</span>
+            <span class="n">Mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">FK1_mask_k1_w</span><span class="p">(</span><span class="n">RelativeTaperLength</span><span class="o">=</span>
+                                              <span class="n">RelativeTaperLength</span><span class="p">)</span>
+            <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FK&#39;</span><span class="p">][:,:,:</span><span class="n">f</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">FK</span>  <span class="o">=</span> <span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FK_tap&#39;</span><span class="p">][:,:,</span><span class="n">ind</span><span class="p">]</span>
+            <span class="n">FKn</span> <span class="o">=</span> <span class="n">Mask</span><span class="p">[</span><span class="s1">&#39;FKn_tap&#39;</span><span class="p">][:,:,</span><span class="n">ind</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">Mask</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">FK</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span>
+            <span class="n">FKn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">FP</span><span class="p">)</span>
+        
+        <span class="c1"># Apply wavelet and FK filter to the focusing function</span>
+        <span class="n">FP</span>  <span class="o">=</span> <span class="n">Wav</span><span class="o">*</span><span class="n">FK</span><span class="o">*</span><span class="n">FP</span>
+        <span class="n">FPa</span> <span class="o">=</span> <span class="n">Wav</span><span class="o">*</span><span class="n">FKn</span><span class="o">*</span><span class="n">FPa</span>
+        
+        <span class="c1"># Compute correction for complex-valued frequency</span>
+        <span class="n">gain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SubSelf</span><span class="o">.</span><span class="n">Gain_t</span><span class="p">()</span>
+    
+        <span class="c1"># Apply correction</span>
+        <span class="n">FP</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1T2K1W</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FP</span><span class="p">))</span>
+        <span class="n">FPa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1T2K1W</span><span class="p">(</span><span class="n">gain</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">FPa</span><span class="p">))</span>
+        
+        <span class="c1"># Update self</span>
+        <span class="k">if</span> <span class="n">UpdateSelf</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x3F</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">Tmp_medium</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x3F</span><span class="p">,</span><span class="n">x3F</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                                               <span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">Tmp_medium</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">x3F</span> <span class="o">=</span> <span class="n">x3F</span>
+            
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FP0&#39;</span><span class="p">:</span><span class="n">FP</span><span class="p">,</span><span class="s1">&#39;FP0a&#39;</span><span class="p">:</span><span class="n">FPa</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+    
+<div class="viewcode-block" id="Marchenko_NRM_k1_w.MarchenkoSeries"><a class="viewcode-back" href="../Marchenko_NRM_k1_w.html#Marchenko_NRM_k1_w.Marchenko_NRM_k1_w.MarchenkoSeries">[docs]</a>    <span class="k">def</span> <span class="nf">MarchenkoSeries</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">x3F</span><span class="p">,</span><span class="n">K</span><span class="p">,</span><span class="n">R</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">FP0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">P</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">delta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">FK_filter</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">RelativeTaperLength</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">),</span>
+                        <span class="n">normalisation</span><span class="o">=</span><span class="s1">&#39;flux&#39;</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">AdjointF</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;computes K iterations of the Marchenko series.</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        </span>
+<span class="sd">        x3F : int, float</span>
+<span class="sd">            Focusing depth.</span>
+<span class="sd">            </span>
+<span class="sd">        K : int, float</span>
+<span class="sd">            Number of iterations of the Marchenko series.</span>
+<span class="sd">            </span>
+<span class="sd">        R : numpy.ndarray, optional</span>
+<span class="sd">            Reflection response of the actual medium in the wavenumber-</span>
+<span class="sd">            frequency domain (nf,nr).</span>
+<span class="sd">        </span>
+<span class="sd">        FP0 : numpy.ndarray, optional</span>
+<span class="sd">            Initial focusing function in the wavenumber-frequency domain </span>
+<span class="sd">            (nf,nr).</span>
+<span class="sd">            </span>
+<span class="sd">        P : numpy.ndarray, optional</span>
+<span class="sd">            Projector in the space-time domain (nt,nr).</span>
+<span class="sd">            </span>
+<span class="sd">        f0 : int, float, optional</span>
+<span class="sd">            If &#39;f0&#39; is defined and &#39;FP0=None&#39; the initial focusing function is </span>
+<span class="sd">            multiplied by a Ricker wavelet with peak frequency f0. If &#39;f0&#39; is </span>
+<span class="sd">            defined and &#39;P=None&#39; the projector onset is shifted by the width of </span>
+<span class="sd">            a Ricker wavelet with peak frequency f0.</span>
+<span class="sd">            </span>
+<span class="sd">        delta : int, float, optional</span>
+<span class="sd">            If &#39;P=None&#39; and &#39;f0=None&#39;, the width of the wavelet in seconds that </span>
+<span class="sd">            the projector should take into account can be given by &#39;delta&#39;.</span>
+<span class="sd">            </span>
+<span class="sd">        FK_filter : bool, optional</span>
+<span class="sd">            If &#39;FP0=None&#39; and &#39;FK_filter=True&#39; an :math:`k_1-\omega` filter is </span>
+<span class="sd">            applied to the intial focusing function. The :math:`k_1-\omega` </span>
+<span class="sd">            filter is defined by the fastest propagation velocity of the </span>
+<span class="sd">            truncated medium.</span>
+<span class="sd">            </span>
+<span class="sd">        RelativeTaperLength : int, float, optional</span>
+<span class="sd">            The product of the RelativeTaperLength and the number of time </span>
+<span class="sd">            samples &#39;nt&#39; determines the lenght of the taper that is applied</span>
+<span class="sd">            to the :math:`k_1-\omega` if &#39;FP0=None&#39; and &#39;FK_filter=True&#39;, to </span>
+<span class="sd">            the projector onset if &#39;P=None&#39;, and the amplitude correction of </span>
+<span class="sd">            the initial focusing function if &#39;FP0=None&#39;.</span>
+<span class="sd">            </span>
+<span class="sd">        normalisation : str, optional</span>
+<span class="sd">            For pressure-normalisation set normalisation=&#39;pressure&#39;, for </span>
+<span class="sd">            flux-normalisation set normalisation=&#39;flux&#39;. If &#39;FP0=None&#39; the </span>
+<span class="sd">            initial focusing function is modelled by &#39;FocusingFunction_k1_w&#39; </span>
+<span class="sd">            which until now only works for flux-normalisation.</span>
+<span class="sd">            </span>
+<span class="sd">        UpdateSelf : bool, optional</span>
+<span class="sd">            If &#39;UpdateSelf=True&#39; the focusing depth level &#39;x3F&#39; is inserted in </span>
+<span class="sd">            the model and the focusing depth is saved as self-parameter.</span>
+<span class="sd">            </span>
+<span class="sd">        AdjointF : bool, optional</span>
+<span class="sd">            For non-reciprocal media there are two sets of Marchenko equations:</span>
+<span class="sd">            Set &#39;AdjointF=True&#39; to solve the Marchenko equations associated</span>
+<span class="sd">            with the focusing functions in the adjoint medium.</span>
+<span class="sd">            Set &#39;AdjointF=False&#39; to solve the Marchenko equations associated</span>
+<span class="sd">            with the focusing functions in the actual medium.</span>
+<span class="sd">            </span>
+<span class="sd">            </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        </span>
+<span class="sd">        dict</span>
+<span class="sd">            Dictionary that contains </span>
+<span class="sd">            </span>
+<span class="sd">                - **FP**:    Downgoing focusing function.</span>
+<span class="sd">                - **FM**:    Downgoing focusing function in the adjoint medium.</span>
+<span class="sd">                - **FP0**    Initial focusing function.</span>
+<span class="sd">                _ **P**      Projector that mutes the Green&#39;s functions.</span>
+<span class="sd">                - **R**      Reflection response.</span>
+<span class="sd">                </span>
+<span class="sd">                 </span>
+<span class="sd">            The outputs are associated with the actual medium if &#39;AdjointF=</span>
+<span class="sd">            False&#39; or with the adjoint medium if &#39;AdjointF=True&#39;. All outputs,</span>
+<span class="sd">            except the projector **P**, are in the wavenumber-frequency domain. </span>
+<span class="sd">            They are stored in arrays of shape (nf,nr). The projector is stored</span>
+<span class="sd">            in an array of shape (nt,nr).</span>
+
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; from Marchenko_NRM_k1_w import Marchenko_NRM_k1_w as Marchenko</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Initialise wavefield</span>
+<span class="sd">        &gt;&gt;&gt; F = Marchenko(nt=4096,dt=5e-3,nr=2048,dx1=12.5,</span>
+<span class="sd">        &gt;&gt;&gt;              x3vec=np.array([1.1,2.2,3.7])*1e3,</span>
+<span class="sd">        &gt;&gt;&gt;              avec=np.array([2,4,6])*1e-3,</span>
+<span class="sd">        &gt;&gt;&gt;              b11vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              b13vec=np.array([0.4,2.4,1.2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              b33vec=np.array([1.4,3.14,2])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              g1vec=np.array([0.8,2,1.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              g3vec=np.array([1.8,0.7,2.3])*1e-4,</span>
+<span class="sd">        &gt;&gt;&gt;              ReciprocalMedium=False,AdjointMedium=True)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Compute initial focusing function for a focusing depth at 3000m</span>
+<span class="sd">        &gt;&gt;&gt; Focus=F.MarchenkoSeries(x3F=3000,K=5,R=None,FP0=None,P=None,f0=30,</span>
+<span class="sd">        &gt;&gt;&gt;                         delta=0,</span>
+<span class="sd">        &gt;&gt;&gt;                         FK_filter=True,RelativeTaperLength=2**(-6),</span>
+<span class="sd">        &gt;&gt;&gt;                         normalisation=&#39;flux&#39;,UpdateSelf=False,</span>
+<span class="sd">        &gt;&gt;&gt;                         AdjointF=False)</span>
+<span class="sd">        &gt;&gt;&gt; FP = Focus[&#39;FP&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; fP = F.K1W2X1T(FP)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # Reference focusing function</span>
+<span class="sd">        &gt;&gt;&gt; Modelled = F.FocusingFunction_k1_w(x3F,normalisation=&#39;flux&#39;,</span>
+<span class="sd">                                   InternalMultiples=True,Negative_eps=False,</span>
+<span class="sd">                                   UpdateSelf=False)</span>
+<span class="sd">        &gt;&gt;&gt; FPmod = Modelled[&#39;FP&#39;]</span>
+<span class="sd">        &gt;&gt;&gt; Wav  = F.RickerWavelet_w(f0=30)</span>
+<span class="sd">        &gt;&gt;&gt; Mask = F.FK1_mask_k1_w(RelativeTaperLength=2**(-6))</span>
+<span class="sd">        &gt;&gt;&gt; ind  = np.argmin(np.linalg.norm(Mask[&#39;FK&#39;][:,:,:3],axis=(0,1)))</span>
+<span class="sd">        &gt;&gt;&gt; FK   = Mask[&#39;FK_tap&#39;][:,:,ind]</span>
+<span class="sd">        &gt;&gt;&gt; fPmod = F.K1W2X1T(FPmod*FK*Wav)</span>
+<span class="sd">        </span>
+<span class="sd">        &gt;&gt;&gt; # We plot the retrieved focusing function and the difference below.</span>
+<span class="sd">        </span>
+<span class="sd">        .. image:: ../pictures/cropped/RetrievedF1plus_x1_t.png</span>
+<span class="sd">           :width: 300px</span>
+<span class="sd">           :height: 200px</span>
+<span class="sd">        </span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if K is an integer larger than or equal to zero</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">K</span><span class="p">,</span><span class="nb">int</span><span class="p">))</span> <span class="ow">or</span> <span class="n">K</span> <span class="o">&lt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;MarchenkoSeries: </span><span class="se">\&#39;</span><span class="s1">K</span><span class="se">\&#39;</span><span class="s1"> must be an integer greater than, &#39;</span>
+                     <span class="o">+</span><span class="s1">&#39;or equal to, zero.&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Check if AdjointF is a boolean</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">AdjointF</span><span class="p">,</span><span class="nb">bool</span><span class="p">):</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;MarchenkoSeries: </span><span class="se">\&#39;</span><span class="s1">AdjointF</span><span class="se">\&#39;</span><span class="s1"> must be a boolean.&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Select the set of Marchenko equation to be solved</span>
+        <span class="k">if</span> <span class="n">AdjointF</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="s1">&#39;a&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            
+        <span class="c1"># Model reflection response if not given    </span>
+        <span class="k">if</span> <span class="n">R</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RT_response_k1_w</span><span class="p">(</span><span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">)[</span><span class="s1">&#39;RP&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">R</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;MarchenkoSeries: The reflection response </span><span class="se">\&#39;</span><span class="s1">R</span><span class="se">\&#39;</span><span class="s1"> must &#39;</span>
+                         <span class="o">+</span><span class="s1">&#39;have the shape (nf,nr).&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Model initial focusing function if not given    </span>
+        <span class="c1"># The initial focusing function is multiplied by a k1-omega filter</span>
+        <span class="c1"># and by a wavelet.</span>
+        <span class="k">if</span> <span class="n">FP0</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">FP0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">F_initial_k1_w</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span><span class="n">FK_filter</span><span class="o">=</span><span class="n">FK_filter</span><span class="p">,</span>
+                                      <span class="n">RelativeTaperLength</span><span class="o">=</span><span class="n">RelativeTaperLength</span><span class="p">,</span>
+                                      <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">,</span>
+                                      <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="s1">&#39;FP0&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">]</span>
+            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">FP0</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nf</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;MarchenkoSeries: The initial focusing function &#39;</span>
+                         <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">FP0</span><span class="se">\&#39;</span><span class="s1"> must have the shape (nf,nr).&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># Determine the projector P if not given        </span>
+        <span class="k">if</span> <span class="n">P</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">P</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Projector_x1_t</span><span class="p">(</span><span class="n">x3F</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">f0</span><span class="o">=</span><span class="n">f0</span><span class="p">,</span><span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span>
+                                    <span class="n">RelativeTaperLength</span><span class="o">=</span><span class="n">RelativeTaperLength</span><span class="p">,</span>
+                                    <span class="n">UpdateSelf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                    <span class="n">normalisation</span><span class="o">=</span><span class="n">normalisation</span><span class="p">)[</span><span class="s1">&#39;P&#39;</span><span class="o">+</span><span class="n">a</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">P</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nt</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">nr</span><span class="p">):</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s1">&#39;MarchenkoSeries: The initial focusing function &#39;</span>
+                         <span class="o">+</span><span class="s1">&#39;</span><span class="se">\&#39;</span><span class="s1">FP0</span><span class="se">\&#39;</span><span class="s1"> must have the shape (nf,nr).&#39;</span><span class="p">)</span>
+      
+        <span class="c1"># Marchenko series</span>
+        <span class="n">FP</span> <span class="o">=</span> <span class="n">FP0</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">FM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1T2K1W</span><span class="p">(</span><span class="n">P</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">R</span><span class="o">*</span><span class="n">FP</span><span class="p">))</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">):</span>
+            <span class="n">FP</span> <span class="o">=</span> <span class="n">FP0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1T2K1W</span><span class="p">(</span> <span class="n">P</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">R</span><span class="o">*</span><span class="n">FM</span><span class="o">.</span><span class="n">conj</span><span class="p">())</span> <span class="p">)</span><span class="o">.</span><span class="n">conj</span><span class="p">()</span>
+            <span class="n">FM</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X1T2K1W</span><span class="p">(</span> <span class="n">P</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">K1W2X1T</span><span class="p">(</span><span class="n">R</span><span class="o">*</span><span class="n">FP</span><span class="p">)</span> <span class="p">)</span>
+            
+        <span class="c1"># Update self</span>
+        <span class="k">if</span> <span class="n">UpdateSelf</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x3F</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x3vec</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x3F</span><span class="p">,</span><span class="n">x3F</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                                               <span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Insert_layer</span><span class="p">(</span><span class="n">x3</span><span class="o">=</span><span class="n">x3F</span><span class="p">,</span><span class="n">UpdateSelf</span><span class="o">=</span><span class="n">UpdateSelf</span><span class="p">)</span>
+        
+            <span class="bp">self</span><span class="o">.</span><span class="n">x3F</span> <span class="o">=</span> <span class="n">x3F</span>
+            
+        <span class="n">out</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;FP&#39;</span><span class="p">:</span><span class="n">FP</span><span class="p">,</span><span class="s1">&#39;FM&#39;</span><span class="p">:</span><span class="n">FM</span><span class="p">,</span><span class="s1">&#39;FP0&#39;</span><span class="p">:</span><span class="n">FP0</span><span class="p">,</span><span class="s1">&#39;P&#39;</span><span class="p">:</span><span class="n">P</span><span class="p">,</span><span class="s1">&#39;R&#39;</span><span class="p">:</span><span class="n">R</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">out</span></div></div>
 </pre></div>
 
